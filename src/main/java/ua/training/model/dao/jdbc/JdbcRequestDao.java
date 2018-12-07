@@ -27,8 +27,8 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     @Override
-    public void insert(Request entity) {
-
+    public Long insert(Request entity) {
+        return null;
     }
 
     @Override

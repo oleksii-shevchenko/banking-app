@@ -5,7 +5,7 @@ import java.util.List;
 public interface Dao<K, E> {
     E get(K key);
     List<E> get(List<K> keys);
-    void insert(E entity);
+    K insert(E entity);
     void update(E entity);
     void remove(E entity);
 }

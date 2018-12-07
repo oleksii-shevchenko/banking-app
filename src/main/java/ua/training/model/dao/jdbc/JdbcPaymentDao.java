@@ -27,8 +27,8 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public void insert(Payment entity) {
-
+    public Long insert(Payment entity) {
+        return null;
     }
 
     @Override

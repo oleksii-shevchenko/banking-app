@@ -22,8 +22,8 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public void insert(Transaction entity) {
-
+    public Long insert(Transaction entity) {
+        return null;
     }
 
     @Override

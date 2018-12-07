@@ -8,12 +8,12 @@ import java.util.List;
 
 public class JdbcAccountDao implements AccountDao {
     @Override
-    public List<Long> getAllAccountUserIds(Long accountId) {
+    public List<Long> getAllUserAccountsIds(Long accountId) {
         return null;
     }
 
     @Override
-    public List<User> getAllAccountUsers(List accountId) {
+    public List<Account> getAllUserAccounts(Long accountId) {
         return null;
     }
 
@@ -28,8 +28,8 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void insert(Account entity) {
-
+    public Long insert(Account entity) {
+        return null;
     }
 
     @Override
@@ -39,6 +39,16 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     public void remove(Account entity) {
+
+    }
+
+    @Override
+    public void createAccount(User user, Account account) {
+
+    }
+
+    @Override
+    public void addAccountUser(User user, Account account) {
 
     }
 }
