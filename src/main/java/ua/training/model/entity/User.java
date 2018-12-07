@@ -27,9 +27,7 @@ public class User {
         GUEST, USER, ADMIN
     }
 
-    public User() {}
-
-    public User(long id, String login, String passwordHash, String email, Role role, String firstName, String secondName, List<Long> accountIds) {
+    private User(long id, String login, String passwordHash, String email, Role role, String firstName, String secondName, List<Long> accountIds) {
         this.id = id;
         this.login = login;
         this.passwordHash = passwordHash;
