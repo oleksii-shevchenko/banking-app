@@ -92,24 +92,28 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    //todo add rollback (maybe)
     @Override
     public List<User> get(List<Long> keys) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.id"))) {
-            for (Long key : keys) {
-                preparedStatement.setLong(1, key);
-                preparedStatement.addBatch();
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.id"))) {
+                for (Long key : keys) {
+                    preparedStatement.setLong(1, key);
+                    preparedStatement.addBatch();
+                }
+
+                Mapper<User, ResultSet> mapper = new JdbcMapperFactory().getUserMapper();
+                ResultSet resultSet = preparedStatement.executeQuery();
+                connection.commit();
+
+                List<User> users = new ArrayList<>();
+                while (resultSet.next()) {
+                    users.add(mapper.map(resultSet));
+                }
+
+                return users;
             }
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<User, ResultSet> mapper = new JdbcMapperFactory().getUserMapper();
-
-            List<User> users = new ArrayList<>();
-            while (resultSet.next()) {
-                users.add(mapper.map(resultSet));
-            }
-
-            return users;
         } catch (SQLException exception) {
             //todo add logger
             throw new RuntimeException(exception);
