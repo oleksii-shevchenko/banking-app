@@ -1,6 +1,6 @@
 package ua.training.model.exception;
 
-public class NoSuchAccountException extends Exception{
+public class NoSuchAccountException extends RuntimeException{
     private Long accountId;
 
     public NoSuchAccountException(Long accountId) {

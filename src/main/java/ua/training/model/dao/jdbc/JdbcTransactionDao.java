@@ -1,5 +1,7 @@
 package ua.training.model.dao.jdbc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTransactionDao implements TransactionDao {
+    private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
+
     @Override
     public List<Transaction> getAllTransactionsForAccount(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -22,7 +26,7 @@ public class JdbcTransactionDao implements TransactionDao {
             preparedStatement.setLong(2, accountId);
             return createListFromResultSet(preparedStatement.executeQuery());
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -38,10 +42,10 @@ public class JdbcTransactionDao implements TransactionDao {
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getTransactionMapper().map(resultSet);
             } else {
-                throw new SQLException();
+                throw new RuntimeException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -62,7 +66,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 return createListFromResultSet(resultSet);
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }

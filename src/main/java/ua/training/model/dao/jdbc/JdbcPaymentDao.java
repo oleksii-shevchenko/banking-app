@@ -1,5 +1,7 @@
 package ua.training.model.dao.jdbc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.PaymentDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcPaymentDao implements PaymentDao {
+    private static Logger logger = LogManager.getLogger(JdbcPaymentDao.class);
+
     @Override
     public List<Payment> getAllPaymentsByRequester(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -26,7 +30,7 @@ public class JdbcPaymentDao implements PaymentDao {
 
             return payments;
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -47,7 +51,7 @@ public class JdbcPaymentDao implements PaymentDao {
 
             return payments;
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -66,7 +70,7 @@ public class JdbcPaymentDao implements PaymentDao {
                 throw new SQLException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -93,7 +97,7 @@ public class JdbcPaymentDao implements PaymentDao {
                 return users;
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -112,7 +116,7 @@ public class JdbcPaymentDao implements PaymentDao {
                 throw new SQLException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -125,7 +129,7 @@ public class JdbcPaymentDao implements PaymentDao {
             preparedStatement.setLong(8, entity.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -137,7 +141,7 @@ public class JdbcPaymentDao implements PaymentDao {
             preparedStatement.setLong(1, entity.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }

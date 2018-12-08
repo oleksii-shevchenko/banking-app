@@ -1,5 +1,7 @@
 package ua.training.model.dao.jdbc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.UserDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
@@ -14,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcUserDao implements UserDao {
+    private static Logger logger = LogManager.getLogger(JdbcUserDao.class);
+
     @Override
-    public User getUserByLogin(String login) throws NoSuchUserException {
+    public User getUserByLogin(String login) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.login"))) {
             preparedStatement.setString(1, login);
@@ -28,7 +32,7 @@ public class JdbcUserDao implements UserDao {
                 throw new NoSuchUserException();
             }
         } catch (SQLException exception) {
-            //Todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -48,7 +52,7 @@ public class JdbcUserDao implements UserDao {
 
             return userIds;
         } catch (SQLException exception) {
-            //Todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -69,7 +73,7 @@ public class JdbcUserDao implements UserDao {
 
             return users;
         } catch (SQLException exception) {
-            // todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -82,13 +86,15 @@ public class JdbcUserDao implements UserDao {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
+
+            //todo change exceptions policy (maybe)
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getUserMapper().map(resultSet);
             } else {
                 throw new NoSuchUserException();
             }
         } catch (SQLException | NoSuchUserException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -115,11 +121,12 @@ public class JdbcUserDao implements UserDao {
                 return users;
             } catch (SQLException exception) {
                 connection.rollback();
-                //todo add logger
+
+                logger.error(exception);
                 throw new RuntimeException(exception);
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -140,7 +147,7 @@ public class JdbcUserDao implements UserDao {
                 throw new SQLException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             switch (exception.getSQLState()) {
                 case "45001":
                     throw new NonUniqueLoginException();
@@ -152,8 +159,6 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
-
-    //todo add method for parsing sqlstate exception
     @Override
     public void update(User entity) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -162,26 +167,25 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.setLong(7, entity.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             switch (exception.getSQLState()) {
-                case "45002":
-                    throw new NonUniqueEmailException();
                 case "45001":
                     throw new NonUniqueLoginException();
+                case "45002":
+                    throw new NonUniqueEmailException();
                 default:
                     throw new RuntimeException(exception);
             }
         }
     }
 
-    //todo change logic
     @Override
     public void remove(User entity) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
              try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));
-                  PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.for.user"))) {
+                  PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.by.user"))) {
                 countAccountsStatement.setLong(1, entity.getId());
 
                 ResultSet resultSet = countAccountsStatement.executeQuery();
@@ -203,13 +207,24 @@ public class JdbcUserDao implements UserDao {
                 connection.commit();
             } catch (SQLException exception) {
                  connection.rollback();
-                 //Todo add logger
+
+                 logger.error(exception);
                  throw new RuntimeException(exception);
              }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
+    }
+
+    @Override
+    public void removeAccountUser(Long userId, Long accountId) {
+        //todo add realization
+    }
+
+    @Override
+    public void addAccountUser(Long userId, Long accountId) {
+        //todo add realization
     }
 
     private void setStatementParameters(User entity, PreparedStatement preparedStatement) throws SQLException {

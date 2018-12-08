@@ -1,5 +1,7 @@
 package ua.training.model.dao.jdbc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.RequestDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
@@ -10,13 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcRequestDao implements RequestDao {
+    private static Logger logger = LogManager.getLogger(JdbcRequestDao.class);
+
     @Override
     public List<Request> getAll() {
         try (Connection connection = ConnectionsPool.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.all"))) {
                 return createListFromResultSet(preparedStatement.executeQuery());
             } catch (SQLException exception) {
-                //todo add logger
+                logger.error(exception);
                 throw new RuntimeException(exception);
         }
     }
@@ -29,7 +33,7 @@ public class JdbcRequestDao implements RequestDao {
 
             return createListFromResultSet(preparedStatement.executeQuery());
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -45,15 +49,14 @@ public class JdbcRequestDao implements RequestDao {
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getRequestMapper().map(resultSet);
             } else {
-                throw new SQLException();
+                throw new RuntimeException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
 
-    //todo add rollback (maybe)
     @Override
     public List<Request> get(List<Long> keys) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -68,9 +71,14 @@ public class JdbcRequestDao implements RequestDao {
                 connection.commit();
 
                 return createListFromResultSet(resultSet);
+            } catch (SQLException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -87,10 +95,11 @@ public class JdbcRequestDao implements RequestDao {
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             } else {
+                //todo change exception policy (in all the same places) (maybe)
                 throw new SQLException();
             }
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -103,7 +112,7 @@ public class JdbcRequestDao implements RequestDao {
             preparedStatement.setLong(4, entity.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
@@ -115,7 +124,7 @@ public class JdbcRequestDao implements RequestDao {
             preparedStatement.setLong(1, entity.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
-            //todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }

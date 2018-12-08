@@ -1,6 +1,8 @@
 package ua.training.model.dao.jdbc;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -12,7 +14,8 @@ import java.util.ResourceBundle;
  * This class provides connections to database using pool structure. Access provided via singleton pattern.
  * @author Oleksii Shevchenko
  */
-public class ConnectionsPool {
+class ConnectionsPool {
+    private static Logger logger = LogManager.getLogger(ConnectionsPool.class);
     private static DataSource dataSource;
 
     private ConnectionsPool() {}
@@ -33,11 +36,11 @@ public class ConnectionsPool {
      * Method return {@link java.sql.Connection} from pool using principle "one stop shopping"
      * @return Connection to MySQL database
      */
-    public static Connection getConnection() {
+    static Connection getConnection() {
         try {
             return dataSource.getConnection();
         } catch (SQLException exception) {
-            //Todo add logger
+            logger.error(exception);
             throw new RuntimeException(exception);
         }
     }

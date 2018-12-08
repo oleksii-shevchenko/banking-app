@@ -2,7 +2,6 @@ package ua.training.model.dao.jdbc;
 
 import ua.training.model.dao.AccountDao;
 import ua.training.model.entity.Account;
-import ua.training.model.entity.User;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,22 +19,12 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void createAccount(User user, Account account) {
+    public void createAccount(Long userId, Account account) {
 
     }
 
     @Override
-    public void closeAccount() {
-
-    }
-
-    @Override
-    public void removeAccountUser(Long userId, Long accountId) {
-
-    }
-
-    @Override
-    public void addAccountUser(User user, Long accountId) {
+    public void closeAccount(Long userId, Long accountId) {
 
     }
 

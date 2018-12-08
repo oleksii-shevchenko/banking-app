@@ -1,4 +1,4 @@
 package ua.training.model.exception;
 
-public class NoSuchUserException extends Exception {
+public class NoSuchUserException extends RuntimeException {
 }
