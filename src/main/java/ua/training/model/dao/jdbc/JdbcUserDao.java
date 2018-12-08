@@ -170,6 +170,7 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    //todo change logic
     @Override
     public void remove(User entity) {
         try (Connection connection = ConnectionsPool.getConnection();

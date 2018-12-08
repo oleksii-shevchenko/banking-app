@@ -41,6 +41,70 @@ public class Payment {
         this.transaction = transaction;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getRequester() {
+        return requester;
+    }
+
+    public void setRequester(long requester) {
+        this.requester = requester;
+    }
+
+    public long getPayer() {
+        return payer;
+    }
+
+    public void setPayer(long payer) {
+        this.payer = payer;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public long getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(long transaction) {
+        this.transaction = transaction;
+    }
+
     /**
      * This class realize pattern Builder for class {@link Payment}
      * @author Oleksii Shevchenko

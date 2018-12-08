@@ -1,4 +1,4 @@
-package ua.training.controller.listeners;
+package ua.training.controller.listener;
 
 public class LanguageChangingListener {
 }
