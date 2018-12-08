@@ -34,7 +34,7 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public List<Long> getAllAccountUserIds(Long accountId) {
+    public List<Long> getAllAccountUsersIds(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.account"))) {
             preparedStatement.setLong(1, accountId);
@@ -93,7 +93,6 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
-    //todo add rollback (maybe)
     @Override
     public List<User> get(List<Long> keys) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -114,6 +113,10 @@ public class JdbcUserDao implements UserDao {
                 }
 
                 return users;
+            } catch (SQLException exception) {
+                connection.rollback();
+                //todo add logger
+                throw new RuntimeException(exception);
             }
         } catch (SQLException exception) {
             //todo add logger

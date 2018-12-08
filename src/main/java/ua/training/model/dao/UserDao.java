@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface UserDao extends Dao<Long, User> {
     User getUserByLogin(String login) throws NoSuchUserException;
-    List<Long> getAllAccountUserIds(Long accountId);
+    List<Long> getAllAccountUsersIds(Long accountId);
     List<User> getAllAccountUsers(Long accountId);
 }
