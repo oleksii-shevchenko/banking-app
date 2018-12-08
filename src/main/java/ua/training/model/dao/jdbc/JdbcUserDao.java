@@ -5,8 +5,9 @@ import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.UserDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.entity.Permission;
 import ua.training.model.entity.User;
-import ua.training.model.exception.AliveAccountsException;
+import ua.training.model.exception.AliveAccountException;
 import ua.training.model.exception.NoSuchUserException;
 import ua.training.model.exception.NonUniqueEmailException;
 import ua.training.model.exception.NonUniqueLoginException;
@@ -201,7 +202,7 @@ public class JdbcUserDao implements UserDao {
                     removeUserStatement.setLong(1, entity.getId());
                     removeUserStatement.executeUpdate();
                 } else {
-                    throw new AliveAccountsException();
+                    throw new AliveAccountException();
                 }
 
                 connection.commit();
@@ -219,12 +220,43 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public void removeAccountUser(Long userId, Long accountId) {
-        //todo add realization
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"));
+             PreparedStatement removeAccountUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"))) {
+            getPermissionStatement.setLong(1, userId);
+            getPermissionStatement.setLong(2, accountId);
+
+            ResultSet resultSet = getPermissionStatement.executeQuery();
+
+            if (resultSet.next()) {
+                if (Permission.valueOf(resultSet.getString(1)).equals(Permission.ALL)) {
+                    throw new AliveAccountException();
+                }
+            } else {
+                throw new RuntimeException();
+            }
+
+            removeAccountUserStatement.setLong(1, userId);
+            removeAccountUserStatement.setLong(2, accountId);
+            removeAccountUserStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
+        }
     }
 
     @Override
     public void addAccountUser(Long userId, Long accountId) {
-        //todo add realization
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, accountId);
+            preparedStatement.setString(3, Permission.RESTRICTED.name());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
+        }
     }
 
     private void setStatementParameters(User entity, PreparedStatement preparedStatement) throws SQLException {
