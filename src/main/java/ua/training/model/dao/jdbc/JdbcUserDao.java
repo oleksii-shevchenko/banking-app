@@ -4,6 +4,7 @@ import ua.training.model.dao.UserDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.User;
+import ua.training.model.exception.AliveAccountsException;
 import ua.training.model.exception.NoSuchUserException;
 import ua.training.model.exception.NonUniqueEmailException;
 import ua.training.model.exception.NonUniqueLoginException;
@@ -173,11 +174,37 @@ public class JdbcUserDao implements UserDao {
     //todo change logic
     @Override
     public void remove(User entity) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"))) {
-            preparedStatement.setLong(1, entity.getId());
-            preparedStatement.executeUpdate();
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+             try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));
+                  PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.for.user"))) {
+                countAccountsStatement.setLong(1, entity.getId());
+
+                ResultSet resultSet = countAccountsStatement.executeQuery();
+
+                long userAccountsNumber;
+                if (resultSet.next()) {
+                    userAccountsNumber = resultSet.getLong(1);
+                } else {
+                    throw new SQLException();
+                }
+
+                if (userAccountsNumber == 0) {
+                    removeUserStatement.setLong(1, entity.getId());
+                    removeUserStatement.executeUpdate();
+                } else {
+                    throw new AliveAccountsException();
+                }
+
+                connection.commit();
+            } catch (SQLException exception) {
+                 connection.rollback();
+                 //Todo add logger
+                 throw new RuntimeException(exception);
+             }
         } catch (SQLException exception) {
+            //todo add logger
             throw new RuntimeException(exception);
         }
     }
