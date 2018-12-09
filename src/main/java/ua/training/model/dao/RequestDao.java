@@ -1,10 +1,10 @@
 package ua.training.model.dao;
 
-import ua.training.model.entity.Request;
+import ua.training.model.entity.Invoice;
 
 import java.util.List;
 
-public interface RequestDao extends Dao<Long, Request> {
-    List<Request> getAll();
-    List<Request> getAllByCompletion(boolean completion);
+public interface RequestDao extends Dao<Long, Invoice> {
+    List<Invoice> getAll();
+    List<Invoice> getAllByCompletion(boolean completion);
 }

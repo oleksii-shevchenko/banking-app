@@ -10,8 +10,8 @@ public class JdbcDaoFactory implements DaoFactory{
     }
 
     @Override
-    public PaymentDao getPaymentDao() {
-        return new JdbcPaymentDao();
+    public InvoiceDao getPaymentDao() {
+        return new JdbcInvoiceDao();
     }
 
     @Override

@@ -17,14 +17,12 @@ import java.util.List;
 public class CreditAccount extends Account {
     private BigDecimal creditRate;
     private BigDecimal creditLimit;
-    private BigDecimal creditAmount;
 
     private CreditAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
-                         boolean corporate, List<Long> holders, BigDecimal creditRate, BigDecimal creditLimit, BigDecimal creditAmount) {
-        super(id, balance, currency, expiresEnd, updatePeriod, corporate, holders);
+                          List<Long> holders, BigDecimal creditRate, BigDecimal creditLimit) {
+        super(id, balance, currency, expiresEnd, updatePeriod, holders);
         this.creditRate = creditRate;
         this.creditLimit = creditLimit;
-        this.creditAmount = creditAmount;
     }
 
     public BigDecimal getCreditRate() {
@@ -41,14 +39,6 @@ public class CreditAccount extends Account {
 
     public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
-    }
-
-    public BigDecimal getCreditAmount() {
-        return creditAmount;
-    }
-
-    public void setCreditAmount(BigDecimal creditAmount) {
-        this.creditAmount = creditAmount;
     }
 
     /**
@@ -81,11 +71,9 @@ public class CreditAccount extends Account {
         private Currency currency;
         private LocalDate expiresEnd;
         private int updatePeriod;
-        private boolean corporate;
         private List<Long> holders;
         private BigDecimal creditRate;
         private BigDecimal creditLimit;
-        private BigDecimal creditAmount;
 
         public CreditAccountBuilder setId(long id) {
             this.id = id;
@@ -112,11 +100,6 @@ public class CreditAccount extends Account {
             return this;
         }
 
-        public CreditAccountBuilder setCorporate(boolean corporate) {
-            this.corporate = corporate;
-            return this;
-        }
-
         public CreditAccountBuilder setHolders(List<Long> holders) {
             this.holders = holders;
             return this;
@@ -132,13 +115,8 @@ public class CreditAccount extends Account {
             return this;
         }
 
-        public CreditAccountBuilder setCreditAmount(BigDecimal creditAmount) {
-            this.creditAmount = creditAmount;
-            return this;
-        }
-
         public CreditAccount build() {
-            return new CreditAccount(id, balance, currency, expiresEnd, updatePeriod, corporate, holders, creditRate, creditLimit, creditAmount);
+            return new CreditAccount(id, balance, currency, expiresEnd, updatePeriod, holders, creditRate, creditLimit);
         }
     }
 

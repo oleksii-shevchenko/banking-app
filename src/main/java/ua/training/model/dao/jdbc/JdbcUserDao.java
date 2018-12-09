@@ -39,19 +39,19 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public List<Long> getAllAccountUsersIds(Long accountId) {
+    public List<Long> getAccountHoldersIds(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            List<Long> userIds = new ArrayList<>();
+            List<Long> holdersIds = new ArrayList<>();
             while (resultSet.next()) {
-                userIds.add(resultSet.getLong("holder_id"));
+                holdersIds.add(resultSet.getLong("holder_id"));
             }
 
-            return userIds;
+            return holdersIds;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
@@ -59,7 +59,7 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public List<User> getAllAccountUsers(Long accountId) {
+    public List<User> getAccountHolders(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
@@ -67,15 +67,62 @@ public class JdbcUserDao implements UserDao {
             Mapper<User, ResultSet> mapper = new JdbcMapperFactory().getUserMapper();
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            List<User> users = new ArrayList<>();
+            List<User> holders = new ArrayList<>();
             while (resultSet.next()) {
-                users.add(mapper.map(resultSet));
+                holders.add(mapper.map(resultSet));
             }
 
-            return users;
+            return holders;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
+        }
+    }
+
+    public Permission getPermissions(Long holderId, Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
+            getPermissionStatement.setLong(1, holderId);
+            getPermissionStatement.setLong(2, accountId);
+
+            ResultSet resultSet = getPermissionStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return Permission.valueOf(resultSet.getString("permission"));
+            } else {
+                throw new RuntimeException();
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+
+    }
+
+    @Override
+    public void removeAccountHolder(Long holderId, Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"))) {
+            preparedStatement.setLong(1, holderId);
+            preparedStatement.setLong(2, accountId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void addAccountHolder(Long holderId, Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
+            preparedStatement.setLong(1, holderId);
+            preparedStatement.setLong(2, accountId);
+            preparedStatement.setString(3, Permission.RESTRICTED.name());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
         }
     }
 
@@ -87,46 +134,12 @@ public class JdbcUserDao implements UserDao {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
-
-            //todo change exceptions policy (maybe)
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getUserMapper().map(resultSet);
             } else {
-                throw new NoSuchUserException();
+                throw new RuntimeException();
             }
-        } catch (SQLException | NoSuchUserException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
-    }
-
-    @Override
-    public List<User> get(List<Long> keys) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setAutoCommit(false);
-            try (PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.id"))) {
-                for (Long key : keys) {
-                    preparedStatement.setLong(1, key);
-                    preparedStatement.addBatch();
-                }
-
-                Mapper<User, ResultSet> mapper = new JdbcMapperFactory().getUserMapper();
-                ResultSet resultSet = preparedStatement.executeQuery();
-                connection.commit();
-
-                List<User> users = new ArrayList<>();
-                while (resultSet.next()) {
-                    users.add(mapper.map(resultSet));
-                }
-
-                return users;
-            } catch (SQLException exception) {
-                connection.rollback();
-
-                logger.error(exception);
-                throw new RuntimeException(exception);
-            }
-        } catch (SQLException exception) {
+        } catch (SQLException | RuntimeException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
         }
@@ -185,8 +198,8 @@ public class JdbcUserDao implements UserDao {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-             try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));
-                  PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.by.user"))) {
+            try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));
+                 PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.by.user"))) {
                 countAccountsStatement.setLong(1, entity.getId());
 
                 ResultSet resultSet = countAccountsStatement.executeQuery();
@@ -207,55 +220,14 @@ public class JdbcUserDao implements UserDao {
 
                 connection.commit();
             } catch (SQLException exception) {
-                 connection.rollback();
+                connection.rollback();
 
-                 logger.error(exception);
-                 throw new RuntimeException(exception);
-             }
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
-        }
-    }
-
-    @Override
-    public void removeAccountUser(Long userId, Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"));
-             PreparedStatement removeAccountUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"))) {
-            getPermissionStatement.setLong(1, userId);
-            getPermissionStatement.setLong(2, accountId);
-
-            ResultSet resultSet = getPermissionStatement.executeQuery();
-
-            if (resultSet.next()) {
-                if (Permission.valueOf(resultSet.getString(1)).equals(Permission.ALL)) {
-                    throw new AliveAccountException();
-                }
-            } else {
-                throw new RuntimeException();
-            }
-
-            removeAccountUserStatement.setLong(1, userId);
-            removeAccountUserStatement.setLong(2, accountId);
-            removeAccountUserStatement.executeUpdate();
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException();
-        }
-    }
-
-    @Override
-    public void addAccountUser(Long userId, Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, accountId);
-            preparedStatement.setString(3, Permission.RESTRICTED.name());
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException();
         }
     }
 

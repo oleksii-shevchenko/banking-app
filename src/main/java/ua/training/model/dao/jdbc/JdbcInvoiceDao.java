@@ -2,33 +2,60 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.training.model.dao.PaymentDao;
-import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
-import ua.training.model.entity.Payment;
+import ua.training.model.dao.InvoiceDao;
+import ua.training.model.entity.Invoice;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcPaymentDao implements PaymentDao {
-    private static Logger logger = LogManager.getLogger(JdbcPaymentDao.class);
+public class JdbcInvoiceDao implements InvoiceDao {
+    private static Logger logger = LogManager.getLogger(JdbcInvoiceDao.class);
 
     @Override
-    public List<Payment> getAllPaymentsByRequester(Long accountId) {
+    public List<Invoice> getInvoicesByRequester(Long accountId) {
+        return null;
+    }
+
+    @Override
+    public List<Invoice> getInvoicesByPayer(Long accountId) {
+        return null;
+    }
+
+    @Override
+    public Invoice get(Long key) {
+        return null;
+    }
+
+    @Override
+    public Long insert(Invoice entity) {
+        return null;
+    }
+
+    @Override
+    public void update(Invoice entity) {
+
+    }
+
+    @Override
+    public void remove(Invoice entity) {
+
+    }
+
+    /*
+    @Override
+    public List<Invoice> getAllPaymentsByRequester(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.get.by.requester"))) {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Payment, ResultSet> mapper = new JdbcMapperFactory().getPaymentMapper();
+            Mapper<Invoice, ResultSet> mapper = new JdbcMapperFactory().getPaymentMapper();
 
-            List<Payment> payments = new ArrayList<>();
+            List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
-                payments.add(mapper.map(resultSet));
+                invoices.add(mapper.map(resultSet));
             }
 
-            return payments;
+            return invoices;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
@@ -36,20 +63,20 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public List<Payment> getAllPaymentsByPayer(Long accountId) {
+    public List<Invoice> getAllPaymentsByPayer(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.get.by.payer"))) {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Payment, ResultSet> mapper = new JdbcMapperFactory().getPaymentMapper();
+            Mapper<Invoice, ResultSet> mapper = new JdbcMapperFactory().getPaymentMapper();
 
-            List<Payment> payments = new ArrayList<>();
+            List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
-                payments.add(mapper.map(resultSet));
+                invoices.add(mapper.map(resultSet));
             }
 
-            return payments;
+            return invoices;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
@@ -57,7 +84,7 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public Payment get(Long key) {
+    public Invoice get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.get.by.id"))) {
             preparedStatement.setLong(1, key);
@@ -76,34 +103,7 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public List<Payment> get(List<Long> keys) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setAutoCommit(false);
-            try (PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.get.by.id"))) {
-                for (Long key : keys) {
-                    preparedStatement.setLong(1, key);
-                    preparedStatement.addBatch();
-                }
-
-                Mapper<Payment, ResultSet> mapper = new JdbcMapperFactory().getPaymentMapper();
-                ResultSet resultSet = preparedStatement.executeQuery();
-                connection.commit();
-
-                List<Payment> users = new ArrayList<>();
-                while (resultSet.next()) {
-                    users.add(mapper.map(resultSet));
-                }
-
-                return users;
-            }
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
-    }
-
-    @Override
-    public Long insert(Payment entity) {
+    public Long insert(Invoice entity) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.insert"), Statement.RETURN_GENERATED_KEYS)) {
             setStatementParameters(entity, preparedStatement);
@@ -122,7 +122,7 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public void update(Payment entity) {
+    public void update(Invoice entity) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.update"))) {
             setStatementParameters(entity, preparedStatement);
@@ -135,7 +135,7 @@ public class JdbcPaymentDao implements PaymentDao {
     }
 
     @Override
-    public void remove(Payment entity) {
+    public void remove(Invoice entity) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.payments.remove"))) {
             preparedStatement.setLong(1, entity.getId());
@@ -146,7 +146,7 @@ public class JdbcPaymentDao implements PaymentDao {
         }
     }
 
-    private void setStatementParameters(Payment entity, PreparedStatement preparedStatement) throws SQLException{
+    private void setStatementParameters(Invoice entity, PreparedStatement preparedStatement) throws SQLException{
         preparedStatement.setLong(1, entity.getRequester());
         preparedStatement.setLong(2, entity.getPayer());
         preparedStatement.setBigDecimal(3, entity.getAmount());
@@ -154,5 +154,5 @@ public class JdbcPaymentDao implements PaymentDao {
         preparedStatement.setString(5, entity.getStatus().name());
         preparedStatement.setString(6, entity.getDescription());
         preparedStatement.setLong(7, entity.getTransaction());
-    }
+    } */
 }

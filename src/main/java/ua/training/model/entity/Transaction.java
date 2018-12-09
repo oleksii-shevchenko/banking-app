@@ -18,6 +18,7 @@ public class Transaction {
     private BigDecimal amount;
     private Currency currency;
 
+    //todo change documentation
     /**
      * The possible transaction types. If transaction type is MANUAL that means that it made by user and both fields
      * sender and receiver are present. IF transaction type is AUTO that means that if made by system (examples:
@@ -25,7 +26,7 @@ public class Transaction {
      * @author Oleksii Shevhcenko
      */
     public enum Type {
-        AUTO, MANUAL
+        MANUAL, REGULAR, EXTERNAL
     }
 
     private Transaction(long id, LocalDateTime time, long sender, long receiver, Type type, BigDecimal amount, Currency currency) {

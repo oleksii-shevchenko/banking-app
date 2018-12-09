@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  * @see User
  * @see Transaction
  */
-public class Payment {
+public class Invoice {
     private long id;
     private long requester;
     private long payer;
@@ -30,7 +30,7 @@ public class Payment {
         ACCEPTED, DENIED, PROCESSING
     }
 
-    private Payment(long id, long requester, long payer, BigDecimal amount, Currency currency, Status status, String description, long transaction) {
+    private Invoice(long id, long requester, long payer, BigDecimal amount, Currency currency, Status status, String description, long transaction) {
         this.id = id;
         this.requester = requester;
         this.payer = payer;
@@ -106,11 +106,11 @@ public class Payment {
     }
 
     /**
-     * This class realize pattern Builder for class {@link Payment}
+     * This class realize pattern Builder for class {@link Invoice}
      * @author Oleksii Shevchenko
-     * @see Payment
+     * @see Invoice
      */
-    public static class PaymentBuilder {
+    public static class InvoiceBuilder {
         private long id;
         private long requester;
         private long payer;
@@ -120,58 +120,58 @@ public class Payment {
         private String description;
         private long transaction;
 
-        public PaymentBuilder setId(long id) {
+        public InvoiceBuilder setId(long id) {
             this.id = id;
             return this;
         }
 
-        public PaymentBuilder setRequester(long requester) {
+        public InvoiceBuilder setRequester(long requester) {
             this.requester = requester;
             return this;
         }
 
-        public PaymentBuilder setPayer(long payer) {
+        public InvoiceBuilder setPayer(long payer) {
             this.payer = payer;
             return this;
         }
 
-        public PaymentBuilder setAmount(BigDecimal amount) {
+        public InvoiceBuilder setAmount(BigDecimal amount) {
             this.amount = amount;
             return this;
         }
 
-        public PaymentBuilder setCurrency(Currency currency) {
+        public InvoiceBuilder setCurrency(Currency currency) {
             this.currency = currency;
             return this;
         }
 
-        public PaymentBuilder setStatus(Status status) {
+        public InvoiceBuilder setStatus(Status status) {
             this.status = status;
             return this;
         }
 
-        public PaymentBuilder setDescription(String description) {
+        public InvoiceBuilder setDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public PaymentBuilder setTransaction(long transaction) {
+        public InvoiceBuilder setTransaction(long transaction) {
             this.transaction = transaction;
             return this;
         }
 
-        public Payment build() {
-            return new Payment(id, requester, payer, amount, currency, status, description, transaction);
+        public Invoice build() {
+            return new Invoice(id, requester, payer, amount, currency, status, description, transaction);
         }
     }
 
     /**
-     * The method for obtaining builder for class {@link Payment}
-     * @return The PaymentBuilder instance, that are builder for class {@link Payment}
-     * @see Payment
-     * @see PaymentBuilder
+     * The method for obtaining builder for class {@link Invoice}
+     * @return The InvoiceBuilder instance, that are builder for class {@link Invoice}
+     * @see Invoice
+     * @see InvoiceBuilder
      */
-    public static PaymentBuilder getBuilder() {
-        return new PaymentBuilder();
+    public static InvoiceBuilder getBuilder() {
+        return new InvoiceBuilder();
     }
 }

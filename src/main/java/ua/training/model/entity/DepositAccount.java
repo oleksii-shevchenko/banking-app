@@ -17,8 +17,8 @@ public class DepositAccount extends Account {
     private BigDecimal depositRate;
 
     private DepositAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
-                          boolean corporate, List<Long> holders, BigDecimal depositRate) {
-        super(id, balance, currency, expiresEnd, updatePeriod, corporate, holders);
+                          List<Long> holders, BigDecimal depositRate) {
+        super(id, balance, currency, expiresEnd, updatePeriod, holders);
         this.depositRate = depositRate;
     }
 
@@ -61,7 +61,6 @@ public class DepositAccount extends Account {
         private Currency currency;
         private LocalDate expiresEnd;
         private int updatePeriod;
-        private boolean corporate;
         private List<Long> holders;
         private BigDecimal depositRate;
 
@@ -90,11 +89,6 @@ public class DepositAccount extends Account {
             return this;
         }
 
-        public DepositAccountBuilder setCorporate(boolean corporate) {
-            this.corporate = corporate;
-            return this;
-        }
-
         public DepositAccountBuilder setHolders(List<Long> holders) {
             this.holders = holders;
             return this;
@@ -106,7 +100,7 @@ public class DepositAccount extends Account {
         }
 
         public DepositAccount build() {
-            return new DepositAccount(id, balance, currency, expiresEnd, updatePeriod, corporate, holders, depositRate);
+            return new DepositAccount(id, balance, currency, expiresEnd, updatePeriod, holders, depositRate);
         }
     }
 

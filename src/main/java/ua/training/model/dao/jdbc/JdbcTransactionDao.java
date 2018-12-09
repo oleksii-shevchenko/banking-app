@@ -3,23 +3,59 @@ package ua.training.model.dao.jdbc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.TransactionDao;
-import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
-import ua.training.model.exception.UnsupportedOperationException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class JdbcTransactionDao implements TransactionDao {
     private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
 
     @Override
-    public List<Transaction> getAllTransactionsForAccount(Long accountId) {
+    public List<Transaction> getAccountTransactions(Long accountId) {
+        return null;
+    }
+
+    @Override
+    public void makeTransfer(Long senderId, Long receiverId, BigDecimal amount) {
+
+    }
+
+    @Override
+    public void makeUpdate(Long accountId, Consumer<Account> updater) {
+
+    }
+
+    @Override
+    public void makeRefill(Long accountId, BigDecimal amount) {
+
+    }
+
+    @Override
+    public Transaction get(Long key) {
+        return null;
+    }
+
+    @Override
+    public Long insert(Transaction entity) {
+        return null;
+    }
+
+    @Override
+    public void update(Transaction entity) {
+
+    }
+
+    @Override
+    public void remove(Transaction entity) {
+
+    }
+
+    /*
+    @Override
+    public List<Transaction> getAllAccountTransactions(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.account"))) {
             preparedStatement.setLong(1, accountId);
@@ -43,27 +79,6 @@ public class JdbcTransactionDao implements TransactionDao {
                 return new JdbcMapperFactory().getTransactionMapper().map(resultSet);
             } else {
                 throw new RuntimeException();
-            }
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
-    }
-
-    @Override
-    public List<Transaction> get(List<Long> keys) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setAutoCommit(false);
-            try (PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.id"))) {
-                for (Long key : keys) {
-                    preparedStatement.setLong(1, key);
-                    preparedStatement.addBatch();
-                }
-
-                ResultSet resultSet = preparedStatement.executeQuery();
-                connection.commit();
-
-                return createListFromResultSet(resultSet);
             }
         } catch (SQLException exception) {
             logger.error(exception);
@@ -98,5 +113,5 @@ public class JdbcTransactionDao implements TransactionDao {
         }
 
         return transactions;
-    }
+    } */
 }

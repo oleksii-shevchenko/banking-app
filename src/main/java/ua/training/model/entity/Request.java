@@ -2,8 +2,9 @@ package ua.training.model.entity;
 
 
 /**
- * This entity represents the requests that user can make to administrators. There is fix number of requests that user
- * can make. The class has POJO structure.
+ * This entity represents the requests for account creation that user can make to administrators.
+ * There is fix number of requests that user can make. user can choose account type and currency, other account
+ * parameters are set by admin. The class has POJO structure.
  * @author Oleksii Shevchenko
  * @see User
  */
@@ -11,6 +12,7 @@ public class Request {
     private long id;
     private long requesterId;
     private Type type;
+    private Currency currency;
     private boolean completed;
 
     /**
@@ -18,13 +20,14 @@ public class Request {
      * @author Oleksii Shevhcenko
      */
     public enum Type {
-        CREATE_ORDINARY_DEPOSIT_ACC, CREATE_CORPORATE_DEPOSIT_ACC, CREATE_ORDINARY_CREDIT_ACC, CREATE_CORPORATE_CREDIT_ACC
+        CREATE_DEPOSIT_ACCOUNT, CREATE_CREDIT_ACCOUNT
     }
 
-    private Request(long id, long requesterId, Type type, boolean completed) {
+    private Request(long id, long requesterId, Type type, Currency currency, boolean completed) {
         this.id = id;
         this.requesterId = requesterId;
         this.type = type;
+        this.currency = currency;
         this.completed = completed;
     }
 
@@ -52,6 +55,14 @@ public class Request {
         this.type = type;
     }
 
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
     public boolean isCompleted() {
         return completed;
     }
@@ -69,6 +80,7 @@ public class Request {
         private long id;
         private long requesterId;
         private Type type;
+        private Currency currency;
         private boolean completed;
 
         public RequestBuilder setId(long id) {
@@ -86,13 +98,18 @@ public class Request {
             return this;
         }
 
+        public RequestBuilder setCurrency(Currency currency) {
+            this.currency = currency;
+            return this;
+        }
+
         public RequestBuilder setCompleted(boolean completed) {
             this.completed = completed;
             return this;
         }
 
         public Request build() {
-            return new Request(id, requesterId, type, completed);
+            return new Request(id, requesterId, type, currency, completed);
         }
     }
 

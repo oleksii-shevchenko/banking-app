@@ -8,9 +8,8 @@ import java.util.List;
 
 /**
  * This entity is general template for all accounts. It contains setters and getters for all fields and in addition a
- * number of methods ({@link Account#isActive()}, {@link Account#refillAccount(BigDecimal)},
- * {@link Account#withdrawFromAccount(BigDecimal)}) the realization of witch could depend on realization of this
- * abstract class.
+ * number of methods ({@link Account#isActive()}, {@link Account#withdrawFromAccount(BigDecimal)}) the realization of
+ * witch could depend on realization of this abstract class.
  * @author Oleksii Shevchenko
  * @see CreditAccount
  * @see DepositAccount
@@ -21,16 +20,14 @@ public abstract class Account {
     private Currency currency;
     private LocalDate expiresEnd;
     private int updatePeriod;
-    private boolean corporate;
     private List<Long> holders;
 
-    Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod, boolean corporate, List<Long> holders) {
+    Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod, List<Long> holders) {
         this.id = id;
         this.balance = balance;
         this.currency = currency;
         this.expiresEnd = expiresEnd;
         this.updatePeriod = updatePeriod;
-        this.corporate = corporate;
         this.holders = holders;
     }
 
@@ -74,14 +71,6 @@ public abstract class Account {
         this.updatePeriod = updatePeriod;
     }
 
-    public boolean isCorporate() {
-        return corporate;
-    }
-
-    public void setCorporate(boolean corporate) {
-        this.corporate = corporate;
-    }
-
     public List<Long> getHolders() {
         return holders;
     }
@@ -96,16 +85,6 @@ public abstract class Account {
      */
     public boolean isActive() {
         return LocalDate.now().isBefore(expiresEnd);
-    }
-
-    /**
-     * This method is common for all account types. The method put money into this account.
-     * @param amount The funds amount that must be putted into account (positive number).
-     * @return Balance of the account after transaction
-     */
-    public BigDecimal refillAccount(BigDecimal amount) {
-        balance = balance.add(amount);
-        return balance;
     }
 
     /**
