@@ -13,8 +13,8 @@ public class JdbcMapperFactory implements MapperFactory <ResultSet> {
     }
 
     @Override
-    public Mapper<Invoice, ResultSet> getPaymentMapper() {
-        return new JdbcPaymentMapper();
+    public Mapper<Invoice, ResultSet> getInvoiceMapper() {
+        return new JdbcInvoiceMapper();
     }
 
     @Override

@@ -7,4 +7,7 @@ import java.util.List;
 public interface InvoiceDao extends Dao<Long, Invoice> {
     List<Invoice> getInvoicesByRequester(Long accountId);
     List<Invoice> getInvoicesByPayer(Long accountId);
+
+    void acceptInvoice(Long invoiceId);
+    void denyInvoice(Long invoiceId);
 }

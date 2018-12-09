@@ -5,7 +5,7 @@ import ua.training.model.entity.Invoice;
 
 import java.sql.ResultSet;
 
-public class JdbcPaymentMapper implements Mapper<Invoice, ResultSet> {
+public class JdbcInvoiceMapper implements Mapper<Invoice, ResultSet> {
     @Override
     public Invoice map(ResultSet resultSet) {
         return null;

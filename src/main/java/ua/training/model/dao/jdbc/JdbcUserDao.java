@@ -208,7 +208,7 @@ public class JdbcUserDao implements UserDao {
                 if (resultSet.next()) {
                     userAccountsNumber = resultSet.getLong(1);
                 } else {
-                    throw new SQLException();
+                    throw new RuntimeException();
                 }
 
                 if (userAccountsNumber == 0) {
@@ -219,7 +219,7 @@ public class JdbcUserDao implements UserDao {
                 }
 
                 connection.commit();
-            } catch (SQLException exception) {
+            } catch (SQLException | RuntimeException exception) {
                 connection.rollback();
 
                 logger.error(exception);

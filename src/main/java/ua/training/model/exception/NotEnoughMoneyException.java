@@ -2,7 +2,7 @@ package ua.training.model.exception;
 
 import ua.training.model.entity.Account;
 
-public class NotEnoughMoneyException extends Exception {
+public class NotEnoughMoneyException extends RuntimeException{
     private Account account;
 
     public NotEnoughMoneyException(Account account) {

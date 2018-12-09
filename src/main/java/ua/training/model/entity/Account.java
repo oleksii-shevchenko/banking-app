@@ -88,6 +88,16 @@ public abstract class Account {
     }
 
     /**
+     * This method is common for all account types. The method put money into this account.
+     * @param amount The funds amount that must be putted into account (positive number).
+     * @return Balance of the account after transaction
+     */
+    public BigDecimal refillAccount(BigDecimal amount) {
+        balance = balance.add(amount);
+        return balance;
+    }
+
+    /**
      * This abstract method must be realized in all subclasses and the realization must depends on account policy. The
      * method withdraw money from account if it is enough for, else throws an exception.
      * @param amount The amount of money that must be withdraw from account (positive number)
