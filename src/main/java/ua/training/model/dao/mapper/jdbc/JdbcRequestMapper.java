@@ -1,13 +1,13 @@
 package ua.training.model.dao.mapper.jdbc;
 
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.entity.Invoice;
+import ua.training.model.entity.Request;
 
 import java.sql.ResultSet;
 
-public class JdbcRequestMapper implements Mapper<Invoice, ResultSet> {
+public class JdbcRequestMapper implements Mapper<Request, ResultSet> {
     @Override
-    public Invoice map(ResultSet resultSet) {
+    public Request map(ResultSet resultSet) {
         return null;
     }
 }

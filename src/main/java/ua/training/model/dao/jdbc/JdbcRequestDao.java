@@ -3,62 +3,71 @@ package ua.training.model.dao.jdbc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.RequestDao;
-import ua.training.model.entity.Invoice;
+import ua.training.model.dao.mapper.Mapper;
+import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.entity.Request;
+import ua.training.model.exception.CompletedRequestException;
+import ua.training.model.exception.UnsupportedOperationException;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcRequestDao implements RequestDao {
     private static Logger logger = LogManager.getLogger(JdbcRequestDao.class);
 
     @Override
-    public List<Invoice> getAll() {
-        return null;
-    }
+    public Request processRequest(Long requestId) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            connection.setAutoCommit(false);
+            try (PreparedStatement getRequestStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
+                 PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.completed"))) {
+                getRequestStatement.setLong(1, requestId);
 
-    @Override
-    public List<Invoice> getAllByCompletion(boolean completion) {
-        return null;
-    }
+                ResultSet resultSet = getRequestStatement.executeQuery();
 
-    @Override
-    public Invoice get(Long key) {
-        return null;
-    }
+                Request request;
+                if (resultSet.next()) {
+                    request = new JdbcMapperFactory().getRequestMapper().map(resultSet);
+                } else {
+                    throw new RuntimeException();
+                }
 
-    @Override
-    public Long insert(Invoice entity) {
-        return null;
-    }
+                if (request.isCompleted()) {
+                    throw new CompletedRequestException();
+                }
 
-    @Override
-    public void update(Invoice entity) {
+                setCompletedStatement.executeUpdate();
 
-    }
+                return request;
+            } catch (SQLException | RuntimeException exception) {
+                connection.rollback();
 
-    @Override
-    public void remove(Invoice entity) {
-
-    }
-
-    /*
-    @Override
-    public List<Invoice> getAll() {
-        try (Connection connection = ConnectionsPool.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.all"))) {
-                return createListFromResultSet(preparedStatement.executeQuery());
-            } catch (SQLException exception) {
                 logger.error(exception);
-                throw new RuntimeException(exception);
+                throw new RuntimeException();
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
         }
     }
 
     @Override
-    public List<Invoice> getAllByCompletion(boolean completion) {
+    public List<Request> getAllByCompletion(boolean completion) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.completion"))) {
             preparedStatement.setBoolean(1, completion);
 
-            return createListFromResultSet(preparedStatement.executeQuery());
+            ResultSet resultSet  = preparedStatement.executeQuery();
+            Mapper<Request, ResultSet> mapper = new JdbcMapperFactory().getRequestMapper();
+
+            List<Request> requests = new ArrayList<>();
+            while (resultSet.next()) {
+                requests.add(mapper.map(resultSet));
+            }
+
+            return requests;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
@@ -66,7 +75,7 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     @Override
-    public Invoice get(Long key) {
+    public Request get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"))) {
             preparedStatement.setLong(1, key);
@@ -85,64 +94,34 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     @Override
-    public Long insert(Invoice entity) {
+    public Long insert(Request entity) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.insert"), Statement.RETURN_GENERATED_KEYS)) {
-            setStatementParameters(entity, preparedStatement);
+            preparedStatement.setLong(1, entity.getRequesterId());
+            preparedStatement.setString(2, entity.getType().name());
+            preparedStatement.setString(3, entity.getCurrency().name());
+            preparedStatement.setBoolean(4, entity.isCompleted());
             preparedStatement.executeUpdate();
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             } else {
-                //todo change exception policy (in all the same places) (maybe)
-                throw new SQLException();
+                throw new RuntimeException();
             }
-        } catch (SQLException exception) {
+        } catch (SQLException | RuntimeException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
         }
     }
 
     @Override
-    public void update(Invoice entity) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update"))) {
-            setStatementParameters(entity, preparedStatement);
-            preparedStatement.setLong(4, entity.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
+    public void update(Request entity) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void remove(Invoice entity) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.remove"))) {
-            preparedStatement.setLong(1, entity.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
+    public void remove(Request entity) {
+        throw new UnsupportedOperationException();
     }
-
-    private List<Invoice> createListFromResultSet(ResultSet resultSet) throws SQLException {
-        Mapper<Invoice, ResultSet> mapper = new JdbcMapperFactory().getRequestMapper();
-
-        List<Invoice> invoices = new ArrayList<>();
-        while (resultSet.next()) {
-            invoices.add(mapper.map(resultSet));
-        }
-
-        return invoices;
-    }
-
-    private void setStatementParameters(Invoice entity, PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setLong(1, entity.getRequesterId());
-        preparedStatement.setString(2, entity.getType().name());
-        preparedStatement.setBoolean(3, entity.isCompleted());
-    } */
 }

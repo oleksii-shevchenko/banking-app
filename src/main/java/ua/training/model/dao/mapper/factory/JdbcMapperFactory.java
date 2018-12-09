@@ -2,10 +2,7 @@ package ua.training.model.dao.mapper.factory;
 
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.jdbc.*;
-import ua.training.model.entity.Account;
-import ua.training.model.entity.Invoice;
-import ua.training.model.entity.Transaction;
-import ua.training.model.entity.User;
+import ua.training.model.entity.*;
 
 import java.sql.ResultSet;
 
@@ -21,7 +18,7 @@ public class JdbcMapperFactory implements MapperFactory <ResultSet> {
     }
 
     @Override
-    public Mapper<Invoice, ResultSet> getRequestMapper() {
+    public Mapper<Request, ResultSet> getRequestMapper() {
         return new JdbcRequestMapper();
     }
 
