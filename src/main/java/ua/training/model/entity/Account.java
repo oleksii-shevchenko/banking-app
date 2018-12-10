@@ -20,15 +20,21 @@ public abstract class Account {
     private Currency currency;
     private LocalDate expiresEnd;
     private int updatePeriod;
+    private Status status;
     private List<Long> holders;
 
-    Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod, List<Long> holders) {
+    public Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod, Status status, List<Long> holders) {
         this.id = id;
         this.balance = balance;
         this.currency = currency;
         this.expiresEnd = expiresEnd;
         this.updatePeriod = updatePeriod;
+        this.status = status;
         this.holders = holders;
+    }
+
+    public enum Status {
+        ACTIVE, BLOCKED, CLOSED
     }
 
     public long getId() {
@@ -71,6 +77,15 @@ public abstract class Account {
         this.updatePeriod = updatePeriod;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public Account setStatus(Status status) {
+        this.status = status;
+        return this;
+    }
+
     public List<Long> getHolders() {
         return holders;
     }
@@ -84,7 +99,7 @@ public abstract class Account {
      * @return {@code true} if account is active, else return {@code false}
      */
     public boolean isActive() {
-        return LocalDate.now().isBefore(expiresEnd);
+        return status.equals(Status.ACTIVE);
     }
 
     /**

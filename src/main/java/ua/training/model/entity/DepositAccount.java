@@ -17,8 +17,8 @@ public class DepositAccount extends Account {
     private BigDecimal depositRate;
 
     private DepositAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
-                          List<Long> holders, BigDecimal depositRate) {
-        super(id, balance, currency, expiresEnd, updatePeriod, holders);
+                          Status status, List<Long> holders, BigDecimal depositRate) {
+        super(id, balance, currency, expiresEnd, updatePeriod, status, holders);
         this.depositRate = depositRate;
     }
 
@@ -45,7 +45,6 @@ public class DepositAccount extends Account {
             this.setBalance(balanceAfterTransaction);
             return balanceAfterTransaction;
         } else {
-            //Todo add message and  logger
             throw new NotEnoughMoneyException(this);
         }
     }
@@ -61,6 +60,7 @@ public class DepositAccount extends Account {
         private Currency currency;
         private LocalDate expiresEnd;
         private int updatePeriod;
+        private Status status;
         private List<Long> holders;
         private BigDecimal depositRate;
 
@@ -99,8 +99,13 @@ public class DepositAccount extends Account {
             return this;
         }
 
+        public DepositAccountBuilder setStatus(Status status) {
+            this.status = status;
+            return this;
+        }
+
         public DepositAccount build() {
-            return new DepositAccount(id, balance, currency, expiresEnd, updatePeriod, holders, depositRate);
+            return new DepositAccount(id, balance, currency, expiresEnd, updatePeriod, status, holders, depositRate);
         }
     }
 

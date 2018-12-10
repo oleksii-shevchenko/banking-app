@@ -119,12 +119,12 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 CurrencyExchangeService exchangeService = new CurrencyExchangeService();
                 BigDecimal exchangeRate;
 
-                exchangeRate = exchangeService.exchange(invoice.getCurrency(), requester.getCurrency());
+                exchangeRate = exchangeService.exchangeRate(invoice.getCurrency(), requester.getCurrency());
                 updateBalanceStatement.setBigDecimal(1, requester.refillAccount(invoice.getAmount().multiply(exchangeRate)));
                 updateBalanceStatement.setLong(2, requester.getId());
                 updateBalanceStatement.executeUpdate();
 
-                exchangeRate = exchangeService.exchange(invoice.getCurrency(), payer.getCurrency());
+                exchangeRate = exchangeService.exchangeRate(invoice.getCurrency(), payer.getCurrency());
                 updateBalanceStatement.setBigDecimal(1, payer.withdrawFromAccount(invoice.getAmount().multiply(exchangeRate)));
                 updateBalanceStatement.setLong(2, payer.getId());
 

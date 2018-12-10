@@ -19,8 +19,8 @@ public class CreditAccount extends Account {
     private BigDecimal creditLimit;
 
     private CreditAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
-                          List<Long> holders, BigDecimal creditRate, BigDecimal creditLimit) {
-        super(id, balance, currency, expiresEnd, updatePeriod, holders);
+                          Status status, List<Long> holders, BigDecimal creditRate, BigDecimal creditLimit) {
+        super(id, balance, currency, expiresEnd, updatePeriod, status, holders);
         this.creditRate = creditRate;
         this.creditLimit = creditLimit;
     }
@@ -55,7 +55,6 @@ public class CreditAccount extends Account {
             this.setBalance(balanceAfterTransaction);
             return balanceAfterTransaction;
         } else {
-            //Todo add message and logger
             throw new NotEnoughMoneyException(this);
         }
     }
@@ -71,6 +70,7 @@ public class CreditAccount extends Account {
         private Currency currency;
         private LocalDate expiresEnd;
         private int updatePeriod;
+        private Status status;
         private List<Long> holders;
         private BigDecimal creditRate;
         private BigDecimal creditLimit;
@@ -115,8 +115,13 @@ public class CreditAccount extends Account {
             return this;
         }
 
+        public CreditAccountBuilder setStatus(Status status) {
+            this.status = status;
+            return this;
+        }
+
         public CreditAccount build() {
-            return new CreditAccount(id, balance, currency, expiresEnd, updatePeriod, holders, creditRate, creditLimit);
+            return new CreditAccount(id, balance, currency, expiresEnd, updatePeriod, status, holders, creditRate, creditLimit);
         }
     }
 
