@@ -8,6 +8,7 @@ import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.Transaction;
+import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
 import ua.training.model.service.CurrencyExchangeService;
 
@@ -59,7 +60,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 if (resultSet.next()) {
                     sender = mapper.map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 getAccountStatement.setLong(1, receiverId);
@@ -70,11 +71,11 @@ public class JdbcTransactionDao implements TransactionDao {
                 if (resultSet.next()) {
                     receiver = mapper.map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!(sender.isActive() && receiver.isActive())) {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 CurrencyExchangeService exchangeService = new CurrencyExchangeService();
@@ -96,7 +97,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 insertTransactionStatement.setBigDecimal(4, amount);
                 insertTransactionStatement.setString(5, currency.name());
                 insertTransactionStatement.executeUpdate();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException | NotEnoughMoneyException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -124,11 +125,11 @@ public class JdbcTransactionDao implements TransactionDao {
                 if (resultSet.next()) {
                     account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!account.isActive()) {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 Transaction transaction = updater.apply(account);
@@ -143,7 +144,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 insertTransactionStatement.setBigDecimal(4, transaction.getAmount());
                 insertTransactionStatement.setString(5, transaction.getCurrency().name());
                 insertTransactionStatement.executeUpdate();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -171,11 +172,11 @@ public class JdbcTransactionDao implements TransactionDao {
                 if (resultSet.next()) {
                     account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!account.isActive()) {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(currency, account.getCurrency());
@@ -190,7 +191,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 insertTransactionStatement.setBigDecimal(4, amount);
                 insertTransactionStatement.setString(5, currency.name());
                 insertTransactionStatement.executeUpdate();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -214,7 +215,7 @@ public class JdbcTransactionDao implements TransactionDao {
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getTransactionMapper().map(resultSet);
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
         } catch (SQLException exception) {
             logger.error(exception);

@@ -1,4 +1,4 @@
 package ua.training.model.exception;
 
-public class CompletedInvoiceException extends RuntimeException {
+public class CompletedInvoiceException extends Exception {
 }

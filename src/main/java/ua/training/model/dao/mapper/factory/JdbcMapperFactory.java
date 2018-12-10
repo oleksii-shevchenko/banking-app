@@ -4,9 +4,7 @@ import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.jdbc.*;
 import ua.training.model.entity.*;
 
-import java.sql.ResultSet;
-
-public class JdbcMapperFactory implements MapperFactory <ResultSet> {
+public class JdbcMapperFactory implements MapperFactory {
     @Override
     public Mapper<Account> getAccountMapper() {
         return new JdbcAccountMapper();

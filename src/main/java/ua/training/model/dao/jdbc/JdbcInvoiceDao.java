@@ -10,6 +10,7 @@ import ua.training.model.entity.Account;
 import ua.training.model.entity.Invoice;
 import ua.training.model.entity.Transaction;
 import ua.training.model.exception.CompletedInvoiceException;
+import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
 import ua.training.model.service.CurrencyExchangeService;
 
@@ -73,7 +74,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                  PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
-                MapperFactory<ResultSet> mapperFactory = new JdbcMapperFactory();
+                MapperFactory mapperFactory = new JdbcMapperFactory();
 
                 getInvoiceStatement.setLong(1, invoiceId);
 
@@ -83,7 +84,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 if (resultSet.next()) {
                     invoice = mapperFactory.getInvoiceMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!invoice.getStatus().equals(Invoice.Status.PROCESSING)) {
@@ -98,7 +99,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 if (resultSet.next()) {
                     requester = mapperFactory.getAccountMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 getAccountStatement.setLong(1, invoice.getPayer());
@@ -109,11 +110,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 if (resultSet.next()) {
                     payer = mapperFactory.getAccountMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!(requester.isActive() && payer.isActive())) {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 CurrencyExchangeService exchangeService = new CurrencyExchangeService();
@@ -141,7 +142,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 if (resultSet.next()) {
                     transactionId = resultSet.getLong(1);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 updateInvoiceStatement.setString(1, Invoice.Status.ACCEPTED.name());
@@ -150,7 +151,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException | CompletedInvoiceException | NotEnoughMoneyException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -177,7 +178,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 if (resultSet.next()) {
                     invoice = new JdbcMapperFactory().getInvoiceMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (!(invoice.getStatus().equals(Invoice.Status.PROCESSING))) {
@@ -189,7 +190,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException | CompletedInvoiceException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -236,9 +237,9 @@ public class JdbcInvoiceDao implements InvoiceDao {
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
-        } catch (SQLException | RuntimeException exception) {
+        } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
         }

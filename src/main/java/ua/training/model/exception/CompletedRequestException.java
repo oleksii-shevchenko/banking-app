@@ -1,4 +1,4 @@
 package ua.training.model.exception;
 
-public class CompletedRequestException extends RuntimeException {
+public class CompletedRequestException extends Exception {
 }

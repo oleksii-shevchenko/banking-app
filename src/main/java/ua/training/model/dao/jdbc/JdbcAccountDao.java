@@ -89,7 +89,7 @@ public class JdbcAccountDao implements AccountDao {
                 if (resultSet.next()) {
                     accountId = resultSet.getLong(1);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 insertHolderStatement.setLong(1, userId);
@@ -100,7 +100,7 @@ public class JdbcAccountDao implements AccountDao {
                 connection.commit();
 
                 return accountId;
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -112,7 +112,6 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
-    //todo add why transaction isolation is not needed
     @Override
     public void blockAccount(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -126,11 +125,11 @@ public class JdbcAccountDao implements AccountDao {
             if (resultSet.next()) {
                 status = Account.Status.valueOf(resultSet.getString("account_status"));
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
 
             if (status.equals(Account.Status.CLOSED)) {
-                throw new RuntimeException();
+                throw new SQLException();
             }
 
             updateStatusStatement.setString(1, Account.Status.BLOCKED.name());
@@ -173,7 +172,7 @@ public class JdbcAccountDao implements AccountDao {
                 removeAccountStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException | AliveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);

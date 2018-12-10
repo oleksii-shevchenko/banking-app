@@ -90,7 +90,7 @@ public class JdbcUserDao implements UserDao {
             if (resultSet.next()) {
                 return Permission.valueOf(resultSet.getString("permission"));
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
         } catch (SQLException exception) {
             logger.error(exception);
@@ -137,7 +137,7 @@ public class JdbcUserDao implements UserDao {
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getUserMapper().map(resultSet);
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
         } catch (SQLException | RuntimeException exception) {
             logger.error(exception);
@@ -145,7 +145,6 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
-    //todo add triggers to db: 45001 not unique login, 45002 not unique email
     @Override
     public Long insert(User entity) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -208,18 +207,18 @@ public class JdbcUserDao implements UserDao {
                 if (resultSet.next()) {
                     userAccountsNumber = resultSet.getLong(1);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (userAccountsNumber == 0) {
                     removeUserStatement.setLong(1, entity.getId());
                     removeUserStatement.executeUpdate();
                 } else {
-                    throw new AliveAccountException();
+                    throw new SQLException(new AliveAccountException());
                 }
 
                 connection.commit();
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);

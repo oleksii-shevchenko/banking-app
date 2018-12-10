@@ -31,7 +31,7 @@ public class JdbcRequestDao implements RequestDao {
                 if (resultSet.next()) {
                     request = new JdbcMapperFactory().getRequestMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (request.isCompleted()) {
@@ -41,7 +41,7 @@ public class JdbcRequestDao implements RequestDao {
                 setCompletedStatement.executeUpdate();
 
                 return request;
-            } catch (SQLException | RuntimeException exception) {
+            } catch (SQLException | CompletedRequestException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -85,7 +85,7 @@ public class JdbcRequestDao implements RequestDao {
             if (resultSet.next()) {
                 return new JdbcMapperFactory().getRequestMapper().map(resultSet);
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
         } catch (SQLException exception) {
             logger.error(exception);
@@ -107,9 +107,9 @@ public class JdbcRequestDao implements RequestDao {
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             } else {
-                throw new RuntimeException();
+                throw new SQLException();
             }
-        } catch (SQLException | RuntimeException exception) {
+        } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
         }
