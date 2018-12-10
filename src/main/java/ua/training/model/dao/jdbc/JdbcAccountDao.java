@@ -3,69 +3,35 @@ package ua.training.model.dao.jdbc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.AccountDao;
+import ua.training.model.dao.jdbc.strategy.CreditStatementSetter;
+import ua.training.model.dao.jdbc.strategy.DepositStatementSetter;
+import ua.training.model.dao.jdbc.strategy.StatementSetter;
+import ua.training.model.dao.mapper.Mapper;
+import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
+import ua.training.model.entity.Permission;
+import ua.training.model.exception.AliveAccountException;
 
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JdbcAccountDao implements AccountDao {
     private static Logger logger = LogManager.getLogger(JdbcAccountDao.class);
 
-    @Override
-    public List<Long> getUserAccountsIds(Long userId) {
-        return null;
-    }
-
-    @Override
-    public List<Account> getUserAccounts(Long userId) {
-        return null;
-    }
-
-    @Override
-    public void createAccount(Long userId, Account account) {
-
-    }
-
-    @Override
-    public void blockAccount(Long accountId) {
-
-    }
-
-    @Override
-    public void closeAccount(Long userId, Long accountId) {
-
-    }
-
-    @Override
-    public Account get(Long key) {
-        return null;
-    }
-
-    @Override
-    public Long insert(Account entity) {
-        return null;
-    }
-
-    @Override
-    public void update(Account entity) {
-
-    }
-
-    @Override
-    public void remove(Account entity) {
-
-    }
-
-    /*
-    private static Map<String, StatementStrategy> strategies;
+    private static Map<String, StatementSetter> statementSetters;
 
     static {
-        strategies = new HashMap<>();
-        strategies.put("DepositAccount", new DepositStatementStrategy());
-        strategies.put("CreditAccount", new CreditStatementStrategy());
+        statementSetters = new HashMap<>();
+        statementSetters.put("DepositAccount", new DepositStatementSetter());
+        statementSetters.put("CreditAccount", new CreditStatementSetter());
     }
 
     @Override
-    public List<Long> getAllUserAccountsIds(Long userId) {
+    public List<Long> getUserAccountsIds(Long userId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
             preparedStatement.setLong(1, userId);
@@ -85,7 +51,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public List<Account> getAllUserAccounts(Long userId) {
+    public List<Account> getUserAccounts(Long userId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.account.by.user"))) {
             preparedStatement.setLong(1, userId);
@@ -106,16 +72,15 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void createAccount(Long userId, Account account) {
-        StatementStrategy strategy = strategies.get(account.getClass().getSimpleName());
-
+    public long createAccount(Long userId, Account account) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);
-
             try (PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement insertHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
-                strategy.setStatementParameters(account, insertAccountStatement);
+                StatementSetter setter = statementSetters.get(account.getClass().getSimpleName());
+
+                setter.setStatementParameters(account, insertAccountStatement);
                 insertAccountStatement.executeUpdate();
 
                 ResultSet resultSet = insertAccountStatement.getGeneratedKeys();
@@ -124,16 +89,91 @@ public class JdbcAccountDao implements AccountDao {
                 if (resultSet.next()) {
                     accountId = resultSet.getLong(1);
                 } else {
-                    throw new SQLException();
+                    throw new RuntimeException();
                 }
 
                 insertHolderStatement.setLong(1, userId);
                 insertHolderStatement.setLong(2, accountId);
                 insertHolderStatement.setString(3, Permission.ALL.name());
-                insertHolderStatement.executeUpdate();
+                insertAccountStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException exception) {
+
+                return accountId;
+            } catch (SQLException | RuntimeException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+    }
+
+    //todo add why transaction isolation is not needed
+    @Override
+    public void blockAccount(Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement getStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.status.by.id"));
+             PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"))) {
+            getStatusStatement.setLong(1, accountId);
+
+            ResultSet resultSet = getStatusStatement.executeQuery();
+
+            Account.Status status;
+            if (resultSet.next()) {
+                status = Account.Status.valueOf(resultSet.getString("account_status"));
+            } else {
+                throw new RuntimeException();
+            }
+
+            if (status.equals(Account.Status.CLOSED)) {
+                throw new RuntimeException();
+            }
+
+            updateStatusStatement.setString(1, Account.Status.BLOCKED.name());
+            updateStatusStatement.setLong(2, accountId);
+            updateStatusStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @Override
+    public void closeAccount(Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+            try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
+                 PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
+                 PreparedStatement removeAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove.account"))) {
+                getAccountStatement.setLong(1, accountId);
+
+                ResultSet resultSet = getAccountStatement.executeQuery();
+
+                Account account;
+                if (resultSet.next()) {
+                    account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
+                } else {
+                    throw new RuntimeException();
+                }
+
+                if (account.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+                    throw new AliveAccountException();
+                }
+
+                updateStatusStatement.setString(1, Account.Status.CLOSED.name());
+                updateStatusStatement.setLong(2, accountId);
+                updateStatusStatement.executeUpdate();
+
+                removeAccountStatement.setLong(1, accountId);
+                removeAccountStatement.executeUpdate();
+
+                connection.commit();
+            } catch (SQLException | RuntimeException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -144,54 +184,6 @@ public class JdbcAccountDao implements AccountDao {
             throw new RuntimeException();
         }
 
-    }
-
-    @Override
-    public void closeAccount(Long userId, Long accountId) {
-
-    }
-
-    @Override
-    public void makeTransfer(Long senderId, Long receiverId, BigDecimal amount) {
-
-    }
-
-    @Override
-    public void makeUpdate(Long accountId, Consumer<Account> updater) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement updateAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update"))) {
-                getAccountStatement.setLong(1, accountId);
-
-                ResultSet resultSet = getAccountStatement.executeQuery();
-
-                Account account;
-                if (resultSet.next()) {
-                    account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
-
-                StatementStrategy strategy = strategies.get(account.getClass().getSimpleName());
-
-                updater.accept(account);
-
-                strategy.setStatementParameters(account, updateAccountStatement);
-                updateAccountStatement.setLong(12, accountId);
-                updateAccountStatement.executeUpdate();
-            } catch (SQLException exception) {
-                connection.rollback();
-
-                logger.error(exception);
-                throw new RuntimeException(exception);
-            }
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
     }
 
     @Override
@@ -226,5 +218,5 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public void remove(Account entity) {
         throw new UnsupportedOperationException();
-    } */
+    }
 }

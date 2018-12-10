@@ -8,7 +8,7 @@ public interface AccountDao extends Dao<Long, Account> {
     List<Long> getUserAccountsIds(Long userId);
     List<Account> getUserAccounts(Long userId);
 
-    void createAccount(Long userId, Account account);
+    long createAccount(Long userId, Account account);
     void blockAccount(Long accountId);
-    void closeAccount(Long userId, Long accountId);
+    void closeAccount(Long accountId);
 }

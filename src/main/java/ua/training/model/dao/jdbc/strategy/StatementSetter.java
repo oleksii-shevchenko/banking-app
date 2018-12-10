@@ -4,6 +4,6 @@ import ua.training.model.entity.Account;
 
 import java.sql.PreparedStatement;
 
-public interface StatementStrategy {
+public interface StatementSetter {
     void setStatementParameters(Account account, PreparedStatement preparedStatement);
 }

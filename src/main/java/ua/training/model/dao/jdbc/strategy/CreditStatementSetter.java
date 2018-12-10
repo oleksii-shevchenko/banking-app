@@ -4,7 +4,7 @@ import ua.training.model.entity.Account;
 
 import java.sql.PreparedStatement;
 
-public class DepositStatementStrategy implements StatementStrategy {
+public class CreditStatementSetter implements StatementSetter {
     @Override
     public void setStatementParameters(Account account, PreparedStatement preparedStatement) {
 
