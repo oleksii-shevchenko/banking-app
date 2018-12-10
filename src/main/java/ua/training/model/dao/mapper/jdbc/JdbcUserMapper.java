@@ -8,19 +8,15 @@ import java.sql.SQLException;
 
 public class JdbcUserMapper implements Mapper<User, ResultSet> {
     @Override
-    public User map(ResultSet resultSet) {
-        try {
-            return User.getBuilder()
-                    .setId(resultSet.getLong("user_id"))
-                    .setLogin(resultSet.getString("user_login"))
-                    .setPasswordHash(resultSet.getString("password_hash"))
-                    .setEmail(resultSet.getString("user_email"))
-                    .setRole(User.Role.valueOf(resultSet.getString("user_role")))
-                    .setFirstName(resultSet.getString("first_name"))
-                    .setSecondName(resultSet.getString("second_name"))
-                    .build();
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
-        }
+    public User map(ResultSet resultSet) throws SQLException {
+        return User.getBuilder()
+                .setId(resultSet.getLong("user_id"))
+                .setLogin(resultSet.getString("user_login"))
+                .setPasswordHash(resultSet.getString("password_hash"))
+                .setEmail(resultSet.getString("user_email"))
+                .setRole(User.Role.valueOf(resultSet.getString("user_role")))
+                .setFirstName(resultSet.getString("first_name"))
+                .setSecondName(resultSet.getString("second_name"))
+                .build();
     }
 }

@@ -9,19 +9,15 @@ import java.sql.SQLException;
 
 public class JdbcTransactionMapper implements Mapper<Transaction, ResultSet> {
     @Override
-    public Transaction map(ResultSet resultSet) {
-        try {
-            return Transaction.getBuilder()
-                    .setId(resultSet.getLong("transaction_id"))
-                    .setTime(resultSet.getTimestamp("transaction_time").toLocalDateTime())
-                    .setSender(resultSet.getLong("sender"))
-                    .setReceiver(resultSet.getLong("receiver"))
-                    .setType(Transaction.Type.valueOf(resultSet.getString("transaction_type")))
-                    .setAmount(resultSet.getBigDecimal("transaction_amount"))
-                    .setCurrency(Currency.valueOf(resultSet.getString("transaction_currency")))
-                    .build();
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
-        }
+    public Transaction map(ResultSet resultSet) throws SQLException{
+        return Transaction.getBuilder()
+                .setId(resultSet.getLong("transaction_id"))
+                .setTime(resultSet.getTimestamp("transaction_time").toLocalDateTime())
+                .setSender(resultSet.getLong("sender"))
+                .setReceiver(resultSet.getLong("receiver"))
+                .setType(Transaction.Type.valueOf(resultSet.getString("transaction_type")))
+                .setAmount(resultSet.getBigDecimal("transaction_amount"))
+                .setCurrency(Currency.valueOf(resultSet.getString("transaction_currency")))
+                .build();
     }
 }
