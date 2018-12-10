@@ -28,7 +28,7 @@ public class JdbcTransactionDao implements TransactionDao {
             preparedStatement.setLong(2, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Transaction, ResultSet> mapper = new JdbcMapperFactory().getTransactionMapper();
+            Mapper<Transaction> mapper = new JdbcMapperFactory().getTransactionMapper();
 
             List<Transaction> transactions = new ArrayList<>();
             while (resultSet.next()) {
@@ -53,7 +53,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 getAccountStatement.setLong(1, senderId);
 
                 ResultSet resultSet = getAccountStatement.executeQuery();
-                Mapper<Account, ResultSet> mapper = new JdbcMapperFactory().getAccountMapper();
+                Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
 
                 Account sender;
                 if (resultSet.next()) {

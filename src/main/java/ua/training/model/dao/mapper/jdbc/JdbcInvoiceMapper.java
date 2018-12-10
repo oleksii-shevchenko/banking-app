@@ -7,7 +7,7 @@ import ua.training.model.entity.Invoice;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcInvoiceMapper implements Mapper<Invoice, ResultSet> {
+public class JdbcInvoiceMapper implements Mapper<Invoice> {
     @Override
     public Invoice map(ResultSet resultSet) throws SQLException {
             return Invoice.getBuilder()

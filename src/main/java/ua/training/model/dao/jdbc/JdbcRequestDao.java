@@ -60,7 +60,7 @@ public class JdbcRequestDao implements RequestDao {
             preparedStatement.setBoolean(1, completion);
 
             ResultSet resultSet  = preparedStatement.executeQuery();
-            Mapper<Request, ResultSet> mapper = new JdbcMapperFactory().getRequestMapper();
+            Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
 
             List<Request> requests = new ArrayList<>();
             while (resultSet.next()) {

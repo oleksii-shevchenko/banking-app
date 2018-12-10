@@ -7,7 +7,7 @@ import ua.training.model.entity.Request;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcRequestMapper implements Mapper<Request, ResultSet> {
+public class JdbcRequestMapper implements Mapper<Request> {
     @Override
     public Request map(ResultSet resultSet) throws SQLException {
         return Request.getBuilder()

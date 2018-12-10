@@ -57,7 +57,7 @@ public class JdbcAccountDao implements AccountDao {
             preparedStatement.setLong(1, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Account, ResultSet> mapper = new JdbcMapperFactory().getAccountMapper();
+            Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
 
             List<Account> accounts = new ArrayList<>();
             while (resultSet.next()) {

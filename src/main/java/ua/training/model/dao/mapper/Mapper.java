@@ -1,5 +1,8 @@
 package ua.training.model.dao.mapper;
 
-public interface Mapper<E, R> {
-    E map(R resource) throws Exception;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public interface Mapper<E> {
+    E map(ResultSet resultSet) throws SQLException;
 }

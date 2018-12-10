@@ -8,27 +8,27 @@ import java.sql.ResultSet;
 
 public class JdbcMapperFactory implements MapperFactory <ResultSet> {
     @Override
-    public Mapper<Account, ResultSet> getAccountMapper() {
+    public Mapper<Account> getAccountMapper() {
         return new JdbcAccountMapper();
     }
 
     @Override
-    public Mapper<Invoice, ResultSet> getInvoiceMapper() {
+    public Mapper<Invoice> getInvoiceMapper() {
         return new JdbcInvoiceMapper();
     }
 
     @Override
-    public Mapper<Request, ResultSet> getRequestMapper() {
+    public Mapper<Request> getRequestMapper() {
         return new JdbcRequestMapper();
     }
 
     @Override
-    public Mapper<Transaction, ResultSet> getTransactionMapper() {
+    public Mapper<Transaction> getTransactionMapper() {
         return new JdbcTransactionMapper();
     }
 
     @Override
-    public Mapper<User, ResultSet> getUserMapper() {
+    public Mapper<User> getUserMapper() {
         return new JdbcUserMapper();
     }
 }

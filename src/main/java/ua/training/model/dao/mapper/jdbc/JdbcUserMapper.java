@@ -6,7 +6,7 @@ import ua.training.model.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcUserMapper implements Mapper<User, ResultSet> {
+public class JdbcUserMapper implements Mapper<User> {
     @Override
     public User map(ResultSet resultSet) throws SQLException {
         return User.getBuilder()

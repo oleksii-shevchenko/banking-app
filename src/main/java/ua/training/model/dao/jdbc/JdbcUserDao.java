@@ -64,7 +64,7 @@ public class JdbcUserDao implements UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
-            Mapper<User, ResultSet> mapper = new JdbcMapperFactory().getUserMapper();
+            Mapper<User> mapper = new JdbcMapperFactory().getUserMapper();
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<User> holders = new ArrayList<>();

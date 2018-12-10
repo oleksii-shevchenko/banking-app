@@ -28,7 +28,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Invoice, ResultSet> mapper = new JdbcMapperFactory().getInvoiceMapper();
+            Mapper<Invoice> mapper = new JdbcMapperFactory().getInvoiceMapper();
 
             List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
@@ -49,7 +49,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Invoice, ResultSet> mapper = new JdbcMapperFactory().getInvoiceMapper();
+            Mapper<Invoice> mapper = new JdbcMapperFactory().getInvoiceMapper();
 
             List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
