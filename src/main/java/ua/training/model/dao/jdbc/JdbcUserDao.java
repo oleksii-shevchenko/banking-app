@@ -16,11 +16,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This realization of {@link UserDao} for database source using jdbc library.
+ * @see UserDao
+ * @see User
+ * @author Oleksii Shevchenko
+ */
 public class JdbcUserDao implements UserDao {
     private static Logger logger = LogManager.getLogger(JdbcUserDao.class);
 
+    /**
+     * Gets entity {@link User} using unique field login. If there is no such user, then throws {@link NoSuchUserException}.
+     * @param login User login
+     * @return User entity by login
+     */
     @Override
-    public User getUserByLogin(String login) {
+    public User getUserByLogin(String login) throws NoSuchUserException {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.login"))) {
             preparedStatement.setString(1, login);
@@ -38,6 +49,11 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Return account holders ids list.
+     * @param accountId Targeted account.
+     * @return List of user ids.
+     */
     @Override
     public List<Long> getAccountHoldersIds(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -58,6 +74,11 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Returns account holders list.
+     * @param accountId Targeted account.
+     * @return List of users.
+     */
     @Override
     public List<User> getAccountHolders(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -79,6 +100,12 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Return user permissions for account.
+     * @param holderId Targeted holder.
+     * @param accountId Targeted account.
+     * @return User permission.
+     */
     public Permission getPermissions(Long holderId, Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
@@ -99,19 +126,44 @@ public class JdbcUserDao implements UserDao {
 
     }
 
+    /**
+     * Removes account holder, if it is now owner (permission - ALL). Before removing must be checked that user is not
+     * owner.
+     * @param holderId Targeted holder
+     * @param accountId Targeted account
+     */
     @Override
     public void removeAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"))) {
-            preparedStatement.setLong(1, holderId);
-            preparedStatement.setLong(2, accountId);
-            preparedStatement.executeUpdate();
+             PreparedStatement removeHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"));
+             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
+            getPermissionStatement.setLong(1, holderId);
+            getPermissionStatement.setLong(2, accountId);
+
+            ResultSet resultSet = getPermissionStatement.executeQuery();
+
+            if (resultSet.next()) {
+                if (Permission.valueOf(resultSet.getString("permission")).equals(Permission.ALL)) {
+                    throw new SQLException();
+                }
+            } else {
+                throw new SQLException();
+            }
+
+            removeHolderStatement.setLong(1, holderId);
+            removeHolderStatement.setLong(2, accountId);
+            removeHolderStatement.executeUpdate();
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();
         }
     }
 
+    /**
+     * Adds holder to account with restricted permission. Only owner can add holder. Account must be active.
+     * @param holderId Targeted user.
+     * @param accountId Targeted account.
+     */
     @Override
     public void addAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -145,8 +197,15 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Inserts User entity into DB and return generated primary key.
+     * @param entity User entity that must be inserted.
+     * @return Primary key of inserted user (user id).
+     * @throws NonUniqueLoginException Is thrown if there is user with the same login.
+     * @throws NonUniqueEmailException Is thrown if there is user with the same email.
+     */
     @Override
-    public Long insert(User entity) {
+    public Long insert(User entity) throws NonUniqueLoginException, NonUniqueEmailException {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.insert"), Statement.RETURN_GENERATED_KEYS)) {
             setStatementParameters(entity, preparedStatement);
@@ -172,8 +231,15 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+
+    /**
+     * Update user record.
+     * @param entity User entity that must be updated
+     * @throws NonUniqueEmailException Is thrown if there is user with the same login.
+     * @throws NonUniqueLoginException Is thrown if there is user with the same email.
+     */
     @Override
-    public void update(User entity) {
+    public void update(User entity) throws NonUniqueEmailException, NonUniqueLoginException {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.update"))) {
             setStatementParameters(entity, preparedStatement);
@@ -192,6 +258,10 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Removes user if and only if user haven't no active accounts.
+     * @param entity User that must be removed.
+     */
     @Override
     public void remove(User entity) {
         try (Connection connection = ConnectionsPool.getConnection()) {

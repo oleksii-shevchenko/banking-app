@@ -7,6 +7,12 @@ import ua.training.model.entity.Request;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface {@link Mapper} for entity {@link Request}.
+ * @see Mapper
+ * @see Request
+ * @author Oleksii Shevchenko
+ */
 public class JdbcRequestMapper implements Mapper<Request> {
     @Override
     public Request map(ResultSet resultSet) throws SQLException {

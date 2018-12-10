@@ -18,11 +18,12 @@ public class Transaction {
     private BigDecimal amount;
     private Currency currency;
 
-    //todo change documentation
     /**
      * The possible transaction types. If transaction type is MANUAL that means that it made by user and both fields
-     * sender and receiver are present. IF transaction type is AUTO that means that if made by system (examples:
+     * sender and receiver are present. IF transaction type is REGULAR that means that it is made by system (examples:
      * accrual of interest on a deposit or a loan) and only field receiver is present, the sender if default value.
+     * If transaction type is EXTERNAL that means that it made by admin and the money were gotten from external resource
+     * (examples: real account refill in bank, another payment system)
      * @author Oleksii Shevhcenko
      */
     public enum Type {

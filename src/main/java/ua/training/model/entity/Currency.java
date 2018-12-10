@@ -8,5 +8,5 @@ package ua.training.model.entity;
  * @author Oleksii Shevchenko
  */
 public enum Currency {
-    USD, UAN, GBP, EUR
+    USD, UAN, EUR
 }

@@ -7,6 +7,12 @@ import ua.training.model.entity.Invoice;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface {@link Mapper} for entity {@link Invoice}
+ * @see Mapper
+ * @see Invoice
+ * @author Oleksii Shevchenko
+ */
 public class JdbcInvoiceMapper implements Mapper<Invoice> {
     @Override
     public Invoice map(ResultSet resultSet) throws SQLException {

@@ -8,6 +8,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * This is extension of template dao for {@link Transaction} entity.
+ * @see Dao
+ * @see Transaction
+ * @author Oleksii Shevchenko
+ */
 public interface TransactionDao extends Dao<Long, Transaction> {
     List<Transaction> getAccountTransactions(Long accountId);
 

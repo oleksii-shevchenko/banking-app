@@ -8,6 +8,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+/**
+ * Realization of interface {@link StatementSetter} for mapping DepositAccounts entities.
+ * @see ua.training.model.dao.jdbc.strategy.StatementSetter
+ * @see DepositAccount
+ * @see Account
+ * @author Oleksii Shevchenko
+ */
 public class DepositStatementSetter implements StatementSetter {
     @Override
     public void setStatementParameters(Account account, PreparedStatement preparedStatement) throws SQLException {

@@ -34,7 +34,7 @@ class ConnectionsPool {
 
     /**
      * Method return {@link java.sql.Connection} from pool using principle "one stop shopping"
-     * @return Connection to MySQL database
+     * @return Connection to database
      */
     static Connection getConnection() {
         try {

@@ -8,6 +8,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+/**
+ * Realization of interface {@link StatementSetter} for mapping CreditAccount entities.
+ * @see ua.training.model.dao.jdbc.strategy.StatementSetter
+ * @see CreditAccount
+ * @see Account
+ * @author Oleksii Shevchenko
+ */
 public class CreditStatementSetter implements StatementSetter {
     @Override
     public void setStatementParameters(Account account, PreparedStatement preparedStatement) throws SQLException {

@@ -19,9 +19,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Realization of {@link InvoiceDao} for database source using jdbc library.
+ * @see ua.training.model.dao.Dao
+ * @see Invoice
+ * @see ua.training.model.dao.InvoiceDao
+ * @author Oleksii Shevchenko
+ */
 public class JdbcInvoiceDao implements InvoiceDao {
     private static Logger logger = LogManager.getLogger(JdbcInvoiceDao.class);
 
+    /**
+     * Method gets all invoices where specified account is requester.
+     * @param accountId Targeted account.
+     * @return List of invoices.
+     */
     @Override
     public List<Invoice> getInvoicesByRequester(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -43,6 +55,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
         }
     }
 
+    /**
+     * Method gets all invoices where specified account is payer.
+     * @param accountId Targeted account.
+     * @return List of invoices.
+     */
     @Override
     public List<Invoice> getInvoicesByPayer(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -64,6 +81,10 @@ public class JdbcInvoiceDao implements InvoiceDao {
         }
     }
 
+    /**
+     * Method accepts invoice and makes payment base on this invoice.
+     * @param invoiceId Targeted invoice.
+     */
     @Override
     public void acceptInvoice(Long invoiceId) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -163,6 +184,10 @@ public class JdbcInvoiceDao implements InvoiceDao {
         }
     }
 
+    /**
+     * Method denys specified invoice.
+     * @param invoiceId Targeted invoice.
+     */
     @Override
     public void denyInvoice(Long invoiceId) {
         try (Connection connection = ConnectionsPool.getConnection()) {

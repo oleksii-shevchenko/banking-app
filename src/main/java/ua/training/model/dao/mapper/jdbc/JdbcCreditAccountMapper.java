@@ -8,6 +8,14 @@ import ua.training.model.entity.Currency;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface {@link Mapper} for entity {@link CreditAccount}. It if used as sub-mapper in
+ * {@link JdbcAccountMapper}.
+ * @see Mapper
+ * @see CreditAccount
+ * @see JdbcAccountMapper
+ * @author Oleksii Shevchenko
+ */
 public class JdbcCreditAccountMapper implements Mapper<Account> {
     @Override
     public Account map(ResultSet resultSet) throws SQLException {

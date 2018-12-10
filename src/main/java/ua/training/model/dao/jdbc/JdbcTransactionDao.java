@@ -18,9 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Realization of {@link TransactionDao} for database source using jdbc library.
+ * @see TransactionDao
+ * @see ua.training.model.dao.Dao
+ * @see Transaction
+ * @author Oleksii Shevchenko
+ */
 public class JdbcTransactionDao implements TransactionDao {
     private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
 
+    /**
+     * Returns all transactions where account is sender or receiver.
+     * @param accountId Targeted account.
+     * @return List of account transactions.
+     */
     @Override
     public List<Transaction> getAccountTransactions(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -43,6 +55,13 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * Transfer money from one account to another if it is possible. If it is not possible throws exception.
+     * @param senderId Account from witch will be withdrawn money.
+     * @param receiverId Account for witch will be putted money.
+     * @param amount Amount of money that are transferred.
+     * @param currency Money currency.
+     */
     @Override
     public void makeTransfer(Long senderId, Long receiverId, BigDecimal amount, Currency currency) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -109,6 +128,12 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * This method used by system for periodic update of account to support its account policy (accrual of interest on
+     * a deposit or a loan).
+     * @param accountId Targeted account.
+     * @param updater Update service.
+     */
     @Override
     public void makeUpdate(Long accountId, Function<Account, Transaction> updater) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -156,6 +181,12 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * This method is used by admins to refill account balance from external sources (real payment in bank).
+     * @param accountId Targeted account.
+     * @param amount Amount of refilling.
+     * @param currency Currency of refilling.
+     */
     @Override
     public void makeRefill(Long accountId, BigDecimal amount, Currency currency) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -223,16 +254,26 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * This method is not supported, because transaction insertion possible only in transact operations
+     * ({@link TransactionDao#makeRefill(Long, BigDecimal, Currency)}, {@link TransactionDao#makeTransfer(Long, Long, BigDecimal, Currency)} and etc.)
+     */
     @Override
     public Long insert(Transaction entity) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * This method not supported, because transactions are immutable after insertion.
+     */
     @Override
     public void update(Transaction entity) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * This method not supported, because transactions are fix operations history.
+     */
     @Override
     public void remove(Transaction entity) {
         throw new UnsupportedOperationException();

@@ -8,6 +8,15 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Realization of interface {@link Mapper} for abstract entity {@link Account}. It is used as master-mapper for all
+ * Account entities. It delegates its responsibilities to sub-mappers.
+ * @see Account
+ * @see Mapper
+ * @see JdbcCreditAccountMapper
+ * @see JdbcDepositAccountMapper
+ * @author Oleksii Shevchenko
+ */
 public class JdbcAccountMapper implements Mapper<Account> {
     private static Map<String, Mapper<Account>> subMappers;
 

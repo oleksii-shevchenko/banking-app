@@ -4,6 +4,12 @@ import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.jdbc.*;
 import ua.training.model.entity.*;
 
+/**
+ * Realization mappers factory for jdbc mappers.
+ * @see Mapper
+ * @see MapperFactory
+ * @author Oleksii Shevchenko
+ */
 public class JdbcMapperFactory implements MapperFactory {
     @Override
     public Mapper<Account> getAccountMapper() {

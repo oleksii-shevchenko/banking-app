@@ -19,6 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Realization of {@link AccountDao} for database source using jdbc library.
+ * @see ua.training.model.dao.Dao
+ * @see ua.training.model.dao.AccountDao
+ * @see Account
+ * @author Oleksii Shevhenko
+ */
 public class JdbcAccountDao implements AccountDao {
     private static Logger logger = LogManager.getLogger(JdbcAccountDao.class);
 
@@ -30,6 +37,11 @@ public class JdbcAccountDao implements AccountDao {
         statementSetters.put("CreditAccount", new CreditStatementSetter());
     }
 
+    /**
+     * Method returns user accounts ids.
+     * @param userId Targeted user.
+     * @return List of account ids.
+     */
     @Override
     public List<Long> getUserAccountsIds(Long userId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -50,6 +62,11 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * Method return user account stored in database.
+     * @param userId Targeted user.
+     * @return List of accounts.
+     */
     @Override
     public List<Account> getUserAccounts(Long userId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -71,6 +88,12 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * Method creates some specific account and registers user as it owner.
+     * @param userId Account owner.
+     * @param account Account to be created.
+     * @return Account id.
+     */
     @Override
     public long createAccount(Long userId, Account account) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -112,6 +135,12 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * Method block account after expires end. Should be perform automatically by system mechanisms.
+     * Only closing then possible for account.
+     * @see AccountDao#closeAccount(Long)
+     * @param accountId Targeted account
+     */
     @Override
     public void blockAccount(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
@@ -141,6 +170,10 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * If the balance of account zero, set to account status closed and remove all account holders.
+     * @param accountId Targeted account.
+     */
     @Override
     public void closeAccount(Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -157,7 +190,7 @@ public class JdbcAccountDao implements AccountDao {
                 if (resultSet.next()) {
                     account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
                 } else {
-                    throw new RuntimeException();
+                    throw new SQLException();
                 }
 
                 if (account.getBalance().compareTo(BigDecimal.ZERO) == 0) {

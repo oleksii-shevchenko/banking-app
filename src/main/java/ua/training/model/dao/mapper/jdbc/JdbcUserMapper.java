@@ -6,6 +6,12 @@ import ua.training.model.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface  {@link Mapper} for entity {@link User}.
+ * @see Mapper
+ * @see User
+ * @author Oleksii Shevchenko
+ */
 public class JdbcUserMapper implements Mapper<User> {
     @Override
     public User map(ResultSet resultSet) throws SQLException {

@@ -8,6 +8,14 @@ import ua.training.model.entity.DepositAccount;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface {@link Mapper} for entity {@link DepositAccount}. It is used as sub-mapper in
+ * {@link JdbcAccountMapper}
+ * @see Mapper
+ * @see DepositAccount
+ * @see JdbcAccountMapper
+ * @author Oleksii Shevchenko
+ */
 public class JdbcDepositAccountMapper implements Mapper<Account> {
     @Override
     public Account map(ResultSet resultSet) throws SQLException {

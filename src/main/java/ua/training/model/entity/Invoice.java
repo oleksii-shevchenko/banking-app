@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 
 /**
- * This entity represents user payment requests. It has setters and getters for all fields. The users can create payments
- * request and pay or deny them. If payment is completed successfully (if the case that payer decide to pay) the payment
- * transaction records to storage.
+ * This entity represents user invoices requests. It has POJO structure. The users can create invoices
+ * request and pay or deny them. If payment is completed successfully (in the case if payer decide to pay) the invoice
+ * transaction registers in system.
  * @author Oleksii Shevhcenko
  * @see User
  * @see Transaction

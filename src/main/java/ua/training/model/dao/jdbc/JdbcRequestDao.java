@@ -13,9 +13,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Realization of {@link RequestDao} for database source using jdbc library.
+ * @see RequestDao
+ * @see ua.training.model.dao.Dao
+ * @see Request
+ * @author Oleksii Shevchenko
+ */
 public class JdbcRequestDao implements RequestDao {
     private static Logger logger = LogManager.getLogger(JdbcRequestDao.class);
 
+    /**
+     * This method returns entity of {@link Request} and sets request status completed. If the request is already
+     * completed throws exception.
+     * @param requestId Targeted request.
+     * @return Entity of Request
+     */
     @Override
     public Request processRequest(Long requestId) {
         try (Connection connection = ConnectionsPool.getConnection()) {
@@ -38,6 +51,8 @@ public class JdbcRequestDao implements RequestDao {
                     throw new CompletedRequestException();
                 }
 
+                setCompletedStatement.setBoolean(1, true);
+                setCompletedStatement.setLong(2, requestId);
                 setCompletedStatement.executeUpdate();
 
                 return request;
@@ -53,6 +68,11 @@ public class JdbcRequestDao implements RequestDao {
         }
     }
 
+    /**
+     * Returns all request by completion status.
+     * @param completion Targeted completion.
+     * @return List of requests.
+     */
     @Override
     public List<Request> getAllByCompletion(boolean completion) {
         try (Connection connection = ConnectionsPool.getConnection();

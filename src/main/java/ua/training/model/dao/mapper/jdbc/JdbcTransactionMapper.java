@@ -7,6 +7,12 @@ import ua.training.model.entity.Transaction;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Realization of interface {@link Mapper} for entity {@link Transaction}
+ * @see Transaction
+ * @see Mapper
+ * @author Oleksii Shevchenko
+ */
 public class JdbcTransactionMapper implements Mapper<Transaction> {
     @Override
     public Transaction map(ResultSet resultSet) throws SQLException {
