@@ -35,7 +35,7 @@ public class JdbcRequestDao implements RequestDao {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getRequestStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
-                 PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.completed"))) {
+                 PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
                 getRequestStatement.setLong(1, requestId);
 
                 ResultSet resultSet = getRequestStatement.executeQuery();
@@ -47,7 +47,7 @@ public class JdbcRequestDao implements RequestDao {
                     throw new SQLException();
                 }
 
-                if (request.isCompleted()) {
+                if (request.isConsidered()) {
                     throw new SQLException(new CompletedRequestException());
                 }
 
@@ -74,9 +74,9 @@ public class JdbcRequestDao implements RequestDao {
      * @return List of requests.
      */
     @Override
-    public List<Request> getAllByCompletion(boolean completion) {
+    public List<Request> getByCompletion(boolean completion) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.completion"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.consideration"))) {
             preparedStatement.setBoolean(1, completion);
 
             ResultSet resultSet  = preparedStatement.executeQuery();
@@ -120,7 +120,7 @@ public class JdbcRequestDao implements RequestDao {
             preparedStatement.setLong(1, entity.getRequesterId());
             preparedStatement.setString(2, entity.getType().name());
             preparedStatement.setString(3, entity.getCurrency().name());
-            preparedStatement.setBoolean(4, entity.isCompleted());
+            preparedStatement.setBoolean(4, entity.isConsidered());
             preparedStatement.executeUpdate();
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();

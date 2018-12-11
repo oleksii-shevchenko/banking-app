@@ -257,7 +257,8 @@ public class JdbcTransactionDao implements TransactionDao {
 
     /**
      * This method is not supported, because transaction insertion possible only in transact operations
-     * ({@link TransactionDao#makeRefill(Long, BigDecimal, Currency)}, {@link TransactionDao#makeTransfer(Long, Long, BigDecimal, Currency)} and etc.)
+     * ({@link TransactionDao#makeRefill(Long, BigDecimal, Currency)},
+     * {@link TransactionDao#makeTransfer(Long, Long, BigDecimal, Currency)} and etc.)
      */
     @Override
     public Long insert(Transaction entity) {

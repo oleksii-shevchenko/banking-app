@@ -109,7 +109,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 }
 
                 if (!invoice.getStatus().equals(Invoice.Status.PROCESSING)) {
-                    throw new CompletedInvoiceException();
+                    throw new SQLException(new CompletedInvoiceException());
                 }
 
                 getAccountStatement.setLong(1, invoice.getRequester());
@@ -172,7 +172,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | CompletedInvoiceException | NotEnoughMoneyException exception) {
+            } catch (SQLException | NotEnoughMoneyException exception) {
                 connection.rollback();
 
                 logger.error(exception);

@@ -13,7 +13,7 @@ public class Request {
     private long requesterId;
     private Type type;
     private Currency currency;
-    private boolean completed;
+    private boolean considered;
 
     /**
      * The enum of possible user requests.
@@ -23,12 +23,12 @@ public class Request {
         CREATE_DEPOSIT_ACCOUNT, CREATE_CREDIT_ACCOUNT
     }
 
-    private Request(long id, long requesterId, Type type, Currency currency, boolean completed) {
+    private Request(long id, long requesterId, Type type, Currency currency, boolean considered) {
         this.id = id;
         this.requesterId = requesterId;
         this.type = type;
         this.currency = currency;
-        this.completed = completed;
+        this.considered = considered;
     }
 
     public long getId() {
@@ -63,12 +63,12 @@ public class Request {
         this.currency = currency;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public boolean isConsidered() {
+        return considered;
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    public void setConsidered(boolean considered) {
+        this.considered = considered;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Request {
         private long requesterId;
         private Type type;
         private Currency currency;
-        private boolean completed;
+        private boolean considered;
 
         public RequestBuilder setId(long id) {
             this.id = id;
@@ -103,13 +103,13 @@ public class Request {
             return this;
         }
 
-        public RequestBuilder setCompleted(boolean completed) {
-            this.completed = completed;
+        public RequestBuilder setConsidered(boolean considered) {
+            this.considered = considered;
             return this;
         }
 
         public Request build() {
-            return new Request(id, requesterId, type, currency, completed);
+            return new Request(id, requesterId, type, currency, considered);
         }
     }
 

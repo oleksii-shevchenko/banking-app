@@ -13,5 +13,5 @@ import java.util.List;
 public interface RequestDao extends Dao<Long, Request> {
     Request processRequest(Long requestId);
 
-    List<Request> getAllByCompletion(boolean completion);
+    List<Request> getByCompletion(boolean completion);
 }
