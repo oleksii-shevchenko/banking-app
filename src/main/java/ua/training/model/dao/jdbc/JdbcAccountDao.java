@@ -38,7 +38,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     /**
-     * Method returns user accounts ids.
+     * Method returns all user accounts ids.
      * @param userId Targeted user.
      * @return List of account ids.
      */
@@ -89,7 +89,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     /**
-     * Method creates some specific account and registers user as it owner.
+     * Method creates specific account and registers user as it owner.
      * @param userId Account owner.
      * @param account Account to be created.
      * @return Account id.

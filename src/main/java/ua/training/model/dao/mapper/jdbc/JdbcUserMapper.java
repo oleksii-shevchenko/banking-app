@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Realization of interface  {@link Mapper} for entity {@link User}.
+ * Realization of interface {@link Mapper} for entity {@link User}.
  * @see Mapper
  * @see User
  * @author Oleksii Shevchenko

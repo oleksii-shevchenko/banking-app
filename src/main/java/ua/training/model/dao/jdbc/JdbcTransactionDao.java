@@ -58,9 +58,9 @@ public class JdbcTransactionDao implements TransactionDao {
     /**
      * Transfer money from one account to another if it is possible. If it is not possible throws exception.
      * @param senderId Account from witch will be withdrawn money.
-     * @param receiverId Account for witch will be putted money.
+     * @param receiverId Account to witch will be putted money.
      * @param amount Amount of money that are transferred.
-     * @param currency Money currency.
+     * @param currency Transaction currency.
      */
     @Override
     public void makeTransfer(Long senderId, Long receiverId, BigDecimal amount, Currency currency) {
@@ -129,10 +129,10 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     /**
-     * This method used by system for periodic update of account to support its account policy (accrual of interest on
-     * a deposit or a loan).
+     * This method used by system for periodic update of account balance to support its account policy (accrual of
+     * interest on a deposit or a loan).
      * @param accountId Targeted account.
-     * @param updater Update service.
+     * @param updater Updater service.
      */
     @Override
     public void makeUpdate(Long accountId, Function<Account, Transaction> updater) {
@@ -165,7 +165,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
                 insertTransactionStatement.setNull(1, Types.BIGINT);
                 insertTransactionStatement.setLong(2, transaction.getReceiver());
-                insertTransactionStatement.setString(3, transaction.getType().name());
+                insertTransactionStatement.setString(3, Transaction.Type.REGULAR.name());
                 insertTransactionStatement.setBigDecimal(4, transaction.getAmount());
                 insertTransactionStatement.setString(5, transaction.getCurrency().name());
                 insertTransactionStatement.executeUpdate();
@@ -182,7 +182,7 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     /**
-     * This method is used by admins to refill account balance from external sources (real payment in bank).
+     * This method is used by admins to refill account balance from external sources (example: real payment in bank).
      * @param accountId Targeted account.
      * @param amount Amount of refilling.
      * @param currency Currency of refilling.

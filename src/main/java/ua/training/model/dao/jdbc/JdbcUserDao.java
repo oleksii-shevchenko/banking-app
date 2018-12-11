@@ -28,7 +28,7 @@ public class JdbcUserDao implements UserDao {
     /**
      * Gets entity {@link User} using unique field login. If there is no such user, then throws {@link NoSuchUserException}.
      * @param login User login
-     * @return User entity by login
+     * @return User entity
      */
     @Override
     public User getUserByLogin(String login) throws NoSuchUserException {
@@ -127,7 +127,7 @@ public class JdbcUserDao implements UserDao {
     }
 
     /**
-     * Removes account holder, if it is now owner (permission - ALL). Before removing must be checked that user is not
+     * Removes account holder, if it is not owner (permission - ALL). Before removing checked that user is not
      * owner.
      * @param holderId Targeted holder
      * @param accountId Targeted account
@@ -160,7 +160,7 @@ public class JdbcUserDao implements UserDao {
     }
 
     /**
-     * Adds holder to account with restricted permission. Only owner can add holder. Account must be active.
+     * Method adds holder to account with restricted permission. Only owner can add holder. Account must be active.
      * @param holderId Targeted user.
      * @param accountId Targeted account.
      */
@@ -191,7 +191,7 @@ public class JdbcUserDao implements UserDao {
             } else {
                 throw new SQLException();
             }
-        } catch (SQLException | RuntimeException exception) {
+        } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
         }

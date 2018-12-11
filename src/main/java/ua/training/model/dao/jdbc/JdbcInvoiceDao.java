@@ -30,7 +30,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
     private static Logger logger = LogManager.getLogger(JdbcInvoiceDao.class);
 
     /**
-     * Method gets all invoices where specified account is requester.
+     * Method returns all invoices where specified account is requester.
      * @param accountId Targeted account.
      * @return List of invoices.
      */
@@ -56,7 +56,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
     }
 
     /**
-     * Method gets all invoices where specified account is payer.
+     * Method returns all invoices where specified account is payer.
      * @param accountId Targeted account.
      * @return List of invoices.
      */
@@ -92,8 +92,8 @@ public class JdbcInvoiceDao implements InvoiceDao {
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"));
-                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"), Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"));
+                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"));
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
                 MapperFactory mapperFactory = new JdbcMapperFactory();
 

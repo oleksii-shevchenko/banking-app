@@ -48,7 +48,7 @@ public class JdbcRequestDao implements RequestDao {
                 }
 
                 if (request.isCompleted()) {
-                    throw new CompletedRequestException();
+                    throw new SQLException(new CompletedRequestException());
                 }
 
                 setCompletedStatement.setBoolean(1, true);
@@ -56,7 +56,7 @@ public class JdbcRequestDao implements RequestDao {
                 setCompletedStatement.executeUpdate();
 
                 return request;
-            } catch (SQLException | CompletedRequestException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
