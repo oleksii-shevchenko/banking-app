@@ -9,14 +9,19 @@ import java.math.BigDecimal;
 import java.util.function.Function;
 
 /**
- * Realization of credit account updater. It modifies account according to credit policy. If account has non
- * negative balance then do no update ({@link CreditUpdater#apply(Account)} throws {@link TrivialUpdateException}).
- * If account has negative account then accrues interest on the loan and creates transaction based on update.
- * @see ua.training.model.dao.TransactionDao#makeUpdate(Long, Function)
- * @see TrivialUpdateException
+ * Realization of credit account updater. It modifies account according to credit policy.
  * @author Oleksii Shevchenko
  */
 public class CreditUpdater implements Function<Account, Transaction> {
+    /**
+     * Method realize credit policy. Account must be credit, if it isn't, then throws exception. If account has non
+     * negative balance then do no update then throws {@link TrivialUpdateException}).
+     * If account has negative account then accrues interest on the loan and creates transaction based on update.
+     * @see ua.training.model.dao.TransactionDao#makeUpdate(Long, Function)
+     * @see TrivialUpdateException
+     * @param account Targeted credit account.
+     * @return Transaction based on update.
+     */
     @Override
     public Transaction apply(Account account) {
         CreditAccount creditAccount = (CreditAccount) account;
