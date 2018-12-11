@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * This class provides connections to database using pool structure. Access provided via singleton pattern.
  * @author Oleksii Shevchenko
  */
-class ConnectionsPool {
+final class ConnectionsPool {
     private static Logger logger = LogManager.getLogger(ConnectionsPool.class);
     private static DataSource dataSource;
 
