@@ -9,6 +9,7 @@ import ua.training.model.entity.Account;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.Transaction;
 import ua.training.model.exception.NotEnoughMoneyException;
+import ua.training.model.exception.TrivialUpdateException;
 import ua.training.model.exception.UnsupportedOperationException;
 import ua.training.model.service.CurrencyExchangeService;
 
@@ -169,7 +170,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 insertTransactionStatement.setBigDecimal(4, transaction.getAmount());
                 insertTransactionStatement.setString(5, transaction.getCurrency().name());
                 insertTransactionStatement.executeUpdate();
-            } catch (SQLException exception) {
+            } catch (SQLException | TrivialUpdateException exception) {
                 connection.rollback();
 
                 logger.error(exception);
