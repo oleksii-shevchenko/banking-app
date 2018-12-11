@@ -4,6 +4,16 @@ import ua.training.model.dao.*;
 import ua.training.model.dao.jdbc.*;
 
 public class JdbcDaoFactory implements DaoFactory{
+    private static DaoFactory factory;
+
+    static {
+        factory = new JdbcDaoFactory();
+    }
+
+    public static DaoFactory getInstance() {
+        return factory;
+    }
+
     @Override
     public AccountDao getAccountDao() {
         return new JdbcAccountDao();
