@@ -1,9 +1,9 @@
-package ua.training.model.service;
+package ua.training.model.service.schedules;
 
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
 import ua.training.model.entity.Transaction;
-import ua.training.model.exception.TrivialUpdateException;
+import ua.training.model.service.ScheduledUpdateService;
 
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -16,10 +16,8 @@ import java.util.function.Function;
 public class DepositUpdater implements Function<Account, Transaction> {
     /**
      * Method realize deposit policy. Account must be deposit, if it isn't, then throws exception. If account has
-     * zero balance then do no update and throws {@link TrivialUpdateException}). If account has positive balance
+     * zero balance then do no update and throws . If account has positive balance
      * then accrues interest on the deposit and creates transaction based on update.
-     * @see TrivialUpdateException
-     * @see ua.training.model.dao.TransactionDao#makeUpdate(Long, Function)
      * @param account Targeted deposit account.
      * @return Transaction based on update.
      */
@@ -28,7 +26,7 @@ public class DepositUpdater implements Function<Account, Transaction> {
         DepositAccount depositAccount = (DepositAccount) account;
 
         if (depositAccount.getBalance().compareTo(BigDecimal.ZERO) == 0) {
-            throw new TrivialUpdateException();
+            //throw new TrivialUpdateException();
         }
         BigDecimal interest = computeInterest(depositAccount);
         Transaction transaction = Transaction.getBuilder()

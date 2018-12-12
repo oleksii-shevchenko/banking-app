@@ -1,7 +1,5 @@
 package ua.training.model.entity;
 
-import ua.training.model.exception.NotEnoughMoneyException;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,24 +27,6 @@ public class DepositAccount extends Account {
     public DepositAccount setDepositRate(BigDecimal depositRate) {
         this.depositRate = depositRate;
         return this;
-    }
-
-    /**
-     * The realization of abstract method {@link Account#withdrawFromAccount(BigDecimal)} due to deposit policy
-     * @param amount The amount of money that must be withdraw from account (positive number)
-     * @return Balance of the account after transaction
-     * @throws NotEnoughMoneyException The exception is thrown if and only is the
-     * expression 'balance - amount' is negative
-     */
-    @Override
-    public BigDecimal withdrawFromAccount(BigDecimal amount) throws NotEnoughMoneyException {
-        BigDecimal balanceAfterTransaction = this.getBalance().subtract(amount);
-        if (balanceAfterTransaction.compareTo(BigDecimal.ZERO) >= 0) {
-            this.setBalance(balanceAfterTransaction);
-            return balanceAfterTransaction;
-        } else {
-            throw new NotEnoughMoneyException(this);
-        }
     }
 
     /**

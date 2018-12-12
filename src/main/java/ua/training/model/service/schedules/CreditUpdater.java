@@ -1,9 +1,9 @@
-package ua.training.model.service;
+package ua.training.model.service.schedules;
 
 import ua.training.model.entity.Account;
 import ua.training.model.entity.CreditAccount;
 import ua.training.model.entity.Transaction;
-import ua.training.model.exception.TrivialUpdateException;
+import ua.training.model.service.ScheduledUpdateService;
 
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -16,10 +16,8 @@ import java.util.function.Function;
 public class CreditUpdater implements Function<Account, Transaction> {
     /**
      * Method realize credit policy. Account must be credit, if it isn't, then throws exception. If account has non
-     * negative balance then do no update and throws {@link TrivialUpdateException}).
+     * negative balance then do no update and throws .
      * If account has negative account then accrues interest on the loan and creates transaction based on update.
-     * @see ua.training.model.dao.TransactionDao#makeUpdate(Long, Function)
-     * @see TrivialUpdateException
      * @param account Targeted credit account.
      * @return Transaction based on update.
      */
@@ -28,7 +26,7 @@ public class CreditUpdater implements Function<Account, Transaction> {
         CreditAccount creditAccount = (CreditAccount) account;
 
         if (!hasNegativeBalance(creditAccount)) {
-            throw new TrivialUpdateException();
+
         }
         BigDecimal loan = computeLoan(creditAccount);
         Transaction transaction = Transaction.getBuilder()

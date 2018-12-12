@@ -1,7 +1,5 @@
 package ua.training.model.entity;
 
-import ua.training.model.exception.NotEnoughMoneyException;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -39,24 +37,6 @@ public class CreditAccount extends Account {
 
     public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
-    }
-
-    /**
-     * The realization of abstract method {@link Account#withdrawFromAccount(BigDecimal)} due to credit policy
-     * @param amount The amount of money that must be withdraw from account (positive number)
-     * @return Balance of the account after transaction
-     * @throws NotEnoughMoneyException The exception is thrown if and only is the
-     * expression 'balance + creditLimit - amount' is negative
-     */
-    @Override
-    public BigDecimal withdrawFromAccount(BigDecimal amount) throws NotEnoughMoneyException {
-        BigDecimal balanceAfterTransaction = this.getBalance().add(creditLimit).subtract(amount);
-        if (balanceAfterTransaction.compareTo(BigDecimal.ZERO) >= 0) {
-            this.setBalance(balanceAfterTransaction);
-            return balanceAfterTransaction;
-        } else {
-            throw new NotEnoughMoneyException(this);
-        }
     }
 
     /**

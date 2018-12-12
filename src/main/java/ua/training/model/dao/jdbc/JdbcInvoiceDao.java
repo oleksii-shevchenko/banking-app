@@ -5,16 +5,15 @@ import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.InvoiceDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
-import ua.training.model.dao.mapper.factory.MapperFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Invoice;
 import ua.training.model.entity.Transaction;
-import ua.training.model.exception.CompletedInvoiceException;
+import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
-import ua.training.model.service.CurrencyExchangeService;
+import ua.training.model.service.account.AccountService;
+import ua.training.model.service.account.AccountServiceFactory;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,69 +94,48 @@ public class JdbcInvoiceDao implements InvoiceDao {
                  PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
-                MapperFactory mapperFactory = new JdbcMapperFactory();
+                AccountService accountService;
 
-                getInvoiceStatement.setLong(1, invoiceId);
-
-                ResultSet resultSet = getInvoiceStatement.executeQuery();
-
-                Invoice invoice;
-                if (resultSet.next()) {
-                    invoice = mapperFactory.getInvoiceMapper().map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
+                Invoice invoice = getInvoiceById(invoiceId, getInvoiceStatement);
 
                 if (!invoice.getStatus().equals(Invoice.Status.PROCESSING)) {
-                    throw new SQLException(new CompletedInvoiceException());
-                }
-
-                getAccountStatement.setLong(1, invoice.getRequester());
-
-                resultSet = getAccountStatement.executeQuery();
-
-                Account requester;
-                if (resultSet.next()) {
-                    requester = mapperFactory.getAccountMapper().map(resultSet);
-                } else {
                     throw new SQLException();
                 }
 
-                getAccountStatement.setLong(1, invoice.getPayer());
+                Account requester = getAccountById(invoice.getRequester(), getAccountStatement);
+                Account payer = getAccountById(invoice.getPayer(), getAccountStatement);
 
-                resultSet = getAccountStatement.executeQuery();
+                Transaction transaction = Transaction.getBuilder()
+                        .setSender(invoice.getPayer())
+                        .setReceiver(invoice.getRequester())
+                        .setType(Transaction.Type.MANUAL)
+                        .setAmount(invoice.getAmount())
+                        .setCurrency(invoice.getCurrency())
+                        .build();
 
-                Account payer;
-                if (resultSet.next()) {
-                    payer = mapperFactory.getAccountMapper().map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
+                accountService = AccountServiceFactory.getService(requester.getClass().getSimpleName());
+                accountService.chargeMoney(requester, transaction);
 
-                if (!(requester.isActive() && payer.isActive())) {
-                    throw new SQLException();
-                }
+                accountService = AccountServiceFactory.getService(payer.getClass().getSimpleName());
+                accountService.withdrawMoney(payer, transaction);
 
-                CurrencyExchangeService exchangeService = new CurrencyExchangeService();
-                BigDecimal exchangeRate;
 
-                exchangeRate = exchangeService.exchangeRate(invoice.getCurrency(), requester.getCurrency());
-                updateBalanceStatement.setBigDecimal(1, requester.refillAccount(invoice.getAmount().multiply(exchangeRate)));
+                updateBalanceStatement.setBigDecimal(1, requester.getBalance());
                 updateBalanceStatement.setLong(2, requester.getId());
                 updateBalanceStatement.executeUpdate();
 
-                exchangeRate = exchangeService.exchangeRate(invoice.getCurrency(), payer.getCurrency());
-                updateBalanceStatement.setBigDecimal(1, payer.withdrawFromAccount(invoice.getAmount().multiply(exchangeRate)));
+                updateBalanceStatement.setBigDecimal(1, payer.getBalance());
                 updateBalanceStatement.setLong(2, payer.getId());
+                updateBalanceStatement.executeUpdate();
 
-                insertTransactionStatement.setLong(1, payer.getId());
-                insertTransactionStatement.setLong(2, requester.getId());
-                insertTransactionStatement.setString(3, Transaction.Type.MANUAL.name());
-                insertTransactionStatement.setBigDecimal(4, invoice.getAmount());
-                insertTransactionStatement.setString(5, invoice.getCurrency().name());
+                insertTransactionStatement.setLong(1, transaction.getSender());
+                insertTransactionStatement.setLong(2, transaction.getReceiver());
+                insertTransactionStatement.setString(3, transaction.getType().name());
+                insertTransactionStatement.setBigDecimal(4, transaction.getAmount());
+                insertTransactionStatement.setString(5, transaction.getCurrency().name());
                 insertTransactionStatement.executeUpdate();
 
-                resultSet = insertTransactionStatement.getGeneratedKeys();
+                ResultSet resultSet = insertTransactionStatement.getGeneratedKeys();
 
                 long transactionId;
                 if (resultSet.next()) {
@@ -172,7 +150,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | NotEnoughMoneyException exception) {
+            } catch (SQLException | NotEnoughMoneyException | NonActiveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -181,6 +159,18 @@ public class JdbcInvoiceDao implements InvoiceDao {
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();
+        }
+    }
+
+    private Account getAccountById(Long accountId, PreparedStatement getAccountStatement) throws SQLException {
+        getAccountStatement.setLong(1, accountId);
+
+        ResultSet resultSet = getAccountStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return new JdbcMapperFactory().getAccountMapper().map(resultSet);
+        } else {
+            throw new SQLException();
         }
     }
 
@@ -207,7 +197,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 }
 
                 if (!(invoice.getStatus().equals(Invoice.Status.PROCESSING))) {
-                    throw new CompletedInvoiceException();
+                    throw new SQLException();
                 }
 
                 updateInvoiceStatement.setString(1, Invoice.Status.DENIED.name());
@@ -215,7 +205,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | CompletedInvoiceException exception) {
+            } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -231,18 +221,22 @@ public class JdbcInvoiceDao implements InvoiceDao {
     public Invoice get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"))) {
-            preparedStatement.setLong(1, key);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return new JdbcMapperFactory().getInvoiceMapper().map(resultSet);
-            } else {
-                throw new SQLException();
-            }
+            return getInvoiceById(key, preparedStatement);
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);
+        }
+    }
+
+    private Invoice getInvoiceById(Long invoiceId, PreparedStatement getAccountStatement) throws SQLException {
+        getAccountStatement.setLong(1, invoiceId);
+
+        ResultSet resultSet = getAccountStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return new JdbcMapperFactory().getInvoiceMapper().map(resultSet);
+        } else {
+            throw new SQLException();
         }
     }
 

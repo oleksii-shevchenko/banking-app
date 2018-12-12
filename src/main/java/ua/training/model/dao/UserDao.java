@@ -14,7 +14,6 @@ import java.util.List;
 public interface UserDao extends Dao<Long, User> {
     User getUserByLogin(String login);
 
-    List<Long> getAccountHoldersIds(Long accountId);
     List<User> getAccountHolders(Long accountId);
 
     Permission getPermissions(Long holderId, Long accountId);

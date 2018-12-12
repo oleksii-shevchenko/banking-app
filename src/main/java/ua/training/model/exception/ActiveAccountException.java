@@ -5,5 +5,5 @@ package ua.training.model.exception;
  * @author Oleksii Shevchenko
  * @see ua.training.model.dao.jdbc.JdbcAccountDao
  */
-public class AliveAccountException extends Exception {
+public class ActiveAccountException extends Exception {
 }

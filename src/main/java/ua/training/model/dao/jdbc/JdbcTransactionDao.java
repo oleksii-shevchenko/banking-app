@@ -6,15 +6,18 @@ import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
-import ua.training.model.entity.Currency;
 import ua.training.model.entity.Transaction;
+import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
-import ua.training.model.exception.TrivialUpdateException;
 import ua.training.model.exception.UnsupportedOperationException;
-import ua.training.model.service.CurrencyExchangeService;
+import ua.training.model.service.account.AccountService;
+import ua.training.model.service.account.AccountServiceFactory;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -56,121 +59,41 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
-    /**
-     * Transfer money from one account to another if it is possible. If it is not possible throws exception.
-     * @param senderId Account from witch will be withdrawn money.
-     * @param receiverId Account to witch will be putted money.
-     * @param amount Amount of money that are transferred.
-     * @param currency Transaction currency.
-     */
     @Override
-    public void makeTransfer(Long senderId, Long receiverId, BigDecimal amount, Currency currency) {
+    public long makeTransaction(Transaction transaction) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
-                getAccountStatement.setLong(1, senderId);
+                AccountService accountService;
 
-                ResultSet resultSet = getAccountStatement.executeQuery();
-                Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
+                if (transaction.getType().equals(Transaction.Type.MANUAL)) {
+                    Account sender = getAccountById(transaction.getSender(), getAccountStatement);
 
-                Account sender;
-                if (resultSet.next()) {
-                    sender = mapper.map(resultSet);
-                } else {
-                    throw new SQLException();
+                    accountService = AccountServiceFactory.getService(sender.getClass().getSimpleName());
+                    accountService.withdrawMoney(sender, transaction);
+
+                    updateAccountBalance(sender.getId(), sender.getBalance(), updateBalanceStatement);
                 }
 
-                getAccountStatement.setLong(1, receiverId);
+                Account receiver = getAccountById(transaction.getReceiver(), getAccountStatement);
 
-                resultSet = getAccountStatement.executeQuery();
+                accountService = AccountServiceFactory.getService(receiver.getClass().getSimpleName());
+                accountService.chargeMoney(receiver, transaction);
 
-                Account receiver;
-                if (resultSet.next()) {
-                    receiver = mapper.map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
+                updateAccountBalance(receiver.getId(), receiver.getBalance(), updateBalanceStatement);
 
-                if (!(sender.isActive() && receiver.isActive())) {
-                    throw new SQLException();
-                }
-
-                CurrencyExchangeService exchangeService = new CurrencyExchangeService();
-
-                sender.withdrawFromAccount(amount.multiply(exchangeService.exchangeRate(currency, sender.getCurrency())));
-                receiver.refillAccount(amount.multiply(exchangeService.exchangeRate(currency, receiver.getCurrency())));
-
-                updateBalanceStatement.setBigDecimal(1, sender.getBalance());
-                updateBalanceStatement.setLong(2, sender.getId());
-                updateBalanceStatement.executeUpdate();
-
-                updateBalanceStatement.setBigDecimal(1, receiver.getBalance());
-                updateBalanceStatement.setLong(2, receiver.getId());
-                updateBalanceStatement.executeUpdate();
-
-                insertTransactionStatement.setLong(1, sender.getId());
-                insertTransactionStatement.setLong(2, receiver.getId());
-                insertTransactionStatement.setString(3, Transaction.Type.MANUAL.name());
-                insertTransactionStatement.setBigDecimal(4, amount);
-                insertTransactionStatement.setString(5, currency.name());
+                setStatementParameters(transaction, insertTransactionStatement);
                 insertTransactionStatement.executeUpdate();
-            } catch (SQLException | NotEnoughMoneyException exception) {
-                connection.rollback();
 
-                logger.error(exception);
-                throw new RuntimeException();
-            }
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException();
-        }
-    }
+                long transactionId = extractGeneratedKey(insertTransactionStatement.getGeneratedKeys());
 
-    /**
-     * This method used by system for periodic update of account balance to support its account policy (accrual of
-     * interest on a deposit or a loan).
-     * @param accountId Targeted account.
-     * @param updater Updater service.
-     */
-    @Override
-    public void makeUpdate(Long accountId, Function<Account, Transaction> updater) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-            connection.setAutoCommit(false);
-            try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement updateAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
-                getAccountStatement.setLong(1, accountId);
+                connection.commit();
 
-                ResultSet resultSet = getAccountStatement.executeQuery();
-
-                Account account;
-                if (resultSet.next()) {
-                    account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
-
-                if (!account.isActive()) {
-                    throw new SQLException();
-                }
-
-                Transaction transaction = updater.apply(account);
-
-                updateAccountStatement.setBigDecimal(1, account.getBalance());
-                updateAccountStatement.setLong(2, accountId);
-                updateAccountStatement.executeUpdate();
-
-                insertTransactionStatement.setNull(1, Types.BIGINT);
-                insertTransactionStatement.setLong(2, transaction.getReceiver());
-                insertTransactionStatement.setString(3, Transaction.Type.REGULAR.name());
-                insertTransactionStatement.setBigDecimal(4, transaction.getAmount());
-                insertTransactionStatement.setString(5, transaction.getCurrency().name());
-                insertTransactionStatement.executeUpdate();
-            } catch (SQLException | TrivialUpdateException exception) {
+                return transactionId;
+            } catch (SQLException | NotEnoughMoneyException | NonActiveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -178,62 +101,80 @@ public class JdbcTransactionDao implements TransactionDao {
             }
         } catch (SQLException exception) {
             logger.error(exception);
-            throw new RuntimeException();
+            throw new RuntimeException(exception);
         }
     }
 
-    /**
-     * This method is used by admins to refill account balance from external sources (example: real payment in bank).
-     * @param accountId Targeted account.
-     * @param amount Amount of refilling.
-     * @param currency Currency of refilling.
-     */
     @Override
-    public void makeRefill(Long accountId, BigDecimal amount, Currency currency) {
+    public long makeTransaction(Long accountId, Function<Account, Transaction> transactionProducer) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
-                getAccountStatement.setLong(1, accountId);
+                Account account = getAccountById(accountId, getAccountStatement);
 
-                ResultSet resultSet = getAccountStatement.executeQuery();
+                Transaction transaction = transactionProducer.apply(account);
 
-                Account account;
-                if (resultSet.next()) {
-                    account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
-                } else {
+                if (transaction == null) {
                     throw new SQLException();
                 }
 
-                if (!account.isActive()) {
-                    throw new SQLException();
-                }
+                updateAccountBalance(account.getId(), account.getBalance(), updateBalanceStatement);
 
-                BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(currency, account.getCurrency());
-
-                updateBalanceStatement.setBigDecimal(1, account.refillAccount(amount.multiply(exchangeRate)));
-                updateBalanceStatement.setLong(2, accountId);
-                updateBalanceStatement.executeUpdate();
-
-                insertTransactionStatement.setNull(1, Types.BIGINT);
-                insertTransactionStatement.setLong(2, account.getId());
-                insertTransactionStatement.setString(3, Transaction.Type.EXTERNAL.name());
-                insertTransactionStatement.setBigDecimal(4, amount);
-                insertTransactionStatement.setString(5, currency.name());
+                setStatementParameters(transaction, insertTransactionStatement);
                 insertTransactionStatement.executeUpdate();
+
+                long transactionId = extractGeneratedKey(insertTransactionStatement.getGeneratedKeys());
+
+                connection.commit();
+
+                return transactionId;
             } catch (SQLException exception) {
                 connection.rollback();
 
                 logger.error(exception);
-                throw new RuntimeException();
+                throw new RuntimeException(exception);
             }
         } catch (SQLException exception) {
             logger.error(exception);
-            throw new RuntimeException();
+            throw new RuntimeException(exception);
         }
+    }
 
+    private Account getAccountById(Long accountId, PreparedStatement getAccountStatement) throws SQLException {
+        getAccountStatement.setLong(1, accountId);
+
+        ResultSet resultSet = getAccountStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return new JdbcMapperFactory().getAccountMapper().map(resultSet);
+        } else {
+            throw new SQLException();
+        }
+    }
+
+    private void updateAccountBalance(Long accountId, BigDecimal balance, PreparedStatement updateBalanceStatement) throws SQLException {
+        updateBalanceStatement.setBigDecimal(1, balance);
+        updateBalanceStatement.setLong(2, accountId);
+        updateBalanceStatement.executeUpdate();
+    }
+
+    private void setStatementParameters(Transaction entity, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setLong(1, entity.getSender());
+        preparedStatement.setLong(2, entity.getReceiver());
+        preparedStatement.setString(3, entity.getType().name());
+        preparedStatement.setBigDecimal(4, entity.getAmount());
+        preparedStatement.setString(5, entity.getCurrency().name());
+    }
+
+    private long extractGeneratedKey(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return resultSet.getLong(1);
+        } else {
+            throw new SQLException();
+        }
     }
 
     @Override
@@ -257,8 +198,6 @@ public class JdbcTransactionDao implements TransactionDao {
 
     /**
      * This method is not supported, because transaction insertion possible only in transact operations
-     * ({@link TransactionDao#makeRefill(Long, BigDecimal, Currency)},
-     * {@link TransactionDao#makeTransfer(Long, Long, BigDecimal, Currency)} and etc.)
      */
     @Override
     public Long insert(Transaction entity) {

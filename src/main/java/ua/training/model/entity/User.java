@@ -16,7 +16,7 @@ public class User {
     private Role role;
     private String firstName;
     private String secondName;
-    private List<Long> accountIds;
+    private List<Long> accounts;
 
     /**
      * The enum represents roles of users that are present in system.
@@ -27,7 +27,7 @@ public class User {
         GUEST, USER, ADMIN
     }
 
-    private User(long id, String login, String passwordHash, String email, Role role, String firstName, String secondName, List<Long> accountIds) {
+    private User(long id, String login, String passwordHash, String email, Role role, String firstName, String secondName, List<Long> accounts) {
         this.id = id;
         this.login = login;
         this.passwordHash = passwordHash;
@@ -35,7 +35,7 @@ public class User {
         this.role = role;
         this.firstName = firstName;
         this.secondName = secondName;
-        this.accountIds = accountIds;
+        this.accounts = accounts;
     }
 
     /**
@@ -61,7 +61,7 @@ public class User {
         private Role role;
         private String firstName;
         private String secondName;
-        private List<Long> accountIds;
+        private List<Long> accounts;
 
         public UserBuilder setId(long id) {
             this.id = id;
@@ -98,13 +98,13 @@ public class User {
             return this;
         }
 
-        public UserBuilder setAccountIds(List<Long> accountIds) {
-            this.accountIds = accountIds;
+        public UserBuilder setAccounts(List<Long> accounts) {
+            this.accounts = accounts;
             return this;
         }
 
         public User build() {
-            return new User(id, login, passwordHash, email, role, firstName, secondName, accountIds);
+            return new User(id, login, passwordHash, email, role, firstName, secondName, accounts);
         }
     }
 
@@ -164,11 +164,11 @@ public class User {
         this.secondName = secondName;
     }
 
-    public List<Long> getAccountIds() {
-        return accountIds;
+    public List<Long> getAccounts() {
+        return accounts;
     }
 
-    public void setAccountIds(List<Long> accountIds) {
-        this.accountIds = accountIds;
+    public void setAccounts(List<Long> accounts) {
+        this.accounts = accounts;
     }
 }

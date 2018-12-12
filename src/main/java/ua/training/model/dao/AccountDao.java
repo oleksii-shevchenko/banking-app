@@ -12,7 +12,6 @@ import java.util.List;
  * @author Oleksii Shevchenko
  */
 public interface AccountDao extends Dao<Long, Account> {
-    List<Long> getUserAccountsIds(Long userId);
     List<Account> getUserAccounts(Long userId);
 
     long createAccount(Long userId, Account account);

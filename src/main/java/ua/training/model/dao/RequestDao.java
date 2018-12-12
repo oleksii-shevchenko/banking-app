@@ -11,7 +11,7 @@ import java.util.List;
  * @author Oleksii Shevchenko
  */
 public interface RequestDao extends Dao<Long, Request> {
-    Request processRequest(Long requestId);
+    Request considerRequest(Long requestId);
 
-    List<Request> getByCompletion(boolean completion);
+    List<Request> getByConsideration(boolean consideration);
 }

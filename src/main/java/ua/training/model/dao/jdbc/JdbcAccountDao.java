@@ -10,7 +10,7 @@ import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Permission;
-import ua.training.model.exception.AliveAccountException;
+import ua.training.model.exception.ActiveAccountException;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -35,31 +35,6 @@ public class JdbcAccountDao implements AccountDao {
         statementSetters = new HashMap<>();
         statementSetters.put("DepositAccount", new DepositStatementSetter());
         statementSetters.put("CreditAccount", new CreditStatementSetter());
-    }
-
-    /**
-     * Method returns all user accounts ids.
-     * @param userId Targeted user.
-     * @return List of account ids.
-     */
-    @Override
-    public List<Long> getUserAccountsIds(Long userId) {
-        try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
-            preparedStatement.setLong(1, userId);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Long> accountsIds = new ArrayList<>();
-            while (resultSet.next()) {
-                accountsIds.add(resultSet.getLong("account_id"));
-            }
-
-            return accountsIds;
-        } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException(exception);
-        }
     }
 
     /**
@@ -194,7 +169,7 @@ public class JdbcAccountDao implements AccountDao {
                 }
 
                 if (account.getBalance().compareTo(BigDecimal.ZERO) == 0) {
-                    throw new AliveAccountException();
+                    throw new ActiveAccountException();
                 }
 
                 updateStatusStatement.setString(1, Account.Status.CLOSED.name());
@@ -205,7 +180,7 @@ public class JdbcAccountDao implements AccountDao {
                 removeAccountStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | AliveAccountException exception) {
+            } catch (SQLException | ActiveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);
@@ -221,16 +196,30 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public Account get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"))) {
-            preparedStatement.setLong(1, key);
+             PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
+             PreparedStatement getHoldersStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
+            getAccountStatement.setLong(1, key);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet resultSet = getAccountStatement.executeQuery();
 
+            Account account;
             if (resultSet.next()) {
-                return new JdbcMapperFactory().getAccountMapper().map(resultSet);
+                account =  new JdbcMapperFactory().getAccountMapper().map(resultSet);
             } else {
                 throw new SQLException();
             }
+
+            getAccountStatement.setLong(1, key);
+
+            resultSet = getHoldersStatement.executeQuery();
+
+            List<Long> holders = new ArrayList<>();
+            while (resultSet.next()) {
+                holders.add(resultSet.getLong("holder_id"));
+            }
+            account.setHolders(holders);
+
+            return account;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);

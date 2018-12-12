@@ -6,7 +6,6 @@ import ua.training.model.dao.RequestDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Request;
-import ua.training.model.exception.CompletedRequestException;
 import ua.training.model.exception.UnsupportedOperationException;
 
 import java.sql.*;
@@ -30,7 +29,7 @@ public class JdbcRequestDao implements RequestDao {
      * @return Entity of Request
      */
     @Override
-    public Request processRequest(Long requestId) {
+    public Request considerRequest(Long requestId) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
@@ -48,7 +47,7 @@ public class JdbcRequestDao implements RequestDao {
                 }
 
                 if (request.isConsidered()) {
-                    throw new SQLException(new CompletedRequestException());
+                    throw new SQLException();
                 }
 
                 setCompletedStatement.setBoolean(1, true);
@@ -70,14 +69,14 @@ public class JdbcRequestDao implements RequestDao {
 
     /**
      * Returns all request by completion status.
-     * @param completion Targeted completion.
+     * @param consideration Targeted completion.
      * @return List of requests.
      */
     @Override
-    public List<Request> getByCompletion(boolean completion) {
+    public List<Request> getByConsideration(boolean consideration) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.consideration"))) {
-            preparedStatement.setBoolean(1, completion);
+            preparedStatement.setBoolean(1, consideration);
 
             ResultSet resultSet  = preparedStatement.executeQuery();
             Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
