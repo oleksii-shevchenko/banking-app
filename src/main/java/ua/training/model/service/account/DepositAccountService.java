@@ -3,6 +3,7 @@ package ua.training.model.service.account;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
 import ua.training.model.entity.Transaction;
+import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -27,10 +28,10 @@ public class DepositAccountService extends AccountService {
         }
     }
 
-    public Optional<Transaction> depositUpdate(Account account) {
+    public static Optional<Transaction> depositUpdate(Account account) throws CancelingTaskException {
         DepositAccount depositAccount = (DepositAccount) account;
 
-        if (isNotActive(depositAccount) || depositAccount.getBalance().equals(BigDecimal.ZERO)) {
+        if ((!depositAccount.getStatus().equals(Account.Status.ACTIVE)) || depositAccount.getBalance().equals(BigDecimal.ZERO)) {
             return Optional.empty();
         }
 

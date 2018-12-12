@@ -7,6 +7,7 @@ import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
+import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
@@ -141,6 +142,11 @@ public class JdbcTransactionDao implements TransactionDao {
 
                 logger.error(exception);
                 throw new RuntimeException(exception);
+            } catch (CancelingTaskException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException();
             }
         } catch (SQLException exception) {
             logger.error(exception);
