@@ -4,6 +4,7 @@ import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -16,5 +17,5 @@ public interface TransactionDao extends Dao<Long, Transaction> {
     List<Transaction> getAccountTransactions(Long accountId);
 
     long makeTransaction(Transaction transaction);
-    long makeTransaction(Long accountId, Function<Account, Transaction> transactionProducer);
+    long makeTransaction(Long accountId, Function<Account, Optional<Transaction>> transactionProducer);
 }

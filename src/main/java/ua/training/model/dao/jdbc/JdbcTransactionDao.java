@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -106,7 +107,7 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public long makeTransaction(Long accountId, Function<Account, Transaction> transactionProducer) {
+    public long makeTransaction(Long accountId, Function<Account, Optional<Transaction>> transactionProducer) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
@@ -115,9 +116,13 @@ public class JdbcTransactionDao implements TransactionDao {
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
                 Account account = getAccountById(accountId, getAccountStatement);
 
-                Transaction transaction = transactionProducer.apply(account);
+                Optional<Transaction> optionalTransaction = transactionProducer.apply(account);
 
-                if (transaction == null) {
+                Transaction transaction;
+
+                if (optionalTransaction.isPresent())  {
+                    transaction = optionalTransaction.get();
+                } else {
                     throw new SQLException();
                 }
 
