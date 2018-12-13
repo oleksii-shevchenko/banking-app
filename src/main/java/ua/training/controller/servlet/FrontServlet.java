@@ -4,6 +4,8 @@ import ua.training.controller.command.Command;
 import ua.training.controller.command.SignInCommand;
 import ua.training.controller.command.SignOutCommand;
 import ua.training.controller.command.SignUpCommand;
+import ua.training.model.dao.factory.JdbcDaoFactory;
+import ua.training.model.service.ScheduledUpdateService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,8 +32,11 @@ public class FrontServlet extends HttpServlet {
     }
 
     @Override
-    public void init() throws ServletException {
-        this.getServletContext().setAttribute("signedInUsers", new ArrayList<Long>());
+    public void init() {
+        ScheduledUpdateService updateService = new ScheduledUpdateService();
+        updateService.init(JdbcDaoFactory.getInstance());
+
+        getServletContext().setAttribute("signedInUsers", new ArrayList<Long>());
 
         commands = new HashMap<>();
         commands.put("signIn", new SignInCommand());

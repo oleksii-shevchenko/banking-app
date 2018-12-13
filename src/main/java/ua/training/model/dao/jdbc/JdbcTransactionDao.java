@@ -142,7 +142,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
                 logger.error(exception);
                 throw new RuntimeException(exception);
-            } catch (CancelingTaskException exception) {
+            } catch (CancelingTaskException | ClassCastException exception) {
                 connection.rollback();
 
                 logger.error(exception);

@@ -9,6 +9,8 @@ import ua.training.model.dao.jdbc.strategy.StatementSetter;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.Account;
+import ua.training.model.entity.CreditAccount;
+import ua.training.model.entity.DepositAccount;
 import ua.training.model.entity.Permission;
 import ua.training.model.exception.ActiveAccountException;
 
@@ -33,8 +35,29 @@ public class JdbcAccountDao implements AccountDao {
 
     static {
         statementSetters = new HashMap<>();
-        statementSetters.put("DepositAccount", new DepositStatementSetter());
-        statementSetters.put("CreditAccount", new CreditStatementSetter());
+        statementSetters.put(DepositAccount.class.getSimpleName(), new DepositStatementSetter());
+        statementSetters.put(CreditAccount.class.getSimpleName(), new CreditStatementSetter());
+    }
+
+    @Override
+    public List<Account> getActiveAccounts(String accountType) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.type"))) {
+            preparedStatement.setString(1, accountType);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
+
+            List<Account> accounts = new ArrayList<>();
+            while (resultSet.next()) {
+                accounts.add(mapper.map(resultSet));
+            }
+
+            return accounts;
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
     }
 
     /**
