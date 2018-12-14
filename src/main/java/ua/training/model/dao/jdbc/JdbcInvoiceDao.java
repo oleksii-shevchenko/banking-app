@@ -11,8 +11,6 @@ import ua.training.model.entity.Transaction;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
-import ua.training.model.service.account.AccountService;
-import ua.training.model.service.account.AccountServiceFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -94,7 +92,6 @@ public class JdbcInvoiceDao implements InvoiceDao {
                  PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
-                AccountService accountService;
 
                 Invoice invoice = getInvoiceById(invoiceId, getInvoiceStatement);
 
@@ -113,18 +110,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
                         .setCurrency(invoice.getCurrency())
                         .build();
 
-                accountService = AccountServiceFactory.getService(requester.getClass().getSimpleName());
-                accountService.chargeMoney(requester, transaction);
-
-                accountService = AccountServiceFactory.getService(payer.getClass().getSimpleName());
-                accountService.withdrawMoney(payer, transaction);
-
-
-                updateBalanceStatement.setBigDecimal(1, requester.getBalance());
+                updateBalanceStatement.setBigDecimal(1, requester.replenishAccount(transaction));
                 updateBalanceStatement.setLong(2, requester.getId());
                 updateBalanceStatement.executeUpdate();
 
-                updateBalanceStatement.setBigDecimal(1, payer.getBalance());
+                updateBalanceStatement.setBigDecimal(1, payer.withdrawFromAccount(transaction));
                 updateBalanceStatement.setLong(2, payer.getId());
                 updateBalanceStatement.executeUpdate();
 

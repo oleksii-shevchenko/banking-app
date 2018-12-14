@@ -5,7 +5,6 @@ import ua.training.controller.command.SignInCommand;
 import ua.training.controller.command.SignOutCommand;
 import ua.training.controller.command.SignUpCommand;
 import ua.training.model.dao.factory.JdbcDaoFactory;
-import ua.training.model.service.CurrencyExchangeService;
 import ua.training.model.service.ScheduledUpdateService;
 
 import javax.servlet.ServletException;
@@ -58,6 +57,7 @@ public class FrontServlet extends HttpServlet {
 
     private void startServices() {
         new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
-        new CurrencyExchangeService().init();
+        /*
+        new CurrencyExchangeService().init(); */
     }
 }
