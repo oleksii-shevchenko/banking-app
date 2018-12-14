@@ -11,8 +11,6 @@ import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
-import ua.training.model.service.account.AccountService;
-import ua.training.model.service.account.AccountServiceFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -22,7 +20,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Realization of {@link TransactionDao} for database source using jdbc library.
@@ -69,23 +66,16 @@ public class JdbcTransactionDao implements TransactionDao {
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
-                AccountService accountService;
 
                 if (transaction.getType().equals(Transaction.Type.MANUAL)) {
                     Account sender = getAccountById(transaction.getSender(), getAccountStatement);
 
-                    accountService = AccountServiceFactory.getService(sender.getClass().getSimpleName());
-                    accountService.withdrawMoney(sender, transaction);
-
-                    updateAccountBalance(sender.getId(), sender.getBalance(), updateBalanceStatement);
+                    updateAccountBalance(sender.getId(), sender.withdrawFromAccount(transaction), updateBalanceStatement);
                 }
 
                 Account receiver = getAccountById(transaction.getReceiver(), getAccountStatement);
 
-                accountService = AccountServiceFactory.getService(receiver.getClass().getSimpleName());
-                accountService.chargeMoney(receiver, transaction);
-
-                updateAccountBalance(receiver.getId(), receiver.getBalance(), updateBalanceStatement);
+                updateAccountBalance(receiver.getId(), receiver.replenishAccount(transaction), updateBalanceStatement);
 
                 setStatementParameters(transaction, insertTransactionStatement);
                 insertTransactionStatement.executeUpdate();
@@ -108,7 +98,7 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public long makeTransaction(Long accountId, Function<Account, Optional<Transaction>> transactionProducer) {
+    public long makePeriodicUpdate(Long accountId) throws CancelingTaskException{
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
@@ -117,7 +107,7 @@ public class JdbcTransactionDao implements TransactionDao {
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
                 Account account = getAccountById(accountId, getAccountStatement);
 
-                Optional<Transaction> optionalTransaction = transactionProducer.apply(account);
+                Optional<Transaction> optionalTransaction = account.update();
 
                 Transaction transaction;
 
@@ -142,7 +132,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
                 logger.error(exception);
                 throw new RuntimeException(exception);
-            } catch (CancelingTaskException | ClassCastException exception) {
+            } catch (CancelingTaskException exception) {
                 connection.rollback();
 
                 logger.error(exception);

@@ -1,4 +1,4 @@
 package ua.training.model.exception;
 
-public class CancelingTaskException extends RuntimeException {
+public class CancelingTaskException extends Exception {
 }

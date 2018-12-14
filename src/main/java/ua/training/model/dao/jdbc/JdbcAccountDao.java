@@ -40,11 +40,9 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public List<Account> getActiveAccounts(String accountType) {
+    public List<Account> getActiveAccounts() {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.type"))) {
-            preparedStatement.setString(1, accountType);
-
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.active"))) {
             ResultSet resultSet = preparedStatement.executeQuery();
             Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
 
@@ -93,7 +91,7 @@ public class JdbcAccountDao implements AccountDao {
      * @return Account id.
      */
     @Override
-    public long createAccount(Long userId, Account account) {
+    public long openAccount(Long userId, Account account) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);

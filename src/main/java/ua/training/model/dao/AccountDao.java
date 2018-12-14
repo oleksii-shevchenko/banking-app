@@ -12,11 +12,11 @@ import java.util.List;
  * @author Oleksii Shevchenko
  */
 public interface AccountDao extends Dao<Long, Account> {
-    List<Account> getActiveAccounts(String accountType);
+    List<Account> getActiveAccounts();
 
     List<Account> getUserAccounts(Long userId);
 
-    long createAccount(Long userId, Account account);
+    long openAccount(Long userId, Account account);
     void blockAccount(Long accountId);
     void closeAccount(Long accountId);
 }

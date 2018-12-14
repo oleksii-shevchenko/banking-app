@@ -1,11 +1,9 @@
 package ua.training.model.dao;
 
-import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
+import ua.training.model.exception.CancelingTaskException;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * This is extension of template dao for {@link Transaction} entity.
@@ -17,5 +15,5 @@ public interface TransactionDao extends Dao<Long, Transaction> {
     List<Transaction> getAccountTransactions(Long accountId);
 
     long makeTransaction(Transaction transaction);
-    long makeTransaction(Long accountId, Function<Account, Optional<Transaction>> transactionProducer);
+    long makePeriodicUpdate(Long accountId) throws CancelingTaskException;
 }

@@ -1,5 +1,6 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -111,5 +112,5 @@ public abstract class Account {
     }
 
     public abstract BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException;
-    public abstract Optional<Transaction> update();
+    public abstract Optional<Transaction> update() throws CancelingTaskException;
 }

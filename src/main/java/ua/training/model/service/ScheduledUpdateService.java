@@ -2,11 +2,11 @@ package ua.training.model.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.training.model.dao.AccountDao;
+import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
-import ua.training.model.entity.DepositAccount;
 import ua.training.model.exception.CancelingTaskException;
-import ua.training.model.service.account.DepositAccountService;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -23,23 +23,24 @@ public class ScheduledUpdateService {
     private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(THREADS_NUMBER);
 
     public void init(DaoFactory factory) {
-        List<Account> depositAccounts = factory.getAccountDao().getActiveAccounts(DepositAccount.class.getSimpleName());
+        List<Account> accounts = factory.getAccountDao().getActiveAccounts();
 
-        for (Account account : depositAccounts) {
-            try {
-                DepositAccount depositAccount = (DepositAccount) account;
-                registerDeposit(depositAccount, factory);
-            } catch (ClassCastException exception) {
-                logger.error(exception);
-            }
+        for (Account account : accounts) {
+            registerAccountTask(account, factory);
         }
     }
 
-    public void registerDeposit(DepositAccount depositAccount, DaoFactory factory) {
+    public void registerAccountTask(Account account, DaoFactory factory) {
+        registerPeriodicAccountUpdate(account, factory.getTransactionDao());
+        registerAccountBlocking(account, factory.getAccountDao());
+        registerAccountClosing(account, factory.getAccountDao());
+    }
+
+    private void registerPeriodicAccountUpdate(Account account, TransactionDao transactionDao) {
         executorService.scheduleWithFixedDelay(
                 () -> {
                     try {
-                        factory.getTransactionDao().makeTransaction(depositAccount.getId(), DepositAccountService::depositUpdate);
+                        transactionDao.makePeriodicUpdate(account.getId());
                     } catch (CancelingTaskException exception) {
                         logger.info(exception);
                         throw new RuntimeException();
@@ -47,23 +48,18 @@ public class ScheduledUpdateService {
                         logger.info(exception);
                     }
                 },
-                depositAccount.getUpdatePeriod(),
-                depositAccount.getUpdatePeriod(),
+                account.getUpdatePeriod(),
+                account.getUpdatePeriod(),
                 TimeUnit.DAYS
         );
-        //todo choose variant
-        /*
-        ScheduledFuture<?> depositServicing = executorService.scheduleWithFixedDelay(
-                () -> factory.getTransactionDao().makeTransaction(depositAccount.getId(), DepositAccountService::depositUpdate),
-                depositAccount.getUpdatePeriod(),
-                depositAccount.getUpdatePeriod(),
-                TimeUnit.DAYS
-        );
-        executorService.schedule(
-                () -> depositServicing.cancel(false),
-                computeDelay(depositAccount.getExpiresEnd()),
-                TimeUnit.DAYS
-        ); */
+    }
+
+    private void registerAccountBlocking(Account account, AccountDao accountDao) {
+        executorService.schedule(() -> accountDao.blockAccount(account.getId()), computeDelay(account.getExpiresEnd()), TimeUnit.DAYS);
+    }
+
+    private void registerAccountClosing(Account account, AccountDao accountDao) {
+        executorService.schedule(() -> accountDao.closeAccount(account.getId()), computeDelay(account.getExpiresEnd()) + 1, TimeUnit.DAYS);
     }
 
     private long computeDelay(LocalDate endDate) {

@@ -1,5 +1,6 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -139,7 +140,7 @@ public class CreditAccount extends Account {
     }
 
     @Override
-    public Optional<Transaction> update() {
-        return Optional.empty();
+    public Optional<Transaction> update() throws CancelingTaskException{
+        throw new CancelingTaskException();
     }
 }

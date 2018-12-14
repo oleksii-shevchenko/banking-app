@@ -1,5 +1,6 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -123,8 +124,12 @@ public class DepositAccount extends Account {
     }
 
     @Override
-    public Optional<Transaction> update() {
-        if (isNonActive() && getBalance().equals(BigDecimal.ZERO)) {
+    public Optional<Transaction> update() throws CancelingTaskException {
+        if (isNonActive()) {
+            throw new CancelingTaskException();
+        }
+
+        if (getBalance().equals(BigDecimal.ZERO)) {
             return Optional.empty();
         }
 
