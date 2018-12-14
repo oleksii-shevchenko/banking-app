@@ -1,8 +1,13 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.NonActiveAccountException;
+import ua.training.model.exception.NotEnoughMoneyException;
+import ua.training.model.service.CurrencyExchangeService;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -97,5 +102,41 @@ public class DepositAccount extends Account {
      */
     public static DepositAccountBuilder getBuilder() {
         return new DepositAccountBuilder();
+    }
+
+    @Override
+    public BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException {
+        if (isNonActive()) {
+            throw new NonActiveAccountException();
+        }
+
+        BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
+        BigDecimal balance = getBalance().subtract(transaction.getAmount().multiply(exchangeRate));
+
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NotEnoughMoneyException();
+        } else {
+            setBalance(balance);
+        }
+
+        return getBalance();
+    }
+
+    @Override
+    public Optional<Transaction> update() {
+        if (isNonActive() && getBalance().equals(BigDecimal.ZERO)) {
+            return Optional.empty();
+        }
+
+        Transaction transaction = Transaction.getBuilder()
+                .setReceiver(getId())
+                .setType(Transaction.Type.REGULAR)
+                .setAmount(getBalance().multiply(getDepositRate()))
+                .setCurrency(getCurrency())
+                .build();
+
+        setBalance(getBalance().add(transaction.getAmount()));
+
+        return Optional.of(transaction);
     }
 }

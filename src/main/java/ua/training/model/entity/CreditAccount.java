@@ -1,8 +1,13 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.NonActiveAccountException;
+import ua.training.model.exception.NotEnoughMoneyException;
+import ua.training.model.service.CurrencyExchangeService;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -113,5 +118,28 @@ public class CreditAccount extends Account {
      */
     public static CreditAccountBuilder getBuilder() {
         return new CreditAccountBuilder();
+    }
+
+    @Override
+    public BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException{
+        if (isNonActive()) {
+            throw new NonActiveAccountException();
+        }
+
+        BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
+        BigDecimal balance = getBalance().subtract(transaction.getAmount().multiply(exchangeRate));
+
+        if (balance.abs().compareTo(getCreditLimit()) > 0) {
+            throw new NotEnoughMoneyException();
+        } else {
+            setBalance(balance.subtract(transaction.getAmount().multiply(exchangeRate).multiply(getCreditRate())));
+        }
+
+        return getBalance();
+    }
+
+    @Override
+    public Optional<Transaction> update() {
+        return Optional.empty();
     }
 }

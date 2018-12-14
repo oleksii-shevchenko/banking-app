@@ -5,6 +5,7 @@ import ua.training.controller.command.SignInCommand;
 import ua.training.controller.command.SignOutCommand;
 import ua.training.controller.command.SignUpCommand;
 import ua.training.model.dao.factory.JdbcDaoFactory;
+import ua.training.model.service.CurrencyExchangeService;
 import ua.training.model.service.ScheduledUpdateService;
 
 import javax.servlet.ServletException;
@@ -33,9 +34,6 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     public void init() {
-        ScheduledUpdateService updateService = new ScheduledUpdateService();
-        updateService.init(JdbcDaoFactory.getInstance());
-
         getServletContext().setAttribute("signedInUsers", new ArrayList<Long>());
 
         commands = new HashMap<>();
@@ -43,6 +41,8 @@ public class FrontServlet extends HttpServlet {
         commands.put("signUp", new SignUpCommand());
         commands.put("signOut", new SignOutCommand());
         //Todo add commands
+
+        startServices();
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -54,5 +54,10 @@ public class FrontServlet extends HttpServlet {
         } else {
             request.getRequestDispatcher(page).forward(request, response);
         }
+    }
+
+    private void startServices() {
+        new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
+        new CurrencyExchangeService().init();
     }
 }

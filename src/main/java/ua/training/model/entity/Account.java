@@ -1,8 +1,13 @@
 package ua.training.model.entity;
 
+import ua.training.model.exception.NonActiveAccountException;
+import ua.training.model.exception.NotEnoughMoneyException;
+import ua.training.model.service.CurrencyExchangeService;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This entity is general template for all accounts. It has POJO structure.
@@ -89,4 +94,22 @@ public abstract class Account {
     public void setHolders(List<Long> holders) {
         this.holders = holders;
     }
+
+    boolean isNonActive() {
+        return !status.equals(Status.ACTIVE);
+    }
+
+    public BigDecimal replenishAccount(Transaction transaction) throws NonActiveAccountException{
+        if (isNonActive()) {
+            throw new NonActiveAccountException();
+        }
+
+        BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
+        setBalance(getBalance().add(transaction.getAmount().multiply(exchangeRate)));
+
+        return getBalance();
+    }
+
+    public abstract BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException;
+    public abstract Optional<Transaction> update();
 }
