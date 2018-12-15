@@ -20,7 +20,6 @@ public class EncodingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.trace("In encoding filter");
         logger.trace(((HttpServletRequest) servletRequest).getContextPath());
 
 

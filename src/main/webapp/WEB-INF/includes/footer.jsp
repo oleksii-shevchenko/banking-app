@@ -8,7 +8,11 @@
 <fmt:setBundle basename="content"/>
 <footer class="footer">
     <div class="container">
-        <span class="text-muted">©2018 <fmt:message key="content.footer.author" /></span>
+        <div class="row justify-content-center">
+            <div class="col-3">
+                <span class="text-muted">&copy;2018 <fmt:message key="content.footer.author" /></span>
+            </div>
+        </div>
     </div>
 </footer>
 </body>

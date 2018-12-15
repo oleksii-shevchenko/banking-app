@@ -44,15 +44,12 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.trace("In auth filter");
-
-
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         String command = request.getRequestURI().replaceAll(".*/api/", "");
 
-        logger.trace(command);
+        logger.trace(request.getRequestURL());
 
         HttpSession session = request.getSession();
         if (Objects.isNull(session.getAttribute("role"))) {
