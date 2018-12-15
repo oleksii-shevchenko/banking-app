@@ -32,7 +32,7 @@
         <p style="font-size: 64px"><fmt:message key="content.error.text" /></p>
     </div>
     <div class="row justify-content-center">
-        <a href="${pageContext.request.contextPath}/index.jsp" class="text-center" style="font-size: 48px"><fmt:message key="contenn.error.home" /></a>
+        <a href="${pageContext.request.contextPath}/index.jsp" class="text-center" style="font-size: 48px"><fmt:message key="content.error.home" /></a>
     </div>
 </div>
 

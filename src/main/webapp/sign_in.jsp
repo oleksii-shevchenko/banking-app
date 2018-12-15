@@ -26,16 +26,19 @@
 
 <jsp:include page="WEB-INF/includes/navbar.jsp" />
 
+<fmt:setLocale value="${sessionScope.lang}" />
+<fmt:setBundle basename="content" />
+
 <div class="container my-lg-4">
     <div class="row justify-content-center">
         <div class="col-4">
             <form class="form-signin">
-                <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-                <label for="inputLogin" class="sr-only">Email address</label>
+                <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.sign.in.welcome" /></h1>
+                <label for="inputLogin" class="sr-only"><fmt:message key="content.sign.in.login"/></label>
                 <input type="text" id="inputLogin" class="form-control" placeholder="User login" required autofocus>
-                <label for="inputPassword" class="sr-only">Password</label>
+                <label for="inputPassword" class="sr-only"><fmt:message key="content.sign.in.password" /></label>
                 <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.sign.in.submit" /></button>
             </form>
         </div>
     </div>
