@@ -45,8 +45,11 @@ public class FrontServlet extends HttpServlet {
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("Testtttttttttttt");
+
         String command = request.getRequestURI().replaceAll(".*/api/", "");
         String page = commands.get(command).execute(request);
+
 
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));

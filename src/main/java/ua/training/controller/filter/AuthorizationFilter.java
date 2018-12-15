@@ -1,15 +1,19 @@
 package ua.training.controller.filter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.PathManager;
+import ua.training.model.entity.User;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -17,8 +21,9 @@ import java.util.Map;
  * be pass further, else the response will be sent to error page. If there is even no such commend, response will be
  * sent to error page to.
  */
-@WebFilter(filterName = "authorization", urlPatterns = {"/api/*"})
 public class AuthorizationFilter implements Filter {
+    private static Logger logger = LogManager.getLogger(AuthorizationFilter.class);
+
     private Map<String, List<String>> permissions;
 
     @Override
@@ -26,12 +31,12 @@ public class AuthorizationFilter implements Filter {
         //Todo add permissions
         permissions = new HashMap<>();
 
-        permissions.put("guest", List.of("signIn",
+        permissions.put("GUEST", List.of("signIn",
                 "signUp"));
 
-        permissions.put("user", List.of("signOut"));
+        permissions.put("USER", List.of("signOut"));
 
-        permissions.put("admin", List.of("signOut"));
+        permissions.put("ADMIN", List.of("signOut"));
     }
 
     @Override
@@ -39,12 +44,22 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        logger.trace("In auth filter");
+
+
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         String command = request.getRequestURI().replaceAll(".*/api/", "");
-        String role = (request.getSession(false) != null) ?
-                (String) request.getSession().getAttribute("role") : "guest";
+
+        logger.trace(command);
+
+        HttpSession session = request.getSession();
+        if (Objects.isNull(session.getAttribute("role"))) {
+            session.setAttribute("role", User.Role.GUEST.name());
+        }
+
+        String role = (String) session.getAttribute("role");
 
         if (permissions.get(role).contains(command)) {
             filterChain.doFilter(servletRequest, servletResponse);
