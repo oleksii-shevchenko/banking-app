@@ -9,9 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <title>Banking App</title>
 
-    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap-grid.css">
     <link rel="stylesheet" href="css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="css/custom.css">
 
     <script src="js/jquery-3.2.1.slim.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -20,7 +21,7 @@
 </head>
 
 <body>
-    <jsp:include page="WEB-INF/includes/navbar.jsp" />
+<jsp:include page="WEB-INF/includes/navbar.jsp" />
+<jsp:include page="WEB-INF/includes/footer.jsp" />
 </body>
-
 </html>
