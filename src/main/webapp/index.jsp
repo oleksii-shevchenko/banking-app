@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/bootstrap-grid.css">
     <link rel="stylesheet" href="css/bootstrap-reboot.css">
     <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <script src="js/jquery-3.2.1.slim.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -21,7 +22,48 @@
 </head>
 
 <body>
+<fmt:setLocale value="${sessionScope.lang}" scope="session" />
+<fmt:setBundle basename="content" />
+
 <jsp:include page="WEB-INF/includes/navbar.jsp" />
+
+<div class="features-boxed">
+    <div class="container">
+        <div class="row justify-content-center features">
+            <div class="col-sm-6 col-md-5 col-lg-4 item">
+                <div class="box">
+                    <i class="material-icons md-48">euro_symbol</i>
+                    <h3 class="name"><fmt:message key="content.index.currency.head" /></h3>
+                    <p class="description"><fmt:message key="content.index.currency.text" /></p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-5 col-lg-4 item">
+                <div class="box">
+                    <i class="material-icons md-48">local_atm</i>
+                    <h3 class="name"><fmt:message key="content.index.account.head" /></h3>
+                    <p class="description"><fmt:message key="content.index.account.text" /></p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center features">
+            <div class="col-sm-6 col-md-5 col-lg-4 item">
+                <div class="box">
+                    <i class="material-icons md-48">shop</i>
+                    <h3 class="name"><fmt:message key="content.index.invoice.head" /></h3>
+                    <p class="description"><fmt:message key="content.index.invoice.text" /></p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-5 col-lg-4 item">
+                <div class="box">
+                    <i class="material-icons md-48">autorenew</i>
+                    <h3 class="name"><fmt:message key="content.index.update.head" /></h3>
+                    <p class="description"><fmt:message key="content.index.update.text" /></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <jsp:include page="WEB-INF/includes/footer.jsp" />
 </body>
 </html>
