@@ -76,7 +76,7 @@ public class AuthorizationFilter implements Filter {
         if (permissions.getOrDefault(role, List.of()).contains(command)) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
-            logger.warn("User with role " + role + "tries to access command " + command);
+            logger.warn("User with role " + role + " tries to access command " + command);
 
             response.sendRedirect(request.getContextPath() + PathManager.getPath("path.error"));
         }

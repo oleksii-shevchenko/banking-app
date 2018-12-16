@@ -61,8 +61,6 @@ public class FrontServlet extends HttpServlet {
         String command = request.getRequestURI().replaceAll(".*/api/", "");
         String page = commands.getOrDefault(command, (r) -> PathManager.getPath("path.error")).execute(request);
 
-        System.out.println(page);
-
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));
         } else {

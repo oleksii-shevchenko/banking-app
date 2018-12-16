@@ -22,7 +22,7 @@ public class AuthenticationService {
         }
     }
 
-    public void registerUser(User user) {
-
+    public void registerUser(User user){
+        userDao.insert(user);
     }
 }

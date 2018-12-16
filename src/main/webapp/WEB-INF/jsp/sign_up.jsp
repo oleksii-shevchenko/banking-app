@@ -34,11 +34,26 @@
         <div class="col-4">
             <form class="form-signup" action="${pageContext.request.contextPath}/api/signUp" method="post">
                 <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.sign.up.welcome" /></h1>
-                <input type="text" name="login" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.login"/>" required autofocus>
-                <input type="password" name="pass" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.password" />" required>
-                <input type="email" name="email" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.email" />" required>
-                <input type=text name="firstName" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.first.name" />" required>
-                <input type="text" name="secondName" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.second.name" />" required>
+                <div class="form-group my-2">
+                    <input type="text" name="login" class="form-control my-2" value="${param.login}" placeholder="<fmt:message key="content.sign.up.login"/>" required autofocus>
+                    <p class="text-danger">${requestScope.wronglogin}</p>
+                </div>
+                <div class="form-group my-2">
+                    <input type="password" name="pass" class="form-control my-2" value="${param.pass}" placeholder="<fmt:message key="content.sign.up.password" />" required>
+                    <p class="text-danger">${requestScope.wrongpass}</p>
+                </div>
+                <div class="form-group my-2">
+                    <input type="email" name="email" class="form-control my-2" value="${param.email}" placeholder="<fmt:message key="content.sign.up.email" />" required>
+                    <p class="text-danger">${requestScope.wrongemail}</p>
+                </div>
+                <div class="form-group my-2">
+                    <input type=text name="firstname" class="form-control my-2" value="${param.firstname}" placeholder="<fmt:message key="content.sign.up.first.name" />" required>
+                    <p class="text-danger">${requestScope.wrongfirstname}</p>
+                </div>
+                <div class="form-group my-2">
+                    <input type="text" name="secondname" class="form-control my-2" value="${param.secondname}" placeholder="<fmt:message key="content.sign.up.second.name" />" required>
+                    <p class="text-danger">${requestScope.wrongsecondname}</p>
+                </div>
                 <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.sign.up.submit"/></button>
             </form>
         </div>

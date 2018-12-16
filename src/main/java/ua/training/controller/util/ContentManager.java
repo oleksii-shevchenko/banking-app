@@ -10,8 +10,7 @@ public class ContentManager {
     }
 
     public void setMessage(HttpServletRequest request, String key, String messageKey) {
-        String lang = (String) request.getSession().getAttribute("lang");
-        Locale locale = new Locale(lang.substring(0, 2), lang.substring(3,5));
+        Locale locale = LocaleUtil.getLocale(request);
         request.setAttribute(key, getContent(messageKey, locale));
     }
 }
