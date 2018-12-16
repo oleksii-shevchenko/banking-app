@@ -3,17 +3,14 @@ package ua.training.controller.filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.PathManager;
-import ua.training.model.entity.User;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -24,19 +21,22 @@ import java.util.Objects;
 public class AuthorizationFilter implements Filter {
     private static Logger logger = LogManager.getLogger(AuthorizationFilter.class);
 
-    private Map<String, List<String>> permissions;
+    private static Map<String, List<String>> permissions;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         //Todo add permissions
-        permissions = new HashMap<>();
+        permissions = new ConcurrentHashMap<>();
 
         permissions.put("GUEST", List.of("signIn",
-                "signUp"));
+                "signUp",
+                "changeLanguage"));
 
-        permissions.put("USER", List.of("signOut"));
+        permissions.put("USER", List.of("signOut",
+                "changeLanguage"));
 
-        permissions.put("ADMIN", List.of("signOut"));
+        permissions.put("ADMIN", List.of("signOut",
+                "changeLanguage"));
     }
 
     @Override
@@ -51,12 +51,7 @@ public class AuthorizationFilter implements Filter {
 
         logger.trace(request.getRequestURL());
 
-        HttpSession session = request.getSession();
-        if (Objects.isNull(session.getAttribute("role"))) {
-            session.setAttribute("role", User.Role.GUEST.name());
-        }
-
-        String role = (String) session.getAttribute("role");
+        String role = (String) request.getSession().getAttribute("role");
 
         if (permissions.get(role).contains(command)) {
             filterChain.doFilter(servletRequest, servletResponse);

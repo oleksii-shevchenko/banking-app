@@ -1,9 +1,6 @@
 package ua.training.controller.servlet;
 
-import ua.training.controller.command.Command;
-import ua.training.controller.command.SignInCommand;
-import ua.training.controller.command.SignOutCommand;
-import ua.training.controller.command.SignUpCommand;
+import ua.training.controller.command.*;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.ScheduledUpdateService;
 
@@ -39,17 +36,17 @@ public class FrontServlet extends HttpServlet {
         commands.put("signIn", new SignInCommand());
         commands.put("signUp", new SignUpCommand());
         commands.put("signOut", new SignOutCommand());
+        commands.put("changeLanguage", new ChangeLanguageCommand());
         //Todo add commands
 
         startServices();
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("Testtttttttttttt");
-
         String command = request.getRequestURI().replaceAll(".*/api/", "");
         String page = commands.get(command).execute(request);
 
+        System.out.println(page);
 
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));

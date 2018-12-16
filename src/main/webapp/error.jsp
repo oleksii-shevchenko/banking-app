@@ -25,7 +25,7 @@
 <fmt:setLocale value="${sessionScope.lang}" scope="session" />
 <fmt:setBundle basename="content" />
 
-<jsp:include page="../WEB-INF/components/navbar.jsp" />
+<jsp:include page="WEB-INF/components/navbar.jsp" />
 
 <div class="container">
     <div class="row justify-content-center">
@@ -36,6 +36,6 @@
     </div>
 </div>
 
-<jsp:include page="../WEB-INF/components/footer.jsp" />
+<jsp:include page="WEB-INF/components/footer.jsp" />
 </body>
 </html>
