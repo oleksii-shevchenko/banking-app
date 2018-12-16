@@ -44,7 +44,8 @@ public class AuthorizationFilter implements Filter {
                 "infoUser",
                 "createInvoice",
                 "infoInvoice",
-                "completeInvoice"));
+                "completeInvoice",
+                "showInvoices"));
 
         permissions.put("ADMIN", List.of("signOut",
                 "workspace",

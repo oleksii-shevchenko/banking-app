@@ -50,6 +50,7 @@ public class FrontServlet extends HttpServlet {
         commands.put("showRequests", new ShowRequestsCommand());
         commands.put("processRequest", new ProcessRequestCommand());
         commands.put("replenishAccount", new ReplenishAccountCommand());
+        commands.put("showInvoices", new ShowInvoicesCommand());
 
         startServices();
     }
