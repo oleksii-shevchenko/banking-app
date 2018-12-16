@@ -10,7 +10,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-3">
-                <span class="text-muted">&copy;2018 <fmt:message key="content.footer.author" /></span>
+                <span class="text-muted">&copy;2018-2019 <fmt:message key="content.footer.author" /></span>
             </div>
         </div>
     </div>
