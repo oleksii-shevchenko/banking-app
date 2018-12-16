@@ -108,7 +108,7 @@ public class JdbcUserDao implements UserDao {
      * @param accountId Targeted account
      */
     @Override
-    public void removeAccountHolder(Long holderId, Long accountId) {
+    public int removeAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement removeHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"));
              PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
@@ -127,7 +127,8 @@ public class JdbcUserDao implements UserDao {
 
             removeHolderStatement.setLong(1, holderId);
             removeHolderStatement.setLong(2, accountId);
-            removeHolderStatement.executeUpdate();
+
+            return removeHolderStatement.executeUpdate();
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();
@@ -140,13 +141,14 @@ public class JdbcUserDao implements UserDao {
      * @param accountId Targeted account.
      */
     @Override
-    public void addAccountHolder(Long holderId, Long accountId) {
+    public int addAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
             preparedStatement.setLong(1, holderId);
             preparedStatement.setLong(2, accountId);
             preparedStatement.setString(3, Permission.RESTRICTED.name());
-            preparedStatement.executeUpdate();
+
+            return preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();
@@ -228,12 +230,13 @@ public class JdbcUserDao implements UserDao {
      * @throws NonUniqueLoginException Is thrown if there is user with the same email.
      */
     @Override
-    public void update(User entity) throws NonUniqueEmailException, NonUniqueLoginException {
+    public int update(User entity) throws NonUniqueEmailException, NonUniqueLoginException {
         try (Connection connection = ConnectionsPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.update"))) {
             setStatementParameters(entity, preparedStatement);
             preparedStatement.setLong(7, entity.getId());
-            preparedStatement.executeUpdate();
+
+            return preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             logger.error(exception);
             switch (exception.getSQLState()) {
@@ -252,7 +255,7 @@ public class JdbcUserDao implements UserDao {
      * @param entity User that must be removed.
      */
     @Override
-    public void remove(User entity) {
+    public int remove(User entity) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
@@ -269,14 +272,17 @@ public class JdbcUserDao implements UserDao {
                     throw new SQLException();
                 }
 
+                int removed;
                 if (userAccountsNumber == 0) {
                     removeUserStatement.setLong(1, entity.getId());
-                    removeUserStatement.executeUpdate();
+                    removed = removeUserStatement.executeUpdate();
                 } else {
                     throw new SQLException(new ActiveAccountException());
                 }
 
                 connection.commit();
+
+                return removed;
             } catch (SQLException exception) {
                 connection.rollback();
 

@@ -201,6 +201,7 @@ public class JdbcAccountDao implements AccountDao {
                 removeAccountStatement.executeUpdate();
 
                 connection.commit();
+
             } catch (SQLException | ActiveAccountException exception) {
                 connection.rollback();
 
@@ -253,12 +254,12 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void update(Account entity) {
+    public int update(Account entity) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void remove(Account entity) {
+    public int remove(Account entity) {
         throw new UnsupportedOperationException();
     }
 }

@@ -135,12 +135,12 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     @Override
-    public void update(Request entity) {
+    public int update(Request entity) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void remove(Request entity) {
+    public int remove(Request entity) {
         throw new UnsupportedOperationException();
     }
 }

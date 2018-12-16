@@ -18,6 +18,6 @@ public interface UserDao extends Dao<Long, User> {
 
     Permission getPermissions(Long holderId, Long accountId);
 
-    void removeAccountHolder(Long holderId, Long accountId);
-    void addAccountHolder(Long holderId, Long accountId);
+    int removeAccountHolder(Long holderId, Long accountId);
+    int addAccountHolder(Long holderId, Long accountId);
 }

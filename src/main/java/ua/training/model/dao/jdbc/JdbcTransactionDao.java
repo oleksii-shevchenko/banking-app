@@ -209,7 +209,7 @@ public class JdbcTransactionDao implements TransactionDao {
      * This method not supported, because transactions are immutable after insertion.
      */
     @Override
-    public void update(Transaction entity) {
+    public int update(Transaction entity) {
         throw new UnsupportedOperationException();
     }
 
@@ -217,7 +217,7 @@ public class JdbcTransactionDao implements TransactionDao {
      * This method not supported, because transactions are fix operations history.
      */
     @Override
-    public void remove(Transaction entity) {
+    public int remove(Transaction entity) {
         throw new UnsupportedOperationException();
     }
 }

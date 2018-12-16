@@ -255,12 +255,12 @@ public class JdbcInvoiceDao implements InvoiceDao {
     }
 
     @Override
-    public void update(Invoice entity) {
+    public int update(Invoice entity) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void remove(Invoice entity) {
+    public int remove(Invoice entity) {
         throw new UnsupportedOperationException();
     }
 }
