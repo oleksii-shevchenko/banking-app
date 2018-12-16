@@ -1,6 +1,7 @@
 package ua.training.controller.servlet;
 
 import ua.training.controller.command.*;
+import ua.training.controller.util.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.ScheduledUpdateService;
 
@@ -10,9 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
 
 @WebServlet(name = "FrontServlet", urlPatterns = {"/api/*"})
 public class FrontServlet extends HttpServlet {
@@ -30,7 +31,7 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     public void init() {
-        getServletContext().setAttribute("signedInUsers", new ArrayList<Long>());
+        getServletContext().setAttribute("signedInUsers", new LinkedBlockingDeque<Long>());
 
         commands = new HashMap<>();
         commands.put("signIn", new SignInCommand());
@@ -58,7 +59,7 @@ public class FrontServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String command = request.getRequestURI().replaceAll(".*/api/", "");
-        String page = commands.get(command).execute(request);
+        String page = commands.getOrDefault(command, (r) -> PathManager.getPath("path.error")).execute(request);
 
         System.out.println(page);
 

@@ -5,5 +5,5 @@ package ua.training.model.exception;
  * @author Oleksii Shevchenko
  * @see ua.training.model.dao.jdbc.JdbcUserDao
  */
-public class NoSuchUserException extends RuntimeException {
+public class NoSuchUserException extends Exception {
 }

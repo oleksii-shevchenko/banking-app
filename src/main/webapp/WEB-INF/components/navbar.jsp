@@ -16,7 +16,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/api/currencyRates"><fmt:message key="content.navbar.rates" /></a>
                 </li>
-                <c:if test="${sessionScope.role != null && sessionScope.role == 'GUEST'}">
+                <c:if test="${sessionScope.role != null && sessionScope.role != 'GUEST'}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/api/workspace"><fmt:message key="content.navbar.workspace" /></a>
                     </li>
@@ -26,10 +26,10 @@
                 <c:choose>
                     <c:when test="${sessionScope.role == 'GUEST'}">
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/jsp/sign_in.jsp"><fmt:message key="content.navbar.sign.in" /></a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/api/signIn"><fmt:message key="content.navbar.sign.in" /></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/jsp/sign_up.jsp"><fmt:message key="content.navbar.sign.up" /></a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/api/singUp"><fmt:message key="content.navbar.sign.up" /></a>
                         </li>
                     </c:when>
                     <c:otherwise>

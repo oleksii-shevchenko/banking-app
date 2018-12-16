@@ -25,7 +25,6 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        //Todo add permissions
         permissions = new ConcurrentHashMap<>();
 
         permissions.put("GUEST", List.of("signIn",
@@ -70,16 +69,20 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String command = request.getRequestURI().replaceAll(".*/api/", "");
-
-        logger.trace(request.getRequestURL());
+        String command = extractCommand(request);
 
         String role = (String) request.getSession().getAttribute("role");
 
-        if (permissions.get(role).contains(command)) {
+        if (permissions.getOrDefault(role, List.of()).contains(command)) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
+            logger.warn("User with role " + role + "tries to access command " + command);
+
             response.sendRedirect(request.getContextPath() + PathManager.getPath("path.error"));
         }
+    }
+
+    private String extractCommand(HttpServletRequest request) {
+        return request.getRequestURI().replaceAll(".*/api/", "");
     }
 }
