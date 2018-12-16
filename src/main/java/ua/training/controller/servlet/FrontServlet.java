@@ -37,7 +37,21 @@ public class FrontServlet extends HttpServlet {
         commands.put("signUp", new SignUpCommand());
         commands.put("signOut", new SignOutCommand());
         commands.put("changeLanguage", new ChangeLanguageCommand());
-        //Todo add commands
+        commands.put("currencyRate", new CurrencyRateCommand());
+        commands.put("openAccount", new OpenAccountCommand());
+        commands.put("request", new RequestCommand());
+        commands.put("closeAccount", new CloseAccountCommand());
+        commands.put("showAccounts", new ShowAccountsCommand());
+        commands.put("infoAccount", new InfoAccountCommand());
+        commands.put("infoTransaction", new InfoTransactionCommand());
+        commands.put("updateUser", new UpdateUserCommand());
+        commands.put("workspace", new WorkspaceCommand());
+        commands.put("createInvoice", new CreateInvoiceCommand());
+        commands.put("infoInvoice", new InfoInvoiceCommand());
+        commands.put("completeInvoice", new CompleteInvoiceCommand());
+        commands.put("showRequests", new ShowRequestsCommand());
+        commands.put("processRequest", new ProcessRequestCommand());
+        commands.put("replenishAccount", new ReplenishAccountCommand());
 
         startServices();
     }

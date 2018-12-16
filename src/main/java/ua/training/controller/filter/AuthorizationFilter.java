@@ -24,19 +24,42 @@ public class AuthorizationFilter implements Filter {
     private static Map<String, List<String>> permissions;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         //Todo add permissions
         permissions = new ConcurrentHashMap<>();
 
         permissions.put("GUEST", List.of("signIn",
                 "signUp",
-                "changeLanguage"));
+                "changeLanguage",
+                "currencyRate"));
 
         permissions.put("USER", List.of("signOut",
-                "changeLanguage"));
+                "workspace",
+                "changeLanguage",
+                "currencyRate",
+                "request",
+                "showAccounts",
+                "infoAccount",
+                "infoTransaction",
+                "updateUser",
+                "infoUser",
+                "createInvoice",
+                "infoInvoice",
+                "completeInvoice"));
 
         permissions.put("ADMIN", List.of("signOut",
-                "changeLanguage"));
+                "workspace",
+                "changeLanguage",
+                "currencyRate",
+                "openAccount",
+                "closeAccount",
+                "showAccounts",
+                "infoAccount",
+                "infoTransaction",
+                "infoUser",
+                "showRequests",
+                "processRequest",
+                "replenishAccount"));
     }
 
     @Override
