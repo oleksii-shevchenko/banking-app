@@ -26,10 +26,10 @@
                 <c:choose>
                     <c:when test="${sessionScope.role == 'GUEST'}">
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/api/signIn"><fmt:message key="content.navbar.sign.in" /></a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/jsp/sign_in.jsp"><fmt:message key="content.navbar.sign.in" /></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/api/signUp"><fmt:message key="content.navbar.sign.up" /></a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/jsp/sign_up.jsp"><fmt:message key="content.navbar.sign.up" /></a>
                         </li>
                     </c:when>
                     <c:otherwise>

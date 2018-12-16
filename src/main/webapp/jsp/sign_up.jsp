@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Sign Up</title>
+    <title>Sign In</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap-grid.css">
@@ -32,11 +32,14 @@
 <div class="container my-lg-4">
     <div class="row justify-content-center">
         <div class="col-4">
-            <form class="form-signin" action="${pageContext.request.contextPath}/api/signIn" method="post">
-                <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.sign.in.welcome" /></h1>
-                <input type="text" name="login" class="form-control my-2" placeholder="<fmt:message key="content.sign.in.login"/>" required autofocus>
-                <input type="password" name="pass" class="form-control my-2" placeholder="<fmt:message key="content.sign.in.password" />" required>
-                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.sign.in.submit" /></button>
+            <form class="form-signup" action="${pageContext.request.contextPath}/api/signUp" method="post">
+                <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.sign.up.welcome" /></h1>
+                <input type="text" name="login" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.login"/>" required autofocus>
+                <input type="password" name="pass" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.password" />" required>
+                <input type="email" name="email" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.email" />" required>
+                <input type=text name="firstName" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.first.name" />" required>
+                <input type="text" name="secondName" class="form-control my-2" placeholder="<fmt:message key="content.sign.up.second.name" />" required>
+                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.sign.up.submit"/></button>
             </form>
         </div>
     </div>
