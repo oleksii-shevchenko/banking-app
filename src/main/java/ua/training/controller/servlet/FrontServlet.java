@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingDeque;
 
 @WebServlet(name = "FrontServlet", urlPatterns = {"/api/*"})
 public class FrontServlet extends HttpServlet {
@@ -31,8 +30,6 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     public void init() {
-        getServletContext().setAttribute("signedInUsers", new LinkedBlockingDeque<Long>());
-
         commands = new HashMap<>();
         commands.put("signIn", new SignInCommand());
         commands.put("signUp", new SignUpCommand());
@@ -70,7 +67,6 @@ public class FrontServlet extends HttpServlet {
 
     private void startServices() {
         new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
-        /*
-        new CurrencyExchangeService().init(); */
+        //new CurrencyExchangeService().init();
     }
 }

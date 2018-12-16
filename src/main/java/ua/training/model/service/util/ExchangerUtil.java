@@ -10,17 +10,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExchangerUtil {
     public URI buildRequestUri(String endPoint, String key) throws URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(endPoint);
 
         uriBuilder.setParameter("access_key", key);
-        for (Currency currency : Currency.values()) {
-            uriBuilder.setParameter("symbols", currency.name());
-        }
 
+        String targets = Arrays.stream(Currency.values()).
+                map(Currency::name).
+                collect(Collectors.joining(","));
+
+        uriBuilder.setParameter("symbols", targets);
         return uriBuilder.build();
     }
 

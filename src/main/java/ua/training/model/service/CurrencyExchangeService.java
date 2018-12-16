@@ -13,7 +13,7 @@ import ua.training.model.service.util.ExchangerUtil;
 
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,12 +26,11 @@ public class CurrencyExchangeService {
     private static Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
 
     private static ReadWriteLock readWriteLock;
+    private static volatile LocalDateTime lastUpdate;
+    private static long validationTime;
 
     private static Map<Currency, BigDecimal> exchangeRates;
     private static Currency base;
-
-    private static volatile LocalDateTime lastUpdate;
-    private static long validationTime;
 
     public void init() {
         ResourceBundle config = ResourceBundle.getBundle("fixer_io");
@@ -44,6 +43,10 @@ public class CurrencyExchangeService {
         validationTime = Long.valueOf(config.getString("fixer.api.valid"));
 
         updateRates();
+    }
+
+    public Currency getBase() {
+        return base;
     }
 
     public BigDecimal exchangeRate(Currency from, Currency to) {
@@ -72,7 +75,7 @@ public class CurrencyExchangeService {
         if (from.equals(base)) {
             return exchangeRates.get(to);
         } else {
-            return exchangeRates.get(to).divide(exchangeRates.get(from), RoundingMode.HALF_DOWN);
+            return exchangeRates.get(to).divide(exchangeRates.get(from), MathContext.DECIMAL128);
         }
     }
 

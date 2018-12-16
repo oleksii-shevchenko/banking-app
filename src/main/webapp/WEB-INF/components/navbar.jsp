@@ -14,7 +14,7 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp"><fmt:message key="content.navbar.home" /></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/api/currencyRates"><fmt:message key="content.navbar.rates" /></a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/api/currencyRate"><fmt:message key="content.navbar.rates" /></a>
                 </li>
                 <c:if test="${sessionScope.role != null && sessionScope.role != 'GUEST'}">
                     <li class="nav-item">
