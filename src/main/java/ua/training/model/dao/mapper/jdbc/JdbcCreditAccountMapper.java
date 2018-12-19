@@ -24,7 +24,6 @@ public class JdbcCreditAccountMapper implements Mapper<Account> {
                 .setBalance(resultSet.getBigDecimal("balance"))
                 .setCurrency(Currency.valueOf(resultSet.getString("account_currency")))
                 .setExpiresEnd(resultSet.getDate("expires_end").toLocalDate())
-                .setUpdatePeriod(resultSet.getInt("update_period"))
                 .setStatus(Account.Status.valueOf(resultSet.getString("account_status")))
                 .setCreditLimit(resultSet.getBigDecimal("credit_limit"))
                 .setCreditRate(resultSet.getBigDecimal("credit_rate"))

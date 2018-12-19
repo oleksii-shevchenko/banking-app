@@ -1,4 +1,4 @@
-package ua.training.controller.filter;
+package ua.training.controller.filters;
 
 import org.apache.http.HttpHeaders;
 

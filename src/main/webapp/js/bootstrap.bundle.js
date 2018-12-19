@@ -2235,7 +2235,7 @@
       return arr.find(check);
     }
 
-    // use `filter` to obtain the same behavior of `find`
+    // use `filters` to obtain the same behavior of `find`
     return arr.filter(check)[0];
   }
 
@@ -4309,12 +4309,12 @@
 
       Dropdown._dataApiKeydownHandler = function _dataApiKeydownHandler(event) {
         // If not input/textarea:
-        //  - And not a key in REGEXP_KEYDOWN => not a dropdown command
+        //  - And not a key in REGEXP_KEYDOWN => not a dropdown commands
         // If input/textarea:
-        //  - If space key => not a dropdown command
+        //  - If space key => not a dropdown commands
         //  - If key is other than escape
-        //    - If key is not up or down => not a dropdown command
-        //    - If trigger inside the menu => not a dropdown command
+        //    - If key is not up or down => not a dropdown commands
+        //    - If trigger inside the menu => not a dropdown commands
         if (/input|textarea/i.test(event.target.tagName) ? event.which === SPACE_KEYCODE || event.which !== ESCAPE_KEYCODE && (event.which !== ARROW_DOWN_KEYCODE && event.which !== ARROW_UP_KEYCODE || $$$1(event.target).closest(Selector.MENU).length) : !REGEXP_KEYDOWN.test(event.which)) {
           return;
         }

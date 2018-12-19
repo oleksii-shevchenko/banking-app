@@ -218,30 +218,24 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public Account get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-             PreparedStatement getHoldersStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
+             PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.full"))) {
             getAccountStatement.setLong(1, key);
 
             ResultSet resultSet = getAccountStatement.executeQuery();
 
-            Account account;
             if (resultSet.next()) {
-                account =  new JdbcMapperFactory().getAccountMapper().map(resultSet);
+                Account account =  new JdbcMapperFactory().getAccountMapper().map(resultSet);
+
+                account.setHolders(new ArrayList<>());
+                resultSet.beforeFirst();
+                while (resultSet.next()) {
+                    account.getHolders().add(resultSet.getLong("holder_id"));
+                }
+
+                return account;
             } else {
                 throw new SQLException();
             }
-
-            getAccountStatement.setLong(1, key);
-
-            resultSet = getHoldersStatement.executeQuery();
-
-            List<Long> holders = new ArrayList<>();
-            while (resultSet.next()) {
-                holders.add(resultSet.getLong("holder_id"));
-            }
-            account.setHolders(holders);
-
-            return account;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);

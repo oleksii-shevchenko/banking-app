@@ -1,6 +1,5 @@
 package ua.training.model.entity;
 
-import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -8,7 +7,6 @@ import ua.training.model.service.CurrencyExchangeService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -19,11 +17,21 @@ import java.util.Optional;
  */
 public class DepositAccount extends Account {
     private BigDecimal depositRate;
+    private int updatePeriod;
 
     private DepositAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
                           Status status, List<Long> holders, BigDecimal depositRate) {
-        super(id, balance, currency, expiresEnd, updatePeriod, status, holders);
+        super(id, balance, currency, expiresEnd, status, holders);
         this.depositRate = depositRate;
+        this.updatePeriod = updatePeriod;
+    }
+
+    public int getUpdatePeriod() {
+        return updatePeriod;
+    }
+
+    public void setUpdatePeriod(int updatePeriod) {
+        this.updatePeriod = updatePeriod;
     }
 
     public BigDecimal getDepositRate() {
@@ -123,7 +131,7 @@ public class DepositAccount extends Account {
         return getBalance();
     }
 
-    @Override
+    /*@Override
     public Optional<Transaction> update() throws CancelingTaskException {
         if (isNonActive()) {
             throw new CancelingTaskException();
@@ -143,5 +151,5 @@ public class DepositAccount extends Account {
         setBalance(getBalance().add(transaction.getAmount()));
 
         return Optional.of(transaction);
-    }
+    }*/
 }

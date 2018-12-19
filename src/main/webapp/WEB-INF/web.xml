@@ -14,7 +14,7 @@
 
   <filter>
     <filter-name>CacheFilter</filter-name>
-    <filter-class>ua.training.controller.filter.CacheFilter</filter-class>
+    <filter-class>ua.training.controller.filters.CacheFilter</filter-class>
   </filter>
 
   <filter-mapping>
@@ -24,7 +24,7 @@
 
   <filter>
     <filter-name>GuestFilter</filter-name>
-    <filter-class>ua.training.controller.filter.GuestFilter</filter-class>
+    <filter-class>ua.training.controller.filters.GuestFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>GuestFilter</filter-name>
@@ -33,7 +33,7 @@
 
   <filter>
     <filter-name>EncodingFiler</filter-name>
-    <filter-class>ua.training.controller.filter.EncodingFilter</filter-class>
+    <filter-class>ua.training.controller.filters.EncodingFilter</filter-class>
   </filter>
 
   <filter-mapping>
@@ -43,7 +43,7 @@
 
   <filter>
     <filter-name>AuthorizationFilter</filter-name>
-    <filter-class>ua.training.controller.filter.AuthorizationFilter</filter-class>
+    <filter-class>ua.training.controller.filters.AuthorizationFilter</filter-class>
   </filter>
 
   <filter-mapping>

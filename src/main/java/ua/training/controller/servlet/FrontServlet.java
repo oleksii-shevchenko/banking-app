@@ -1,8 +1,10 @@
 package ua.training.controller.servlet;
 
-import ua.training.controller.command.*;
+import ua.training.controller.commands.*;
 import ua.training.controller.util.CommandUtil;
 import ua.training.controller.util.managers.PathManager;
+import ua.training.model.dao.factory.JdbcDaoFactory;
+import ua.training.model.service.ScheduledTaskService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -66,7 +68,7 @@ public class FrontServlet extends HttpServlet {
     }
 
     private void startServices() {
-        //new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
+        new ScheduledTaskService().init(JdbcDaoFactory.getInstance());
         //new CurrencyExchangeService().init();
     }
 }

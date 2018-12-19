@@ -1,4 +1,4 @@
-package ua.training.controller.command;
+package ua.training.controller.commands;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;

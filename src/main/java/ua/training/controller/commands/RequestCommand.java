@@ -1,8 +1,8 @@
-package ua.training.controller.command;
+package ua.training.controller.commands;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class UpdateUserCommand implements Command {
+public class RequestCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         return null;

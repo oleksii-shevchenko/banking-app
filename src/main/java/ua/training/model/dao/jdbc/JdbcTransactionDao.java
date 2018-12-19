@@ -11,6 +11,7 @@ import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
+import ua.training.model.service.producers.TransactionProducer;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -98,7 +99,7 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public long makePeriodicUpdate(Long accountId) throws CancelingTaskException{
+    public long makeTransaction(Long accountId, TransactionProducer producer) throws CancelingTaskException{
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
@@ -107,7 +108,7 @@ public class JdbcTransactionDao implements TransactionDao {
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
                 Account account = getAccountById(accountId, getAccountStatement);
 
-                Optional<Transaction> optionalTransaction = account.update();
+                Optional<Transaction> optionalTransaction = producer.produce(account);
 
                 Transaction transaction;
 

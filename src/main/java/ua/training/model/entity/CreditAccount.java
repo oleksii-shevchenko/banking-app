@@ -1,6 +1,5 @@
 package ua.training.model.entity;
 
-import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -8,7 +7,6 @@ import ua.training.model.service.CurrencyExchangeService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -22,9 +20,9 @@ public class CreditAccount extends Account {
     private BigDecimal creditRate;
     private BigDecimal creditLimit;
 
-    private CreditAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod,
+    private CreditAccount(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd,
                           Status status, List<Long> holders, BigDecimal creditRate, BigDecimal creditLimit) {
-        super(id, balance, currency, expiresEnd, updatePeriod, status, holders);
+        super(id, balance, currency, expiresEnd, status, holders);
         this.creditRate = creditRate;
         this.creditLimit = creditLimit;
     }
@@ -55,7 +53,6 @@ public class CreditAccount extends Account {
         private BigDecimal balance;
         private Currency currency;
         private LocalDate expiresEnd;
-        private int updatePeriod;
         private Status status;
         private List<Long> holders;
         private BigDecimal creditRate;
@@ -81,11 +78,6 @@ public class CreditAccount extends Account {
             return this;
         }
 
-        public CreditAccountBuilder setUpdatePeriod(int updatePeriod) {
-            this.updatePeriod = updatePeriod;
-            return this;
-        }
-
         public CreditAccountBuilder setHolders(List<Long> holders) {
             this.holders = holders;
             return this;
@@ -107,7 +99,7 @@ public class CreditAccount extends Account {
         }
 
         public CreditAccount build() {
-            return new CreditAccount(id, balance, currency, expiresEnd, updatePeriod, status, holders, creditRate, creditLimit);
+            return new CreditAccount(id, balance, currency, expiresEnd, status, holders, creditRate, creditLimit);
         }
     }
 
@@ -137,10 +129,5 @@ public class CreditAccount extends Account {
         }
 
         return getBalance();
-    }
-
-    @Override
-    public Optional<Transaction> update() throws CancelingTaskException{
-        throw new CancelingTaskException();
     }
 }

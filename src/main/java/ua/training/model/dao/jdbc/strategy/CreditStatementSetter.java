@@ -24,10 +24,10 @@ public class CreditStatementSetter implements StatementSetter {
         preparedStatement.setString(2, creditAccount.getClass().getSimpleName());
         preparedStatement.setString(3, creditAccount.getCurrency().name());
         preparedStatement.setDate(4, Date.valueOf(creditAccount.getExpiresEnd()));
-        preparedStatement.setInt(5, creditAccount.getUpdatePeriod());
-        preparedStatement.setString(6, creditAccount.getStatus().name());
-        preparedStatement.setBigDecimal(7, creditAccount.getCreditLimit());
-        preparedStatement.setBigDecimal(8, creditAccount.getCreditRate());
-        preparedStatement.setNull(9, Types.DECIMAL);
+        preparedStatement.setString(5, creditAccount.getStatus().name());
+        preparedStatement.setBigDecimal(6, creditAccount.getCreditLimit());
+        preparedStatement.setBigDecimal(7, creditAccount.getCreditRate());
+        preparedStatement.setNull(8, Types.DECIMAL);
+        preparedStatement.setNull(9, Types.INTEGER);
     }
 }

@@ -1,4 +1,4 @@
-package ua.training.controller.filter;
+package ua.training.controller.filters;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * This filter implements authorization mechanism. If user has permissions to make such request, than the request will
+ * This filters implements authorization mechanism. If user has permissions to make such request, than the request will
  * be pass further, else the response will be sent to error page. If there is even no such commend, response will be
  * sent to error page to.
  */
@@ -78,7 +78,7 @@ public class AuthorizationFilter implements Filter {
         if (permissions.getOrDefault(role, List.of()).contains(command)) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
-            logger.warn("User with role " + role + " tries to access command " + command);
+            logger.warn("User with role " + role + " tries to access commands " + command);
 
             response.sendRedirect(request.getContextPath() + PathManager.getPath("path.error"));
         }

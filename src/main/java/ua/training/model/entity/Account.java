@@ -1,6 +1,5 @@
 package ua.training.model.entity;
 
-import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
@@ -8,7 +7,6 @@ import ua.training.model.service.CurrencyExchangeService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This entity is general template for all accounts. It has POJO structure.
@@ -21,16 +19,14 @@ public abstract class Account {
     private BigDecimal balance;
     private Currency currency;
     private LocalDate expiresEnd;
-    private int updatePeriod;
     private Status status;
     private List<Long> holders;
 
-    public Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, int updatePeriod, Status status, List<Long> holders) {
+    public Account(long id, BigDecimal balance, Currency currency, LocalDate expiresEnd, Status status, List<Long> holders) {
         this.id = id;
         this.balance = balance;
         this.currency = currency;
         this.expiresEnd = expiresEnd;
-        this.updatePeriod = updatePeriod;
         this.status = status;
         this.holders = holders;
     }
@@ -71,14 +67,6 @@ public abstract class Account {
         this.expiresEnd = expiresEnd;
     }
 
-    public int getUpdatePeriod() {
-        return updatePeriod;
-    }
-
-    public void setUpdatePeriod(int updatePeriod) {
-        this.updatePeriod = updatePeriod;
-    }
-
     public Status getStatus() {
         return status;
     }
@@ -112,5 +100,4 @@ public abstract class Account {
     }
 
     public abstract BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException;
-    public abstract Optional<Transaction> update() throws CancelingTaskException;
 }

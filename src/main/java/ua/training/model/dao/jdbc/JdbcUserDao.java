@@ -25,6 +25,7 @@ import java.util.List;
 public class JdbcUserDao implements UserDao {
     private static Logger logger = LogManager.getLogger(JdbcUserDao.class);
 
+    //todo add that is is proxy
     /**
      * Gets entity {@link User} using unique field login. If there is no such user, then throws {@link NoSuchUserException}.
      * @param login User login
@@ -158,30 +159,25 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.id"));
+             PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.full"));
              PreparedStatement getAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
             getUserStatement.setLong(1, key);
 
             ResultSet resultSet = getUserStatement.executeQuery();
 
-            User user;
             if (resultSet.next()) {
-                user =  new JdbcMapperFactory().getUserMapper().map(resultSet);
+                User user =  new JdbcMapperFactory().getUserMapper().map(resultSet);
+
+                user.setAccounts(new ArrayList<>());
+                resultSet.beforeFirst();
+                while (resultSet.next()) {
+                    user.getAccounts().add(resultSet.getLong("account_id"));
+                }
+
+                return user;
             } else {
                 throw new SQLException();
             }
-
-            getAccountsStatement.setLong(1, key);
-
-            resultSet = getAccountsStatement.executeQuery();
-
-            List<Long> accounts = new ArrayList<>();
-            while (resultSet.next()) {
-                accounts.add(resultSet.getLong("account_id"));
-            }
-            user.setAccounts(accounts);
-
-            return user;
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);

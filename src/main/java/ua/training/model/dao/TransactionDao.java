@@ -2,6 +2,7 @@ package ua.training.model.dao;
 
 import ua.training.model.entity.Transaction;
 import ua.training.model.exception.CancelingTaskException;
+import ua.training.model.service.producers.TransactionProducer;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface TransactionDao extends Dao<Long, Transaction> {
     List<Transaction> getAccountTransactions(Long accountId);
 
     long makeTransaction(Transaction transaction);
-    long makePeriodicUpdate(Long accountId) throws CancelingTaskException;
+    long makeTransaction(Long accountId, TransactionProducer producer) throws CancelingTaskException;
 }

@@ -24,10 +24,10 @@ public class DepositStatementSetter implements StatementSetter {
         preparedStatement.setString(2, depositAccount.getClass().getSimpleName());
         preparedStatement.setString(3, depositAccount.getCurrency().name());
         preparedStatement.setDate(4, Date.valueOf(depositAccount.getExpiresEnd()));
-        preparedStatement.setInt(5, depositAccount.getUpdatePeriod());
-        preparedStatement.setString(6, depositAccount.getStatus().name());
+        preparedStatement.setString(5, depositAccount.getStatus().name());
+        preparedStatement.setNull(6, Types.DECIMAL);
         preparedStatement.setNull(7, Types.DECIMAL);
-        preparedStatement.setNull(8, Types.DECIMAL);
-        preparedStatement.setBigDecimal(9, depositAccount.getDepositRate());
+        preparedStatement.setBigDecimal(8, depositAccount.getDepositRate());
+        preparedStatement.setInt(9, depositAccount.getUpdatePeriod());
     }
 }
