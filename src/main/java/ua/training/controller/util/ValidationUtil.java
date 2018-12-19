@@ -12,7 +12,7 @@ public class ValidationUtil {
         if (isMatch(request.getParameter(param), bundle.getString("regex." + param))) {
             return true;
         } else {
-            new ContentManager().setLocalizedMessage(request, "wrong" + param, "content.message.not.match." + param);
+            ContentManager.setLocalizedMessage(request, "wrong" + param, "content.message.not.match." + param);
             return false;
         }
     }

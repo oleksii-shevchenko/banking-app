@@ -20,7 +20,6 @@ public class SignInCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
-        ContentManager manager = new ContentManager();
 
         String login = request.getParameter("login");
         String password = request.getParameter("pass");
@@ -37,12 +36,12 @@ public class SignInCommand implements Command {
         } catch (NoSuchUserException exception) {
             logger.warn("Tries to sign in with wrong login " + login);
 
-            manager.setLocalizedMessage(request, "wronglogin", "content.message.wrong.login");
+            ContentManager.setLocalizedMessage(request, "wronglogin", "content.message.wrong.login");
             return PathManager.getPath("path.sign.in");
         } catch (WrongPasswordException exception) {
             logger.warn("User " + login + " tries to sign in with wrong password");
 
-            manager.setLocalizedMessage(request, "wrongpass", "content.message.wrong.pass");
+            ContentManager.setLocalizedMessage(request, "wrongpass", "content.message.wrong.pass");
             return PathManager.getPath("path.sign.in");
         }
 

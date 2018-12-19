@@ -22,7 +22,6 @@ public class SignUpCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
-        ContentManager contentManager = new ContentManager();
 
         if (hasEmptyParam(request) || isNotValid(request)) {
             return PathManager.getPath("path.sign.up");
@@ -35,12 +34,12 @@ public class SignUpCommand implements Command {
         } catch (NonUniqueLoginException exception) {
             logger.warn("Tries to sign up with existing login " + user.getLogin());
 
-            contentManager.setLocalizedMessage(request, "wronglogin", "content.message.exist.login");
+            ContentManager.setLocalizedMessage(request, "wronglogin", "content.message.exist.login");
             return PathManager.getPath("path.sign.up");
         } catch (NonUniqueEmailException exception) {
             logger.warn("Tries to sign in with existing email " + user.getEmail());
 
-            contentManager.setLocalizedMessage(request, "wrongemail", "content.message.exist.email");
+            ContentManager.setLocalizedMessage(request, "wrongemail", "content.message.exist.email");
             return PathManager.getPath("path.sign.up");
         }
 
