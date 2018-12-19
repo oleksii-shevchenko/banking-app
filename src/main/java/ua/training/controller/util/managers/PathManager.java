@@ -1,4 +1,4 @@
-package ua.training.controller.util;
+package ua.training.controller.util.managers;
 
 import java.util.ResourceBundle;
 

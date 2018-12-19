@@ -2,8 +2,8 @@ package ua.training.controller.command;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.training.controller.util.ContentManager;
-import ua.training.controller.util.PathManager;
+import ua.training.controller.util.managers.ContentManager;
+import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
 import ua.training.model.exception.NoSuchUserException;
@@ -37,12 +37,12 @@ public class SignInCommand implements Command {
         } catch (NoSuchUserException exception) {
             logger.warn("Tries to sign in with wrong login " + login);
 
-            manager.setMessage(request, "wronglogin", "content.message.wrong.login");
+            manager.setLocalizedMessage(request, "wronglogin", "content.message.wrong.login");
             return PathManager.getPath("path.sign.in");
         } catch (WrongPasswordException exception) {
             logger.warn("User " + login + " tries to sign in with wrong password");
 
-            manager.setMessage(request, "wrongpass", "content.message.wrong.pass");
+            manager.setLocalizedMessage(request, "wrongpass", "content.message.wrong.pass");
             return PathManager.getPath("path.sign.in");
         }
 

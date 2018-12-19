@@ -2,7 +2,7 @@ package ua.training.controller.command;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.training.controller.util.PathManager;
+import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -1,7 +1,7 @@
 package ua.training.controller.servlet;
 
 import ua.training.controller.command.*;
-import ua.training.controller.util.PathManager;
+import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

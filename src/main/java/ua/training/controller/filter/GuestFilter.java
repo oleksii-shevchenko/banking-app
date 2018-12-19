@@ -21,7 +21,7 @@ public class GuestFilter implements Filter {
             HttpSession session = request.getSession();
 
             session.setAttribute("role", User.Role.GUEST.name());
-            session.setAttribute("lang", "en_US");
+            session.setAttribute("lang", "en-US");
 
             logger.info("Create default session " + session.getId() + " for guest user");
         }

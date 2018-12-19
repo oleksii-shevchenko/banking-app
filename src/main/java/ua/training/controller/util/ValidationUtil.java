@@ -1,5 +1,7 @@
 package ua.training.controller.util;
 
+import ua.training.controller.util.managers.ContentManager;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -10,7 +12,7 @@ public class ValidationUtil {
         if (isMatch(request.getParameter(param), bundle.getString("regex." + param))) {
             return true;
         } else {
-            new ContentManager().setMessage(request, "wrong" + param, "content.message.not.match." + param);
+            new ContentManager().setLocalizedMessage(request, "wrong" + param, "content.message.not.match." + param);
             return false;
         }
     }

@@ -3,9 +3,9 @@ package ua.training.controller.command;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.training.controller.util.ContentManager;
-import ua.training.controller.util.PathManager;
 import ua.training.controller.util.ValidationUtil;
+import ua.training.controller.util.managers.ContentManager;
+import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
 import ua.training.model.exception.NonUniqueEmailException;
@@ -39,12 +39,12 @@ public class SignUpCommand implements Command {
         } catch (NonUniqueLoginException exception) {
             logger.warn("Tries to sign up with existing login " + user.getLogin());
 
-            contentManager.setMessage(request, "wronglogin", "content.message.exist.login");
+            contentManager.setLocalizedMessage(request, "wronglogin", "content.message.exist.login");
             return PathManager.getPath("path.sign.up");
         } catch (NonUniqueEmailException exception) {
             logger.warn("Tries to sign in with existing email " + user.getEmail());
 
-            contentManager.setMessage(request, "wrongemail", "content.message.exist.email");
+            contentManager.setLocalizedMessage(request, "wrongemail", "content.message.exist.email");
             return PathManager.getPath("path.sign.up");
         }
 

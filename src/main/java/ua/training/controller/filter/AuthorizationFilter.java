@@ -2,7 +2,8 @@ package ua.training.controller.filter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.training.controller.util.PathManager;
+import ua.training.controller.util.UserUtil;
+import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -70,9 +71,7 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        logger.info(request.getContextPath());
-
-        String command = extractCommand(request);
+        String command = new UserUtil().extractCommand(request);
 
         String role = (String) request.getSession().getAttribute("role");
 
@@ -83,9 +82,5 @@ public class AuthorizationFilter implements Filter {
 
             response.sendRedirect(request.getContextPath() + PathManager.getPath("path.error"));
         }
-    }
-
-    private String extractCommand(HttpServletRequest request) {
-        return request.getRequestURI().replaceAll(".*/api/", "");
     }
 }

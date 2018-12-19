@@ -1,6 +1,6 @@
 package ua.training.controller.command;
 
-import ua.training.controller.util.PathManager;
+import ua.training.controller.util.managers.PathManager;
 import ua.training.model.entity.Currency;
 import ua.training.model.service.CurrencyExchangeService;
 

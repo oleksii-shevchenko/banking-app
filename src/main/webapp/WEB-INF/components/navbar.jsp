@@ -42,8 +42,8 @@
                 <li>
                     <form method="post" action="${pageContext.request.contextPath}/api/changeLanguage">
                         <select class="form-control" name="lang" onchange="submit()">
-                            <option value="en_US" ${sessionScope.lang eq 'en_US' ? 'selected' : ''}>EN</option>
-                            <option value="ua_UA" ${sessionScope.lang eq 'ua_UA' ? 'selected' : ''}>UA</option>
+                            <option value="en-US" ${sessionScope.lang eq 'en-US' ? 'selected' : ''}>EN</option>
+                            <option value="ua-UA" ${sessionScope.lang eq 'ua-UA' ? 'selected' : ''}>UA</option>
                         </select>
                     </form>
                 </li>
