@@ -84,7 +84,7 @@ public abstract class Account {
         this.holders = holders;
     }
 
-    boolean isNonActive() {
+    public boolean isNonActive() {
         return !status.equals(Status.ACTIVE);
     }
 

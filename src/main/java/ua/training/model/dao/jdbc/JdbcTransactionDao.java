@@ -66,13 +66,11 @@ public class JdbcTransactionDao implements TransactionDao {
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-                if (transaction.getType().equals(Transaction.Type.MANUAL)) {
-                    Account sender = getAccountById(transaction.getSender(), getAccountStatement);
+                Account sender = getAccountById(transaction.getSender(), getAccountStatement);
 
-                    updateAccountBalance(sender.getId(), sender.withdrawFromAccount(transaction), updateBalanceStatement);
-                }
+                updateAccountBalance(sender.getId(), sender.withdrawFromAccount(transaction), updateBalanceStatement);
 
                 Account receiver = getAccountById(transaction.getReceiver(), getAccountStatement);
 
@@ -105,7 +103,7 @@ public class JdbcTransactionDao implements TransactionDao {
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"))) {
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
                 Account account = getAccountById(accountId, getAccountStatement);
 
                 Optional<Transaction> optionalTransaction = producer.produce(account);

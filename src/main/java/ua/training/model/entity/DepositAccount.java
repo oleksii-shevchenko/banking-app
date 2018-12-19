@@ -130,26 +130,4 @@ public class DepositAccount extends Account {
 
         return getBalance();
     }
-
-    /*@Override
-    public Optional<Transaction> update() throws CancelingTaskException {
-        if (isNonActive()) {
-            throw new CancelingTaskException();
-        }
-
-        if (getBalance().equals(BigDecimal.ZERO)) {
-            return Optional.empty();
-        }
-
-        Transaction transaction = Transaction.getBuilder()
-                .setReceiver(getId())
-                .setType(Transaction.Type.REGULAR)
-                .setAmount(getBalance().multiply(getDepositRate()))
-                .setCurrency(getCurrency())
-                .build();
-
-        setBalance(getBalance().add(transaction.getAmount()));
-
-        return Optional.of(transaction);
-    }*/
 }
