@@ -12,6 +12,15 @@
     <location>/error.jsp</location>
   </error-page>
 
+  <filter>
+    <filter-name>CacheFilter</filter-name>
+    <filter-class>ua.training.controller.filter.CacheFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>CacheFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <filter>
     <filter-name>GuestFilter</filter-name>

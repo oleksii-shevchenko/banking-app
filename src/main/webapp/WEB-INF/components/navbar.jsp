@@ -6,6 +6,7 @@
 <body>
     <fmt:setLocale value="${sessionScope.lang}" scope="session" />
     <fmt:setBundle basename="content"/>
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#"><fmt:message key="content.navbar.logo" /></a>
         <div class="collapse navbar-collapse">

@@ -29,7 +29,7 @@
 
 <c:choose>
     <c:when test="${sessionScope.role eq 'USER'}">
-        <jsp:include page="../components/user_menu.jsp" />
+        <jsp:include page="../components/user-menu.jsp" />
     </c:when>
     <c:otherwise>
         <jsp:include page="../components/admin_menu.jsp" />

@@ -26,7 +26,7 @@
 
 <jsp:include page="../components/navbar.jsp" />
 
-<fmt:setLocale value="${sessionScope.lang}" />
+<fmt:setLocale value="${sessionScope.lang}" scope="session"/>
 <fmt:setBundle basename="content" />
 
 <div class="container my-lg-4">

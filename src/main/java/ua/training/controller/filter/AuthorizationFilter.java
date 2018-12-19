@@ -70,6 +70,8 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        logger.info(request.getContextPath());
+
         String command = extractCommand(request);
 
         String role = (String) request.getSession().getAttribute("role");

@@ -2,8 +2,6 @@ package ua.training.controller.servlet;
 
 import ua.training.controller.command.*;
 import ua.training.controller.util.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
-import ua.training.model.service.ScheduledUpdateService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -59,6 +57,8 @@ public class FrontServlet extends HttpServlet {
         String command = request.getRequestURI().replaceAll(".*/api/", "");
         String page = commands.getOrDefault(command, (r) -> PathManager.getPath("path.error")).execute(request);
 
+
+
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));
         } else {
@@ -67,7 +67,7 @@ public class FrontServlet extends HttpServlet {
     }
 
     private void startServices() {
-        new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
+        //new ScheduledUpdateService().init(JdbcDaoFactory.getInstance());
         //new CurrencyExchangeService().init();
     }
 }
