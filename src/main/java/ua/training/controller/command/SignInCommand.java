@@ -32,7 +32,7 @@ public class SignInCommand implements Command {
         try {
             User user = service.authenticateUser(login, password);
 
-            closeOtherSessions(request, user);
+            invalidateOtherSessions(request, user);
             signInUser(request, user);
         } catch (NoSuchUserException exception) {
             logger.warn("Tries to sign in with wrong login " + login);
@@ -46,23 +46,23 @@ public class SignInCommand implements Command {
             return PathManager.getPath("path.sign.in");
         }
 
-        return PathManager.getPath("path.index");
+        return "redirect:" + PathManager.getPath("path.index");
     }
 
     private void signInUser(HttpServletRequest request, User user) {
-        logger.info("User " + user.getLogin() + "is signed in");
-
         request.getSession().setAttribute("login", user.getLogin());
         request.getSession().setAttribute("role", user.getRole().name());
         request.getServletContext().setAttribute(user.getLogin(), request.getSession());
+
+        logger.info("User " + user.getLogin() + "is signed in");
     }
 
-    private void closeOtherSessions(HttpServletRequest request, User user) {
-        logger.warn("Closed another session of user " + user.getLogin());
-
+    private void invalidateOtherSessions(HttpServletRequest request, User user) {
         if (Objects.nonNull(request.getServletContext().getAttribute(user.getLogin()))) {
             ((HttpSession) request.getServletContext().getAttribute(user.getLogin())).invalidate();
             request.getServletContext().removeAttribute(user.getLogin());
         }
+
+        logger.warn("Closed another session of user " + user.getLogin());
     }
 }

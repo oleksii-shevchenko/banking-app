@@ -1,6 +1,7 @@
 package ua.training.controller.servlet;
 
 import ua.training.controller.command.*;
+import ua.training.controller.util.CommandUtil;
 import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.ServletException;
@@ -9,8 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @WebServlet(name = "FrontServlet", urlPatterns = {"/api/*"})
 public class FrontServlet extends HttpServlet {
@@ -28,7 +29,7 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     public void init() {
-        commands = new HashMap<>();
+        commands = new ConcurrentHashMap<>();
         commands.put("signIn", new SignInCommand());
         commands.put("signUp", new SignUpCommand());
         commands.put("signOut", new SignOutCommand());
@@ -54,10 +55,8 @@ public class FrontServlet extends HttpServlet {
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String command = request.getRequestURI().replaceAll(".*/api/", "");
+        String command = new CommandUtil().extractCommand(request);
         String page = commands.getOrDefault(command, (r) -> PathManager.getPath("path.error")).execute(request);
-
-
 
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));

@@ -5,8 +5,6 @@ import java.util.ResourceBundle;
 
 public class RegexUtil {
     boolean validate(String target, String regexKey, Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle("regex", locale);
-
-        return target.matches(bundle.getString(regexKey));
+        return target.matches(ResourceBundle.getBundle("regex", locale).getString(regexKey));
     }
 }

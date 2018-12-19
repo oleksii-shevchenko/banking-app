@@ -24,11 +24,7 @@ public class SignUpCommand implements Command {
         AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
         ContentManager contentManager = new ContentManager();
 
-        if (hasEmptyParam(request)) {
-            return PathManager.getPath("path.sign.up");
-        }
-
-        if (!isRequestValid(request)) {
+        if (hasEmptyParam(request) || isNotValid(request)) {
             return PathManager.getPath("path.sign.up");
         }
 
@@ -50,10 +46,10 @@ public class SignUpCommand implements Command {
 
         signInUser(request, user);
 
-        return PathManager.getPath("path.index");
+        return "redirect:" + PathManager.getPath("path.index");
     }
 
-    private boolean isRequestValid(HttpServletRequest request) {
+    private boolean isNotValid(HttpServletRequest request) {
         ValidationUtil util = new ValidationUtil();
         return util.isValid(request, "login")
                 & util.isValid(request, "pass")
@@ -74,11 +70,11 @@ public class SignUpCommand implements Command {
     }
 
     private void signInUser(HttpServletRequest request, User user) {
-        logger.info("User " + user.getLogin() + " is signed in");
-
         request.getSession().setAttribute("login", user.getLogin());
         request.getSession().setAttribute("role", user.getRole().name());
         request.getServletContext().setAttribute(user.getLogin(), request.getSession());
+
+        logger.info("User " + user.getLogin() + " is signed in");
     }
 
     private boolean hasEmptyParam(HttpServletRequest request) {
