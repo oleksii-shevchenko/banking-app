@@ -15,4 +15,8 @@ public class AccountService {
     public List<Account> getAccounts(Long userId) {
         return factory.getAccountDao().getUserAccounts(userId);
     }
+
+    public Account getAccount(Long accountId) {
+        return factory.getAccountDao().get(accountId);
+    }
 }

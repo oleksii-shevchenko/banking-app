@@ -30,20 +30,20 @@
 
 <div class="container my-lg-4">
     <div class="row justify-content-start my-lg-2">
-        <p class="h2">Accounts</p>
+        <p class="h2"><fmt:message key="content.accounts.welcome" /></p>
     </div>
     <div class="row justify-content-center">
         <div class="col-3">
-            <p class="font-weight-bold">Account Id</p>
+            <p class="font-weight-bold"><fmt:message key="content.accounts.id" /></p>
         </div>
         <div class="col-3">
-            <p class="font-weight-bold">Account balance</p>
+            <p class="font-weight-bold"><fmt:message key="content.accounts.balance" /></p>
         </div>
         <div class="col-3">
-            <p class="font-weight-bold">Account status</p>
+            <p class="font-weight-bold"><fmt:message key="content.accounts.status" /></p>
         </div>
         <div class="col-3">
-            <p class="font-weight-bold">Info</p>
+            <p class="font-weight-bold"><fmt:message key="content.accounts.info" /></p>
         </div>
     </div>
     <c:forEach items="${requestScope.accounts}" var="accounts">
@@ -60,7 +60,7 @@
             <div class="col-3">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
                     <input type="hidden" name="id" value="${accounts.id}" />
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Info</button>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.accounts.info" /></button>
                 </form>
             </div>
         </div>

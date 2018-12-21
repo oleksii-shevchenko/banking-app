@@ -41,6 +41,8 @@ public class AuthorizationFilter implements Filter {
                 "showAccounts",
                 "infoAccount",
                 "infoTransaction",
+                "showTransactions",
+                "makeTransaction",
                 "updateUser",
                 "profile",
                 "createInvoice",
