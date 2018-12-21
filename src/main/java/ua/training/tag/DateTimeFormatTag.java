@@ -4,16 +4,16 @@ import ua.training.tag.util.PatternManager;
 
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class DateFormatTag extends SimpleTagSupport {
-    private LocalDate date;
+public class DateTimeFormatTag extends SimpleTagSupport {
+    private LocalDateTime time;
     private String localeTag;
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setTime(LocalDateTime time) {
+        this.time = time;
     }
 
     public void setLocaleTag(String localeTag) {
@@ -23,7 +23,7 @@ public class DateFormatTag extends SimpleTagSupport {
     @Override
     public void doTag() throws IOException {
         Locale locale = Locale.forLanguageTag(localeTag);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PatternManager.getPattern("pattern.day", locale), locale);
-        getJspContext().getOut().write(date.format(formatter));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PatternManager.getPattern("pattern.time", locale), locale);
+        getJspContext().getOut().write(time.format(formatter));
     }
 }

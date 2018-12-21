@@ -55,4 +55,21 @@
         </attribute>
     </tag>
 
+    <tag>
+        <name>time</name>
+        <tag-class>ua.training.tag.DateTimeFormatTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>time</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.time.LocalDateTime</type>
+        </attribute>
+        <attribute>
+            <name>localeTag</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
 </taglib>
