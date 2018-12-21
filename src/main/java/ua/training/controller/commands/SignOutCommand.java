@@ -11,7 +11,7 @@ public class SignOutCommand implements Command {
 
     @Override
     public String execute(HttpServletRequest request) {
-        logger.info("User " + request.getSession().getAttribute("login") + "is sign out.");
+        logger.info("User " + request.getSession().getAttribute("login") + " is sign out.");
 
         request.getServletContext().removeAttribute((String) request.getSession().getAttribute("login"));
         request.getSession().invalidate();

@@ -21,8 +21,9 @@ public class SignUpCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
+        ValidationUtil util = new ValidationUtil();
 
-        if (isNotValid(request, List.of("login", "pass", "email", "firstName", "secondName"))) {
+        if (!util.makeValidation(request, List.of("login", "pass", "email", "firstName", "secondName"))) {
             return PathManager.getPath("path.sign.up");
         }
 
@@ -45,17 +46,6 @@ public class SignUpCommand implements Command {
         signInUser(request, user);
 
         return "redirect:" + PathManager.getPath("path.index");
-    }
-
-    private boolean isNotValid(HttpServletRequest request, List<String> params) {
-        ValidationUtil util = new ValidationUtil();
-
-        boolean flag = false;
-        for (String param : params) {
-            flag |= (util.isEmpty(request, param) || !util.isValid(request, param));
-        }
-
-        return flag;
     }
 
     private User buildUserFromRequest(HttpServletRequest request) {

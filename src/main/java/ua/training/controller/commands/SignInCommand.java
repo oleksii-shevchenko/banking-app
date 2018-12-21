@@ -13,6 +13,7 @@ import ua.training.model.service.AuthenticationService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Objects;
 
 public class SignInCommand implements Command {
@@ -23,12 +24,12 @@ public class SignInCommand implements Command {
         AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
         ValidationUtil util = new ValidationUtil();
 
-        String login = request.getParameter("login");
-        String password = request.getParameter("pass");
-
-        if (Objects.isNull(login) || Objects.isNull(password)) {
+        if (!util.makeValidation(request, List.of("login", "pass"))) {
             return PathManager.getPath("path.sign.in");
         }
+
+        String login = request.getParameter("login");
+        String password = request.getParameter("pass");
 
         try {
             User user = service.authenticate(login, password);
