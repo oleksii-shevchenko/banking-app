@@ -51,7 +51,7 @@
                     <c:forEach var="elem" items="${requestScope.rates}">
                         <tr>
                             <td>${elem.key}</td>
-                            <td><fmt:formatNumber value="${elem.value}" maxFractionDigits="5" /></td>
+                            <td><fmt:formatNumber value="${elem.value}" maxFractionDigits="2" /></td>
                         </tr>
                     </c:forEach>
                 </tbody>

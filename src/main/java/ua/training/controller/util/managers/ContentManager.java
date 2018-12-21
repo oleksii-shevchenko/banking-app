@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ContentManager {
-    private static String getLocalizedContent(String key, Locale locale) {
+    public static String getLocalizedContent(String key, Locale locale) {
         return ResourceBundle.getBundle("content", locale).getString(key);
     }
 
