@@ -32,7 +32,7 @@
         <jsp:include page="../components/user-menu.jsp" />
     </c:when>
     <c:otherwise>
-        <jsp:include page="../components/admin_menu.jsp" />
+        <jsp:include page="../components/admin-menu.jsp" />
     </c:otherwise>
 </c:choose>
 

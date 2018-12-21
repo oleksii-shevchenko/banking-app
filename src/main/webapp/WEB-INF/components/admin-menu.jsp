@@ -10,8 +10,7 @@
 <div class="container my-2">
     <div class="row justify-content-center my-3">
         <div class="col-5">
-            <form method="post" action="${pageContext.request.contextPath}/api/infoUser">
-                <input type="hidden" name="login" value="${sessionScope.login}">
+            <form method="post" action="${pageContext.request.contextPath}/api/profile">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.info.profile" /></button>
             </form>
         </div>

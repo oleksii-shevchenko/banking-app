@@ -13,7 +13,7 @@ public class AuthenticationService {
         this.userDao = userDao;
     }
 
-    public User authenticateUser(String login, String password) throws NoSuchUserException, WrongPasswordException {
+    public User authenticate(String login, String password) throws NoSuchUserException, WrongPasswordException {
         User user = userDao.getUserByLogin(login);
         if (DigestUtils.sha256Hex(password).equals(user.getPasswordHash())) {
             return user;
@@ -22,7 +22,7 @@ public class AuthenticationService {
         }
     }
 
-    public void registerUser(User user){
+    public void register(User user){
         userDao.insert(user);
     }
 }

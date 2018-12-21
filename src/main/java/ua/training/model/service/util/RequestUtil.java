@@ -5,16 +5,17 @@ import org.apache.http.client.utils.URIBuilder;
 import ua.training.model.entity.Currency;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ExchangerUtil {
+public class RequestUtil {
     public URI buildRequestUri(String endPoint, String key) throws URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(endPoint);
 
@@ -26,6 +27,10 @@ public class ExchangerUtil {
 
         uriBuilder.setParameter("symbols", targets);
         return uriBuilder.build();
+    }
+
+    public String readJson(InputStream stream) throws IOException {
+        return null;
     }
 
     public void updateFromJson(JsonReader reader, Map<Currency, BigDecimal> rates) throws IOException {
@@ -47,6 +52,6 @@ public class ExchangerUtil {
     }
 
     public boolean isRatesNotValid(LocalDateTime lastUpdate, long validationPeriod) {
-        return Duration.between(lastUpdate, LocalDateTime.now()).toHours() > validationPeriod;
+        return ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now()) > validationPeriod;
     }
 }

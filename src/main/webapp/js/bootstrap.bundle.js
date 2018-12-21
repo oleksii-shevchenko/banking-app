@@ -2442,11 +2442,11 @@
    * @private
    */
   function setupEventListeners(reference, options, state, updateBound) {
-    // Resize event listener on window
+    // Resize event listeners on window
     state.updateBound = updateBound;
     getWindow(reference).addEventListener('resize', state.updateBound, { passive: true });
 
-    // Scroll event listener on scroll parents
+    // Scroll event listeners on scroll parents
     var scrollElement = getScrollParent(reference);
     attachToScrollParents(scrollElement, 'scroll', state.updateBound, state.scrollParents);
     state.scrollElement = scrollElement;
@@ -2474,10 +2474,10 @@
    * @private
    */
   function removeEventListeners(reference, state) {
-    // Remove resize event listener on window
+    // Remove resize event listeners on window
     getWindow(reference).removeEventListener('resize', state.updateBound);
 
-    // Remove scroll event listener on scroll parents
+    // Remove scroll event listeners on scroll parents
     state.scrollParents.forEach(function (target) {
       target.removeEventListener('scroll', state.updateBound);
     });

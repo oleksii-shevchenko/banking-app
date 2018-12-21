@@ -12,12 +12,16 @@ public class ValidationUtil {
         if (isMatch(request.getParameter(param), bundle.getString("regex." + param))) {
             return true;
         } else {
-            ContentManager.setLocalizedMessage(request, "wrong" + param, "content.message.not.match." + param);
+            ContentManager.setLocalizedMessage(request, param + "Wrong", "content.message.not.match." + param);
             return false;
         }
     }
 
     private boolean isMatch(String target, String regex) {
         return Objects.nonNull(target) && target.matches(regex);
+    }
+
+    public boolean isEmpty(HttpServletRequest request, String param) {
+        return Objects.isNull(request.getParameter(param)) || request.getParameter(param).isEmpty();
     }
 }

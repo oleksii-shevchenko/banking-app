@@ -9,7 +9,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.entity.Currency;
-import ua.training.model.service.util.ExchangerUtil;
+import ua.training.model.service.util.RequestUtil;
 
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -55,7 +55,7 @@ public class CurrencyExchangeService {
         //todo activate
         /*readWriteLock.readLock().lock();
         try {
-            ExchangerUtil util = new ExchangerUtil();
+            RequestUtil util = new RequestUtil();
 
             if (util.isRatesNotValid(lastUpdate, validationTime)) {
                 readWriteLock.readLock().unlock();
@@ -84,7 +84,7 @@ public class CurrencyExchangeService {
 
     private void updateRates() {
         ResourceBundle config = ResourceBundle.getBundle("fixer_io");
-        ExchangerUtil util = new ExchangerUtil();
+        RequestUtil util = new RequestUtil();
 
         String endPoint = config.getString("fixer.api.end_point");
         String key = config.getString("fixer.api.key");

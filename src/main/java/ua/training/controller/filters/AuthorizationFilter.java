@@ -42,7 +42,7 @@ public class AuthorizationFilter implements Filter {
                 "infoAccount",
                 "infoTransaction",
                 "updateUser",
-                "infoUser",
+                "profile",
                 "createInvoice",
                 "infoInvoice",
                 "completeInvoice",
@@ -60,7 +60,8 @@ public class AuthorizationFilter implements Filter {
                 "infoUser",
                 "showRequests",
                 "processRequest",
-                "replenishAccount"));
+                "replenishAccount",
+                "profile"));
     }
 
     @Override
