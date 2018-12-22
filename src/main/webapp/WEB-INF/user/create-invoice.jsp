@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Make transaction</title>
+    <title>Create invoice</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap-grid.css">
@@ -34,35 +34,38 @@
 <div class="container my-lg-4">
     <div class="row justify-content-center">
         <div class="col-4">
-            <form action="${pageContext.request.contextPath}/api/makeTransaction" method="post">
-                <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.make.transaction.welcome" /></h1>
+            <form action="${pageContext.request.contextPath}/api/createInvoice" method="post">
+                <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.create.invoice.welcome" /></h1>
                 <div class="form-group my-2">
-                    <p class="font-weight-bold"><fmt:message key="content.make.transaction.sender" /></p>
-                    <select class="form-control" name="sender" required>
+                    <p class="font-weight-bold"><fmt:message key="content.create.invoice.requester" /></p>
+                    <select class="form-control" name="requester" required>
                         <c:forEach var="account" items="${requestScope.accountIds}">
-                            <option value="${account}" ${param.sender eq account ? 'selected' : ''}>${account}</option>
+                            <option value="${account}" ${param.requester eq account ? 'selected' : ''}>${account}</option>
                         </c:forEach>
                     </select>
-                    <p class="text-danger">${requestScope.notEnough}</p>
                 </div>
                 <div class="form-group my-2">
-                    <p class="font-weight-bold"><fmt:message key="content.make.transaction.receiver" /></p>
-                    <input type="number" name="receiver" class="form-control my-2" value="${param.receiver}" placeholder="<fmt:message key="content.make.transaction.receiver.placeholder" />" required>
+                    <p class="font-weight-bold"><fmt:message key="content.create.invoice.payer" /></p>
+                    <input type="number" name="payer" class="form-control my-2" value="${param.payer}" placeholder="<fmt:message key="content.create.invoice.payer.placeholder" />" required>
                 </div>
                 <div class="form-group my-2">
-                    <p class="font-weight-bold"><fmt:message key="content.make.transaction.amount" /></p>
-                    <input type="number" step="0.01" name="amount" class="form-control my-2" value="${param.amount}" placeholder="<fmt:message key="content.make.transaction.amount.placeholder" />" required>
+                    <p class="font-weight-bold"><fmt:message key="content.create.invoice.amount" /></p>
+                    <input type="number" step="0.01" name="amount" class="form-control my-2" value="${param.amount}" placeholder="<fmt:message key="content.create.invoice.amount.placeholder" />" required>
                     <p class="text-danger">${requestScope.amountWrong}</p>
                 </div>
                 <div class="form-group my-2">
-                    <p class="font-weight-bold"><fmt:message key="content.make.transaction.currency" /></p>
+                    <p class="font-weight-bold"><fmt:message key="content.create.invoice.currency" /></p>
                     <select class="form-control" name="currency" required>
                         <c:forEach var="currency" items="${requestScope.currencies}">
                             <option value="${currency}" ${param.currency eq currency ? 'selected' : ''}>${currency}</option>
                         </c:forEach>
                     </select>
                 </div>
-                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.make.transaction.make" /></button>
+                <div class="form-group my-2">
+                    <p class="font-weight-bold"><fmt:message key="content.create.invoice.description" /></p>
+                    <textarea class="form-control" name="description" rows="4"></textarea>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.create.invoice.create" /></button>
             </form>
         </div>
     </div>

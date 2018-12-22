@@ -5,7 +5,6 @@ import org.apache.http.client.utils.URIBuilder;
 import ua.training.model.entity.Currency;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,11 +25,8 @@ public class RequestUtil {
                 collect(Collectors.joining(","));
 
         uriBuilder.setParameter("symbols", targets);
-        return uriBuilder.build();
-    }
 
-    public String readJson(InputStream stream) throws IOException {
-        return null;
+        return uriBuilder.build();
     }
 
     public void updateFromJson(JsonReader reader, Map<Currency, BigDecimal> rates) throws IOException {

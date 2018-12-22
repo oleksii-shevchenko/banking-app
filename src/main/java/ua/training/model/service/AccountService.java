@@ -3,6 +3,7 @@ package ua.training.model.service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.dto.InvoiceDto;
 import ua.training.model.entity.Account;
+import ua.training.model.entity.Invoice;
 import ua.training.model.entity.Transaction;
 
 import java.util.List;
@@ -31,5 +32,9 @@ public class AccountService {
 
     public void makeTransaction(Transaction transaction) {
         factory.getTransactionDao().makeTransaction(transaction);
+    }
+
+    public void createInvoice(Invoice invoice) {
+        factory.getInvoiceDao().insert(invoice);
     }
 }
