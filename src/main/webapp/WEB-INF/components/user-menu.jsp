@@ -31,8 +31,8 @@
     </div>
     <div class="row justify-content-center my-3">
         <div class="col-5">
-            <form method="post" action="${pageContext.request.contextPath}/api/showInvoices">
-                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.user.show.invoices" /></button>
+            <form method="post" action="${pageContext.request.contextPath}/api/makeTransaction">
+                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.user.make.transaction" /></button>
             </form>
         </div>
     </div>

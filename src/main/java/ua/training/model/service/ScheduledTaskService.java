@@ -1,13 +1,9 @@
 package ua.training.model.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.AccountDao;
-import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
-import ua.training.model.exception.CancelingTaskException;
 import ua.training.model.service.producers.DepositUpdater;
 
 import java.time.LocalDate;
@@ -18,8 +14,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ScheduledTaskService {
-    private static Logger logger = LogManager.getLogger(ScheduledTaskService.class);
-
     private static final int THREADS_NUMBER = 4;
 
     private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(THREADS_NUMBER);
@@ -32,25 +26,15 @@ public class ScheduledTaskService {
             registerAccountClosing(account, factory.getAccountDao());
 
             if (account instanceof DepositAccount) {
-                registerDeposit(account, factory.getTransactionDao());
+                registerDeposit(account, factory);
             }
         }
     }
 
-    private void registerDeposit(Account account, TransactionDao transactionDao) {
+    private void registerDeposit(Account account, DaoFactory factory) {
         DepositAccount depositAccount = (DepositAccount) account;
-
         executorService.scheduleWithFixedDelay(
-                () -> {
-                    try {
-                        transactionDao.makeTransaction(account.getId(), new DepositUpdater());
-                    } catch (CancelingTaskException exception) {
-                        logger.info(exception);
-                        throw new RuntimeException();
-                    } catch (RuntimeException exception) {
-                        logger.info(exception);
-                    }
-                },
+                new DepositUpdater(factory, account.getId()),
                 depositAccount.getUpdatePeriod(),
                 depositAccount.getUpdatePeriod(),
                 TimeUnit.DAYS

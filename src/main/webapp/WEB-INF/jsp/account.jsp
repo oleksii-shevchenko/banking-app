@@ -41,19 +41,20 @@
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.show" /></button>
                 </form>
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/showTransactions">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.transactions" /></button>
                 </form>
             </div>
-            <div class="col-3">
-                <form method="post" action="${pageContext.request.contextPath}/api/makeTransaction">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.make" /></button>
+            <div class="col-2">
+                <form method="post" action="${pageContext.request.contextPath}/api/showInvoices">
+                    <input type="hidden" name="id" value="${requestScope.account.id}">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.invoices" /></button>
                 </form>
             </div>
             <div class="col-2">
-                <form method="post" action="${pageContext.request.contextPath}/api/showInvoices">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.invoices" /></button>
+                <form method="post" action="${pageContext.request.contextPath}/api/showHolders">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.holders" /></button>
                 </form>
             </div>
         </c:if>
@@ -71,7 +72,7 @@
             <p class="text-right text-primary text"><fmt:message key="content.info.account.balance" /></p>
         </div>
         <div class="col-4">
-            <p class="text-left"><ctg:balance account="${requestScope.account}" /></p>
+            <p class="text-left"><ctg:balance balance="${requestScope.account.balance}" currency="${requestScope.account.currency}" /></p>
         </div>
     </div>
     <div class="row justify-content-start my-3">

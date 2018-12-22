@@ -1,16 +1,16 @@
 package ua.training.tag.util;
 
-import ua.training.model.entity.Account;
+import ua.training.model.entity.Currency;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class AccountUtil {
-    public String getCurrencySign(Account account) {
-        String currency = account.getCurrency().name().toLowerCase();
-        return FormatManager.getFormat("content.tag.currency." + currency);
+    public String getCurrencySign(Currency currency) {
+        return FormatManager.getFormat("content.tag.currency." + currency.name().toLowerCase());
     }
 
-    public String getFormattedBalance(Account account) {
-        return account.getBalance().setScale(2, RoundingMode.FLOOR).toString();
+    public String getFormattedBalance(BigDecimal balance) {
+        return balance.setScale(2, RoundingMode.FLOOR).toString();
     }
 }

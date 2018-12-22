@@ -52,7 +52,7 @@
                 <p>${accounts.id}</p>
             </div>
             <div class="col-3">
-                <p><ctg:balance account="${accounts}"/></p>
+                <p><ctg:balance balance="${accounts.balance}" currency="${accounts.currency}" /></p>
             </div>
             <div class="col-3">
                 <ctg:status account="${accounts}" localeTag="${sessionScope.lang}" />

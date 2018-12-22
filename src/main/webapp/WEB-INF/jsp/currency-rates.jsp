@@ -30,7 +30,7 @@
 <div class="container">
     <div class="row justify-content-center my-5">
         <div class="col-2">
-            <form class="form-control" method="post" action="${pageContext.request.contextPath}/api/currencyRate">
+            <form method="post" action="${pageContext.request.contextPath}/api/currencyRate">
                 <h5 class="text-center"><fmt:message key="content.rates.base" /></h5>
                 <select class="form-control" name="base" onchange="submit()">
                     <option value="EUR" ${requestScope.base eq 'EUR' ? 'selected' : ''}>EUR</option>

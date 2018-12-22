@@ -4,7 +4,7 @@ import ua.training.model.dao.*;
 
 public interface DaoFactory {
     AccountDao getAccountDao();
-    InvoiceDao getPaymentDao();
+    InvoiceDao getInvoiceDao();
     RequestDao getRequestDao();
     TransactionDao getTransactionDao();
     UserDao getUserDao();

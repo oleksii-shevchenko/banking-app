@@ -14,10 +14,16 @@
         <tag-class>ua.training.tag.BalanceFormatTag</tag-class>
         <body-content>empty</body-content>
         <attribute>
-            <name>account</name>
+            <name>balance</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
-            <type>ua.training.model.entity.Account</type>
+            <type>java.math.BigDecimal</type>
+        </attribute>
+        <attribute>
+            <name>currency</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>ua.training.model.entity.Currency</type>
         </attribute>
     </tag>
 
