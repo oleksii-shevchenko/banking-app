@@ -159,8 +159,7 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User get(Long key) {
         try (Connection connection = ConnectionsPool.getConnection();
-             PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.full"));
-             PreparedStatement getAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.id.by.user"))) {
+             PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.full"))) {
             getUserStatement.setLong(1, key);
 
             ResultSet resultSet = getUserStatement.executeQuery();

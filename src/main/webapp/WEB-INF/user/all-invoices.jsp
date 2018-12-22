@@ -75,6 +75,7 @@
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoInvoice">
+                    <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
                     <input type="hidden" name="id" value="${invoices.id}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.invoices.info" /></button>
                 </form>
@@ -127,6 +128,7 @@
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoInvoice">
+                    <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
                     <input type="hidden" name="id" value="${invoices.id}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.invoices.info" /></button>
                 </form>

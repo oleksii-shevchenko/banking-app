@@ -37,4 +37,8 @@ public class AccountService {
     public void createInvoice(Invoice invoice) {
         factory.getInvoiceDao().insert(invoice);
     }
+
+    public Invoice getInvoice(Long invoiceId) {
+        return factory.getInvoiceDao().get(invoiceId);
+    }
 }

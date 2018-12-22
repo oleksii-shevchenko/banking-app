@@ -23,6 +23,7 @@ public class ShowInvoicesCommand implements Command {
 
         request.setAttribute("payer", invoiceDto.getInvoicesAsPayer());
         request.setAttribute("requester", invoiceDto.getInvoicesAsRequester());
+        request.setAttribute("masterAccount", accountId);
 
         return PathManager.getPath("path.all-invoices");
     }

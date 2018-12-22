@@ -53,6 +53,7 @@ public class FrontServlet extends HttpServlet {
         commands.put("infoUser", new InfoUserCommand());
         commands.put("profile", new ProfileCommand());
         commands.put("makeTransaction", new MakeTransactionCommand());
+        commands.put("denyInvoice", new DenyInvoiceCommand());
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
