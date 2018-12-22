@@ -3,6 +3,7 @@ package ua.training.model.service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.dto.InvoiceDto;
 import ua.training.model.entity.Account;
+import ua.training.model.entity.Transaction;
 
 import java.util.List;
 
@@ -26,5 +27,9 @@ public class AccountService {
         invoiceDto.setInvoicesAsPayer(factory.getInvoiceDao().getInvoicesByPayer(accountId));
         invoiceDto.setInvoicesAsRequester(factory.getInvoiceDao().getInvoicesByRequester(accountId));
         return invoiceDto;
+    }
+
+    public void makeTransaction(Transaction transaction) {
+        factory.getTransactionDao().makeTransaction(transaction);
     }
 }

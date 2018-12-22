@@ -8,7 +8,8 @@ import java.util.ResourceBundle;
 
 public class ContentManager {
     public static String getLocalizedContent(String key, Locale locale) {
-        return ResourceBundle.getBundle("content", locale).getString(key);
+        ResourceBundle bundle = ResourceBundle.getBundle("content", locale);
+        return bundle.containsKey(key) ? bundle.getString(key) : "";
     }
 
     public static void setLocalizedMessage(HttpServletRequest request, String attributeKey, String messageKey) {

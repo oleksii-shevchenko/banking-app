@@ -122,10 +122,10 @@ public class CreditAccount extends Account {
         BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
         BigDecimal balance = getBalance().subtract(transaction.getAmount().multiply(exchangeRate));
 
-        if (balance.abs().compareTo(getCreditLimit()) > 0) {
+        if (balance.abs().compareTo(getCreditLimit()) >= 0) {
             throw new NotEnoughMoneyException();
         } else {
-            setBalance(balance.subtract(transaction.getAmount().multiply(exchangeRate).multiply(getCreditRate())));
+            setBalance(balance.subtract(balance.abs().multiply(getCreditRate())));
         }
 
         return getBalance();

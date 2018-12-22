@@ -84,11 +84,16 @@ public class JdbcTransactionDao implements TransactionDao {
                 connection.commit();
 
                 return transactionId;
-            } catch (SQLException | NotEnoughMoneyException | NonActiveAccountException exception) {
+            } catch (SQLException | NonActiveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);
                 throw new RuntimeException(exception);
+            } catch (NotEnoughMoneyException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw exception;
             }
         } catch (SQLException exception) {
             logger.error(exception);
