@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
 import ua.training.model.exception.CancelingTaskException;
@@ -31,6 +32,66 @@ import java.util.Optional;
  */
 public class JdbcTransactionDao implements TransactionDao {
     private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
+
+    @Override
+    public PageDto<Transaction> getPage(Long accountId, int itemsNumber, int page) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+            try (PreparedStatement countTransactions = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.count"));
+                 PreparedStatement getTransactionsPage = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.page"))) {
+                countTransactions.setLong(1, accountId);
+                countTransactions.setLong(2, accountId);
+
+                int transactionsNumber;
+                ResultSet resultSet = countTransactions.executeQuery();
+                if (resultSet.next()) {
+                    transactionsNumber = resultSet.getInt("transactions_number");
+                } else {
+                    throw new SQLException();
+                }
+
+                int pagesNumber = transactionsNumber % itemsNumber == 0 ? transactionsNumber / itemsNumber : (transactionsNumber / itemsNumber) + 1;
+
+                if (page > pagesNumber) {
+                    throw new SQLException();
+                }
+
+                int offset = itemsNumber * (page - 1);
+
+                getTransactionsPage.setLong(1, accountId);
+                getTransactionsPage.setLong(2, accountId);
+                getTransactionsPage.setInt(3, itemsNumber);
+                getTransactionsPage.setInt(4, offset);
+
+                Mapper<Transaction> mapper = new JdbcMapperFactory().getTransactionMapper();
+                resultSet = getTransactionsPage.executeQuery();
+
+                List<Transaction> transactions = new ArrayList<>();
+                while (resultSet.next()) {
+                    transactions.add(mapper.map(resultSet));
+                }
+
+                PageDto<Transaction> pageDto = new PageDto<>();
+                pageDto.setPagesNumber(pagesNumber);
+                pageDto.setCurrentPage(page);
+                pageDto.setItemsNumber(itemsNumber);
+                pageDto.setItems(transactions);
+
+                connection.commit();
+
+                return pageDto;
+            } catch (SQLException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+    }
 
     /**
      * Returns all transactions where account is sender or receiver.
