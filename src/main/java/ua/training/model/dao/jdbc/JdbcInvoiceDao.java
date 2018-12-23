@@ -140,11 +140,16 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 updateInvoiceStatement.executeUpdate();
 
                 connection.commit();
-            } catch (SQLException | NotEnoughMoneyException | NonActiveAccountException exception) {
+            } catch (SQLException | NonActiveAccountException exception) {
                 connection.rollback();
 
                 logger.error(exception);
                 throw new RuntimeException(exception);
+            } catch (NotEnoughMoneyException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw exception;
             }
         } catch (SQLException exception) {
             logger.error(exception);
@@ -173,8 +178,8 @@ public class JdbcInvoiceDao implements InvoiceDao {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoice.get.by.id"));
-                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoice.update.status"))) {
+            try (PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"));
+                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.status"))) {
                 getInvoiceStatement.setLong(1, invoiceId);
 
                 ResultSet resultSet = getInvoiceStatement.executeQuery();

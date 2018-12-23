@@ -41,4 +41,12 @@ public class AccountService {
     public Invoice getInvoice(Long invoiceId) {
         return factory.getInvoiceDao().get(invoiceId);
     }
+
+    public void denyInvoice(Long invoiceId) {
+        factory.getInvoiceDao().denyInvoice(invoiceId);
+    }
+
+    public void acceptInvoice(Long invoiceId) {
+        factory.getInvoiceDao().acceptInvoice(invoiceId);
+    }
 }

@@ -50,17 +50,27 @@
         <c:if test="${requestScope.invoice.status eq 'PROCESSING'}" >
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/completeInvoice">
+                    <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
+                    <input type="hidden" name="id" value="${requestScope.invoice.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.accept" /></button>
                 </form>
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/denyInvoice">
-                    <input type="hidden" name="id" value="${requestScope.account.id}">
+                    <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
+                    <input type="hidden" name="id" value="${requestScope.invoice.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.deny" /></button>
                 </form>
             </div>
         </c:if>
     </div>
+    <c:if test="${not empty requestScope.notEnough}">
+        <div class="row justify-content-start my-2">
+            <div class="col-10">
+                <h3 class="text-danger"><c:out value="${requestScope.notEnough}" /></h3>
+            </div>
+        </div>
+    </c:if>
     <div class="row justify-content-start my-3">
         <div class="col-4">
             <p class="text-right text-primary text"><fmt:message key="content.info.invoice.requester" /></p>

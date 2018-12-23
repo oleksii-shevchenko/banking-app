@@ -13,6 +13,6 @@ public class ShowAccountsCommand implements Command {
 
         request.setAttribute("accounts", service.getAccounts((Long) request.getSession().getAttribute("id")));
 
-        return PathManager.getPath("path.accounts");
+        return PathManager.getPath("path.all-accounts");
     }
 }
