@@ -29,6 +29,12 @@
 <jsp:include page="../components/navbar.jsp" />
 
 <div class="container my-lg-4">
+    <div class="row justify-content-start">
+        <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
+            <input type="hidden" name="id" value="${requestScope.masterAccount}">
+            <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.account" /></button>
+        </form>
+    </div>
     <div class="row justify-content-start my-2">
         <p class="h2"><fmt:message key="content.all.invoices.welcome.payer" /></p>
     </div>

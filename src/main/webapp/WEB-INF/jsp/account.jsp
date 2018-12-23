@@ -43,6 +43,7 @@
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/showTransactions">
+                    <input type="hidden" name="accountId" value="${requestScope.account.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.transactions" /></button>
                 </form>
             </div>

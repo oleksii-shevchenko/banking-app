@@ -2,6 +2,7 @@ package ua.training.model.service;
 
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.dto.InvoiceDto;
+import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Invoice;
 import ua.training.model.entity.Transaction;
@@ -48,5 +49,9 @@ public class AccountService {
 
     public void acceptInvoice(Long invoiceId) {
         factory.getInvoiceDao().acceptInvoice(invoiceId);
+    }
+
+    public PageDto<Transaction> getTransactionsPage(Long accountId, int itemsNumber, int page) {
+        return factory.getTransactionDao().getPage(accountId, itemsNumber, page);
     }
 }

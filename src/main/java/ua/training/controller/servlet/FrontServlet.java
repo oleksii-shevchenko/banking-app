@@ -56,6 +56,7 @@ public class FrontServlet extends HttpServlet {
         commands.put("showHolders", new ShowHoldersCommand());
         commands.put("addHolder", new AddHolderCommand());
         commands.put("removeHolder", new RemoveHolderCommand());
+        commands.put("showTransactions", new ShowTransactionsCommand());
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
