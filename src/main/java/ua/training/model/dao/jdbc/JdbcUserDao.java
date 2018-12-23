@@ -14,7 +14,9 @@ import ua.training.model.exception.NonUniqueLoginException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This realization of {@link UserDao} for database source using jdbc library.
@@ -67,6 +69,27 @@ public class JdbcUserDao implements UserDao {
             List<User> holders = new ArrayList<>();
             while (resultSet.next()) {
                 holders.add(mapper.map(resultSet));
+            }
+
+            return holders;
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @Override
+    public Map<User, Permission> getAccountHoldersWithPermission(Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
+            preparedStatement.setLong(1, accountId);
+
+            Mapper<User> mapper = new JdbcMapperFactory().getUserMapper();
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Map<User, Permission> holders = new HashMap<>();
+            while (resultSet.next()) {
+                holders.put(mapper.map(resultSet), Permission.valueOf(resultSet.getString("permission")));
             }
 
             return holders;

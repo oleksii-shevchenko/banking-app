@@ -54,6 +54,7 @@
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/showHolders">
+                    <input type="hidden" name="id" value="${requestScope.account.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.account.holders" /></button>
                 </form>
             </div>
@@ -137,6 +138,71 @@
             </div>
         </c:otherwise>
     </c:choose>
+
+    <c:if test="${sessionScope.role eq 'USER'}">
+        <div class="row justify-content-start my-2">
+            <p class="h2"><fmt:message key="content.info.account.transactions.welcome" /></p>
+        </div>
+
+        <form class="form-row justify-content-center" action="${pageContext.request.contextPath}/api/makeTransaction" method="post">
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <select class="form-control my-2" name="sender" required>
+                    <c:forEach var="account" items="${requestScope.accountIds}">
+                        <option value="${account}" ${requestScope.account.id eq account ? 'selected' : ''}>${account}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <input type="number" name="receiver" class="form-control my-2" placeholder="<fmt:message key="content.info.account.transaction.receiver" />" required>
+            </div>
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <input type="number" step="0.01" name="amount" class="form-control my-2" placeholder="<fmt:message key="content.info.account.transaction.amount" />" required>
+            </div>
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <select class="form-control my-2" name="currency" required>
+                    <c:forEach var="currency" items="${requestScope.currencies}">
+                        <option value="${currency}" ${requestScope.account.currency eq currency ? 'selected' : ''}>${currency}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group my-2 mx-2">
+                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.info.account.transaction.make" /></button>
+            </div>
+        </form>
+
+        <div class="row justify-content-start my-2">
+            <p class="h2"><fmt:message key="content.info.account.invoice.welcome" /></p>
+        </div>
+
+        <form class="form-row justify-content-center" action="${pageContext.request.contextPath}/api/createInvoice" method="post">
+            <div class="form-group input-group-lg my-2 mx-1">
+                <select class="form-control my-2" name="requester" required>
+                    <c:forEach var="account" items="${requestScope.accountIds}">
+                        <option value="${account}" ${requestScope.account.id eq account ? 'selected' : ''}>${account}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group input-group-lg my-2 mx-1">
+                <input type="number" name="payer" class="form-control my-2" placeholder="<fmt:message key="content.info.account.invoice.payer" />" required>
+            </div>
+            <div class="form-group input-group-lg my-2 mx-1">
+                <input type="number" step="0.01" name="amount" class="form-control my-2" value="${param.amount}" placeholder="<fmt:message key="content.info.account.invoice.amount" />" required>
+            </div>
+            <div class="form-group input-group-lg my-2 mx-1">
+                <select class="form-control my-2" name="currency" required>
+                    <c:forEach var="currency" items="${requestScope.currencies}">
+                        <option value="${currency}" ${requestScope.account.currency eq currency ? 'selected' : ''}>${currency}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group input-group-lg my-2 mx-1">
+                <textarea class="form-control my-2" name="description" rows="1" placeholder="<fmt:message key="content.info.account.invoice.description" />"></textarea>
+            </div>
+            <div class="form-group my-2 mx-1">
+                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.info.account.invoice.create" /></button>
+            </div>
+        </form>
+    </c:if>
 </div>
 
 <jsp:include page="../components/footer.jsp" />

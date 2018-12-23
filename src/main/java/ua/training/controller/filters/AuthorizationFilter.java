@@ -49,7 +49,8 @@ public class AuthorizationFilter implements Filter {
                 "infoInvoice",
                 "completeInvoice",
                 "showInvoices",
-                "denyInvoice"));
+                "denyInvoice",
+                "showHolders"));
 
         permissions.put("ADMIN", List.of("signOut",
                 "workspace",

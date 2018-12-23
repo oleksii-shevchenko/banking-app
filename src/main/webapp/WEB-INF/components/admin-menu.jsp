@@ -32,7 +32,7 @@
     <div class="row justify-content-center my-3">
         <div class="col-5">
             <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.close.account" /></button>
+                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.info.account" /></button>
             </form>
         </div>
     </div>
