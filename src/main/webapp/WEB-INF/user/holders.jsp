@@ -97,7 +97,7 @@
             </div>
             <c:if test="${requestScope.permission eq 'ALL'}">
                 <div class="col-3">
-                    <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
+                    <form method="post" action="${pageContext.request.contextPath}/api/removeHolder">
                         <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
                         <input type="hidden" name="holderId" value="${holders.key.id}" />
                         <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.holders.remove" /></button>

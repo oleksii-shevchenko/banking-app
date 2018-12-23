@@ -43,14 +43,15 @@ public class AuthorizationFilter implements Filter {
                 "infoTransaction",
                 "showTransactions",
                 "makeTransaction",
-                "updateUser",
                 "profile",
                 "createInvoice",
                 "infoInvoice",
                 "completeInvoice",
                 "showInvoices",
                 "denyInvoice",
-                "showHolders"));
+                "showHolders",
+                "addHolder",
+                "removeHolder"));
 
         permissions.put("ADMIN", List.of("signOut",
                 "workspace",

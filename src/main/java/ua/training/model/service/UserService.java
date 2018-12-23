@@ -29,4 +29,12 @@ public class UserService {
     public Permission getPermission(Long userId, Long accountId) {
         return factory.getUserDao().getPermissions(userId, accountId);
     }
+
+    public void addHolder(Long userId, Long accountId) {
+        factory.getUserDao().addAccountHolder(userId, accountId);
+    }
+
+    public void removeHolder(Long userId, Long accountId) {
+        factory.getUserDao().removeAccountHolder(userId, accountId);
+    }
 }
