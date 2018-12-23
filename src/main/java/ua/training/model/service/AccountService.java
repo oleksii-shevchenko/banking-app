@@ -54,4 +54,8 @@ public class AccountService {
     public PageDto<Transaction> getTransactionsPage(Long accountId, int itemsNumber, int page) {
         return factory.getTransactionDao().getPage(accountId, itemsNumber, page);
     }
+
+    public Transaction getTransaction(Long transactionId) {
+        return factory.getTransactionDao().get(transactionId);
+    }
 }
