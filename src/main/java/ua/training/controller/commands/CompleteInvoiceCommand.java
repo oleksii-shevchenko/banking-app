@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
@@ -12,6 +14,8 @@ import ua.training.model.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 
 public class CompleteInvoiceCommand implements Command {
+    private static Logger logger = LogManager.getLogger(CompleteInvoiceCommand.class);
+
     @Override
     public String execute(HttpServletRequest request) {
         Long accountId = Long.valueOf(request.getParameter("masterAccount"));
@@ -22,12 +26,16 @@ public class CompleteInvoiceCommand implements Command {
         Invoice invoice = new AccountService(JdbcDaoFactory.getInstance()).getInvoice(invoiceId);
 
         if (!user.getAccounts().contains(accountId) || !(accountId.equals(invoice.getPayer()) || accountId.equals(invoice.getRequester()))) {
+            logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
+
             return "redirect:" + PathManager.getPath("path.error");
         }
 
         try {
             new AccountService(JdbcDaoFactory.getInstance()).acceptInvoice(invoiceId);
         } catch (NotEnoughMoneyException exception) {
+            logger.warn(exception);
+
             ContentManager.setLocalizedMessage(request, "notEnough", "content.info.invoice.not.enough");
 
             request.setAttribute("invoice", invoice);
@@ -35,6 +43,8 @@ public class CompleteInvoiceCommand implements Command {
 
             return PathManager.getPath("path.invoice");
         }
+
+        logger.info("User " + user.getId() + " accept invoice " + invoiceId);
 
         return "redirect:" + PathManager.getPath("path.completed");
     }

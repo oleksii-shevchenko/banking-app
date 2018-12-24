@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
@@ -14,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CreateInvoiceCommand implements Command {
+    private static Logger logger = LogManager.getLogger(CreateInvoiceCommand.class);
+
     @Override
     public String execute(HttpServletRequest request) {
         User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
@@ -23,6 +27,8 @@ public class CreateInvoiceCommand implements Command {
 
         ValidationUtil util = new ValidationUtil();
         if (!util.makeValidation(request, List.of("requester", "payer", "amount", "currency"))) {
+            logger.warn("User " + user.getId() + " inputs not valid data");
+
             return PathManager.getPath("path.create-invoice");
         }
 
@@ -36,6 +42,8 @@ public class CreateInvoiceCommand implements Command {
                 .build();
 
         if (!user.getAccounts().contains(invoice.getRequester())) {
+            logger.warn("User " + user.getId() + "try to access account " + invoice.getRequester() + " without permissions");
+
             return "redirect:" + PathManager.getPath("path.error");
         }
 

@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Account;
@@ -11,6 +13,8 @@ import ua.training.model.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 
 public class InfoAccountCommand implements Command {
+    private static Logger logger = LogManager.getLogger(InfoAccountCommand.class);
+
     @Override
     public String execute(HttpServletRequest request) {
         Long accountId = Long.valueOf(request.getParameter("accountId"));
@@ -21,6 +25,8 @@ public class InfoAccountCommand implements Command {
         User user = new UserService(JdbcDaoFactory.getInstance()).get(userId);
 
         if (!role.equals(User.Role.ADMIN) && !account.getHolders().contains(userId)) {
+            logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
+
             return "redirect:" + PathManager.getPath("path.error");
         }
 

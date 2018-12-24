@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
@@ -10,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 public class ShowTransactionsCommand implements Command {
+    private static Logger logger = LogManager.getLogger(ShowTransactionsCommand.class);
+
     private final int ITEMS_NUMBER = 5;
 
     @Override
@@ -18,6 +22,8 @@ public class ShowTransactionsCommand implements Command {
 
         User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
         if (!user.getAccounts().contains(accountId)) {
+            logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
+
             return "redirect:" + PathManager.getPath("path.error");
         }
 

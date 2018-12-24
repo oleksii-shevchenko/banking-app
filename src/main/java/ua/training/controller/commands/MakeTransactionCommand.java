@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
@@ -16,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class MakeTransactionCommand implements Command {
+    private static Logger logger = LogManager.getLogger(MakeTransactionCommand.class);
+
     @Override
     public String execute(HttpServletRequest request) {
         User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
@@ -25,6 +29,8 @@ public class MakeTransactionCommand implements Command {
 
         ValidationUtil util = new ValidationUtil();
         if (!util.makeValidation(request, List.of("sender", "receiver", "amount", "currency"))) {
+            logger.warn("User " + user.getId() + " input not valid data");
+
             return PathManager.getPath("path.make-transaction");
         }
 
@@ -37,6 +43,8 @@ public class MakeTransactionCommand implements Command {
                 .build();
 
         if (!user.getAccounts().contains(transaction.getSender())) {
+            logger.warn("User " + user.getId() + "try to access account " + transaction.getSender() + " without permissions");
+
             return "redirect:" + PathManager.getPath("path.error");
         }
 
@@ -44,6 +52,8 @@ public class MakeTransactionCommand implements Command {
         try {
             service.makeTransaction(transaction);
         } catch (NotEnoughMoneyException exception) {
+            logger.warn(exception);
+
             ContentManager.setLocalizedMessage(request, "notEnough", "content.message.not.enough.money");
 
             return PathManager.getPath("path.make-transaction");
