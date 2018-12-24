@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 public class InfoAccountCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
-        Long accountId = Long.valueOf(request.getParameter("id"));
+        Long accountId = Long.valueOf(request.getParameter("accountId"));
         Long userId = (Long) request.getSession().getAttribute("id");
         User.Role role = User.Role.valueOf((String) request.getSession().getAttribute("role"));
 

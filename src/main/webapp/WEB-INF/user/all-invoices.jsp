@@ -31,7 +31,7 @@
 <div class="container my-lg-4">
     <div class="row justify-content-start">
         <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-            <input type="hidden" name="id" value="${requestScope.masterAccount}">
+            <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
             <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.account" /></button>
         </form>
     </div>
@@ -82,7 +82,7 @@
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoInvoice">
                     <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
-                    <input type="hidden" name="id" value="${invoices.id}" />
+                    <input type="hidden" name="invoiceId" value="${invoices.id}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.invoices.info" /></button>
                 </form>
             </div>
@@ -135,7 +135,7 @@
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoInvoice">
                     <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
-                    <input type="hidden" name="id" value="${invoices.id}" />
+                    <input type="hidden" name="invoiceId" value="${invoices.id}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.invoices.info" /></button>
                 </form>
             </div>

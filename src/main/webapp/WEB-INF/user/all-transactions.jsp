@@ -35,7 +35,7 @@
         </div>
         <div class="col-2">
             <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                <input type="hidden" name="id" value="${requestScope.masterAccount}">
+                <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.transactions.account" /></button>
             </form>
         </div>
@@ -80,7 +80,7 @@
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoTransaction">
-                    <input type="hidden" name="id" value="${transaction.id}" />
+                    <input type="hidden" name="transactionId" value="${transaction.id}" />
                     <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.all.transactions.info" /></button>
                 </form>

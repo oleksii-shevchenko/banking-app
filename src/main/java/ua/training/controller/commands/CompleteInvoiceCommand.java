@@ -15,7 +15,7 @@ public class CompleteInvoiceCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         Long accountId = Long.valueOf(request.getParameter("masterAccount"));
-        Long invoiceId = Long.valueOf(request.getParameter("id"));
+        Long invoiceId = Long.valueOf(request.getParameter("invoiceId"));
 
         User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
 

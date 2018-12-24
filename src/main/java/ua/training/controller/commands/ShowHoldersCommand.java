@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ShowHoldersCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
-        Long accountId = Long.valueOf(request.getParameter("id"));
+        Long accountId = Long.valueOf(request.getParameter("accountId"));
 
         request.setAttribute("masterAccount", accountId);
         request.setAttribute("permission", new UserService(JdbcDaoFactory.getInstance()).getPermission((Long) request.getSession().getAttribute("id"), accountId));

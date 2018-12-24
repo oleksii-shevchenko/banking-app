@@ -38,7 +38,7 @@
         <c:if test="${not empty requestScope.masterAccount}" >
             <div class="col-3">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                    <input type="hidden" name="id" value="${requestScope.masterAccount}">
+                    <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.transaction.account" /></button>
                 </form>
             </div>

@@ -37,13 +37,13 @@
         </div>
         <div class="col-2">
             <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                <input type="hidden" name="id" value="${requestScope.masterAccount}">
+                <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.account" /></button>
             </form>
         </div>
         <div class="col-2">
             <form method="post" action="${pageContext.request.contextPath}/api/showInvoices">
-                <input type="hidden" name="id" value="${requestScope.masterAccount}">
+                <input type="hidden" name="accountId" value="${requestScope.masterAccount}">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.all.invoices" /></button>
             </form>
         </div>
@@ -51,14 +51,14 @@
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/completeInvoice">
                     <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
-                    <input type="hidden" name="id" value="${requestScope.invoice.id}">
+                    <input type="hidden" name="invoiceId" value="${requestScope.invoice.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.accept" /></button>
                 </form>
             </div>
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/denyInvoice">
                     <input type="hidden" name="masterAccount" value="${requestScope.masterAccount}">
-                    <input type="hidden" name="id" value="${requestScope.invoice.id}">
+                    <input type="hidden" name="invoiceId" value="${requestScope.invoice.id}">
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.info.invoice.deny" /></button>
                 </form>
             </div>
@@ -136,7 +136,7 @@
             </div>
             <div class="col-3">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoTransaction">
-                    <input type="hidden" name="id" value="${requestScope.invoice.transaction}" />
+                    <input type="hidden" name="transactionId" value="${requestScope.invoice.transaction}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit">${requestScope.invoice.transaction}</button>
                 </form>
             </div>

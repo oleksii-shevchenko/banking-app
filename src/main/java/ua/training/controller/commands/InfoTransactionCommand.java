@@ -13,7 +13,7 @@ import java.util.Objects;
 public class InfoTransactionCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
-        Long transactionId = Long.valueOf(request.getParameter("id"));
+        Long transactionId = Long.valueOf(request.getParameter("transactionId"));
 
         if (Objects.nonNull(request.getParameter("masterAccount"))) {
             request.setAttribute("masterAccount", Long.valueOf(request.getParameter("masterAccount")));

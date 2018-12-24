@@ -12,7 +12,7 @@ public class ShowInvoicesCommand implements Command {
     public String execute(HttpServletRequest request) {
         AccountService service = new AccountService(JdbcDaoFactory.getInstance());
 
-        Long accountId = Long.valueOf(request.getParameter("id"));
+        Long accountId = Long.valueOf(request.getParameter("accountId"));
         Long userId = (Long) request.getSession().getAttribute("id");
 
         if (!service.getAccount(accountId).getHolders().contains(userId)) {

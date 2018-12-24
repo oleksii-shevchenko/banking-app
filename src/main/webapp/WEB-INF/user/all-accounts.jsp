@@ -59,7 +59,7 @@
             </div>
             <div class="col-3">
                 <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                    <input type="hidden" name="id" value="${accounts.id}" />
+                    <input type="hidden" name="accountId" value="${accounts.id}" />
                     <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.accounts.info" /></button>
                 </form>
             </div>
