@@ -37,4 +37,12 @@ public class UserService {
     public void removeHolder(Long userId, Long accountId) {
         factory.getUserDao().removeAccountHolder(userId, accountId);
     }
+
+    public Request getRequest(Long requestId) {
+        return factory.getRequestDao().get(requestId);
+    }
+
+    public void considerRequest(Long requestId) {
+        factory.getRequestDao().considerRequest(requestId);
+    }
 }

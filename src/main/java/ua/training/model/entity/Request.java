@@ -20,7 +20,18 @@ public class Request {
      * @author Oleksii Shevhcenko
      */
     public enum Type {
-        CREATE_DEPOSIT_ACCOUNT, CREATE_CREDIT_ACCOUNT
+        CREATE_DEPOSIT_ACCOUNT ("content.request.type.deposit"),
+        CREATE_CREDIT_ACCOUNT ("content.request.type.credit");
+
+        private String massageKey;
+
+        Type(String massageKey) {
+            this.massageKey = massageKey;
+        }
+
+        public String getMassageKey() {
+            return massageKey;
+        }
     }
 
     private Request(long id, long requesterId, Type type, Currency currency, boolean considered) {

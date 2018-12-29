@@ -65,6 +65,7 @@ public class AuthorizationFilter implements Filter {
                 "infoUser",
                 "showRequests",
                 "processRequest",
+                "considerRequest",
                 "replenishAccount",
                 "profile"));
     }

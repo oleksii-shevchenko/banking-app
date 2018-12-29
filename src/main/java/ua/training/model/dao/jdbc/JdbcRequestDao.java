@@ -30,19 +30,11 @@ public class JdbcRequestDao implements RequestDao {
      */
     @Override
     public void considerRequest(Long requestId) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-            connection.setAutoCommit(false);
-            try (PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
+        try (Connection connection = ConnectionsPool.getConnection();
+             PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update.considered"))) {
                 setCompletedStatement.setBoolean(1, true);
                 setCompletedStatement.setLong(2, requestId);
                 setCompletedStatement.executeUpdate();
-            } catch (SQLException exception) {
-                connection.rollback();
-
-                logger.error(exception);
-                throw new RuntimeException();
-            }
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();

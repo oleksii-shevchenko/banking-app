@@ -46,7 +46,7 @@ public class FrontServlet extends HttpServlet {
         commands.put("infoInvoice", new InfoInvoiceCommand());
         commands.put("completeInvoice", new CompleteInvoiceCommand());
         commands.put("showRequests", new ShowRequestsCommand());
-        commands.put("processRequest", new ProcessRequestCommand());
+        commands.put("considerRequest", new ConsiderRequestCommand());
         commands.put("replenishAccount", new ReplenishAccountCommand());
         commands.put("showInvoices", new ShowInvoicesCommand());
         commands.put("infoUser", new InfoUserCommand());
@@ -57,6 +57,7 @@ public class FrontServlet extends HttpServlet {
         commands.put("addHolder", new AddHolderCommand());
         commands.put("removeHolder", new RemoveHolderCommand());
         commands.put("showTransactions", new ShowTransactionsCommand());
+        commands.put("processRequest", new ProcessRequestCommand());
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
