@@ -21,4 +21,6 @@ public interface AccountDao extends Dao<Long, Account> {
     void closeAccount(Long accountId);
 
     long completeOpeningRequest(Long requestId, Account account);
+
+    void accountForceClosing(Long accountId);
 }

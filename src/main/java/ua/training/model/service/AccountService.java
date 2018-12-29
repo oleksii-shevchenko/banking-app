@@ -58,4 +58,8 @@ public class AccountService {
     public Transaction getTransaction(Long transactionId) {
         return factory.getTransactionDao().get(transactionId);
     }
+
+    public void accountForceClosing(Long accountId) {
+        factory.getAccountDao().accountForceClosing(accountId);
+    }
 }

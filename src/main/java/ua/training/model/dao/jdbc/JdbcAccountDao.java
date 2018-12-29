@@ -271,6 +271,39 @@ public class JdbcAccountDao implements AccountDao {
             logger.error(exception);
             throw new RuntimeException();
         }
+    }
+
+    @Override
+    public void accountForceClosing(Long accountId) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+            try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
+                 PreparedStatement removeAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove.account"));
+                 PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
+                updateStatusStatement.setString(1, Account.Status.CLOSED.name());
+                updateStatusStatement.setLong(2, accountId);
+                updateStatusStatement.executeUpdate();
+
+                updateBalanceStatement.setBigDecimal(1, BigDecimal.ZERO);
+                updateBalanceStatement.setLong(2, accountId);
+                updateBalanceStatement.executeUpdate();
+
+                removeAccountStatement.setLong(1, accountId);
+                removeAccountStatement.executeUpdate();
+
+                connection.commit();
+
+            } catch (SQLException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException();
+        }
 
     }
 
