@@ -50,13 +50,12 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     @Override
-    public PageDto<Request> getPage(boolean isConsidered, int itemsNumber, int page) {
+    public PageDto<Request> getPage(int itemsNumber, int page) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement countRequests = connection.prepareStatement(QueriesManager.getQuery("sql.requests.count"));
                  PreparedStatement getRequestsPage = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.page"))) {
-                countRequests.setBoolean(1, isConsidered);
 
                 int requestsNumber;
                 ResultSet resultSet = countRequests.executeQuery();
@@ -74,9 +73,8 @@ public class JdbcRequestDao implements RequestDao {
 
                 int offset = itemsNumber * (page - 1);
 
-                getRequestsPage.setBoolean(1, isConsidered);
-                getRequestsPage.setInt(2, itemsNumber);
-                getRequestsPage.setInt(3, offset);
+                getRequestsPage.setInt(1, itemsNumber);
+                getRequestsPage.setInt(2, offset);
 
                 Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
                 resultSet = getRequestsPage.executeQuery();

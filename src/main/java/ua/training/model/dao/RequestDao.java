@@ -15,5 +15,5 @@ public interface RequestDao extends Dao<Long, Request> {
     void considerRequest(Long requestId);
 
     List<Request> getByConsideration(boolean consideration);
-    PageDto<Request> getPage(boolean isConsidered, int itemsNumber, int page);
+    PageDto<Request> getPage(int itemsNumber, int page);
 }

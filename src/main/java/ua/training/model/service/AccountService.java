@@ -5,6 +5,7 @@ import ua.training.model.dto.InvoiceDto;
 import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Invoice;
+import ua.training.model.entity.Request;
 import ua.training.model.entity.Transaction;
 
 import java.util.List;
@@ -53,6 +54,10 @@ public class AccountService {
 
     public PageDto<Transaction> getTransactionsPage(Long accountId, int itemsNumber, int page) {
         return factory.getTransactionDao().getPage(accountId, itemsNumber, page);
+    }
+
+    public PageDto<Request> getRequestsPage(int itemsNumber, int page) {
+        return factory.getRequestDao().getPage(itemsNumber, page);
     }
 
     public Transaction getTransaction(Long transactionId) {

@@ -21,7 +21,7 @@ public class JdbcRequestMapper implements Mapper<Request> {
                 .setRequesterId(resultSet.getLong("requester_id"))
                 .setType(Request.Type.valueOf(resultSet.getString("type")))
                 .setCurrency(Currency.valueOf(resultSet.getString("currency")))
-                .setConsidered(resultSet.getBoolean("is_completed"))
+                .setConsidered(resultSet.getBoolean("is_considered"))
                 .build();
     }
 }
