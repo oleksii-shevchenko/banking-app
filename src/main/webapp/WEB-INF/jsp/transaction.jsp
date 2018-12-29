@@ -60,6 +60,14 @@
             <p class="text-left"><ctg:time time="${requestScope.transaction.time}" localeTag="${sessionScope.lang}" /></p>
         </div>
     </div>
+    <div class="row justify-content-start my-3">
+        <div class="col-4">
+            <p class="text-right text-primary text"><fmt:message key="content.transaction.type" /></p>
+        </div>
+        <div class="col-4">
+            <p class="text-left">${requestScope.transaction.type}</p>
+        </div>
+    </div>
     <c:if test="${requestScope.transaction.type eq 'MANUAL'}">
         <div class="row justify-content-start my-3">
             <div class="col-4">

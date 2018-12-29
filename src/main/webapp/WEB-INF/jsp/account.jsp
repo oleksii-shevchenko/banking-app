@@ -60,6 +60,14 @@
                 </form>
             </div>
         </c:if>
+        <c:if test="${sessionScope.role eq 'ADMIN'}">
+            <div class="col-2">
+                <form method="post" action="${pageContext.request.contextPath}/api/closeAccount">
+                    <input type="hidden" name="accountId" value="${requestScope.account.id}">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Close Account</button>
+                </form>
+            </div>
+        </c:if>
     </div>
     <div class="row justify-content-start my-3">
         <div class="col-4">
@@ -201,6 +209,29 @@
             </div>
             <div class="form-group my-2 mx-1">
                 <button class="btn btn-lg btn-primary btn-block my-2" type="submit" ><fmt:message key="content.info.account.invoice.create" /></button>
+            </div>
+        </form>
+    </c:if>
+
+    <c:if test="${sessionScope.role eq 'ADMIN'}">
+        <div class="row justify-content-start my-2">
+            <p class="h2">Replenish account</p>
+        </div>
+
+        <form class="form-row justify-content-center" action="${pageContext.request.contextPath}/api/replenishAccount" method="post">
+            <input type="hidden" name="accountId" value="${requestScope.account.id}">
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <input type="number" step="0.01" name="amount" value="${param.amount}" class="form-control my-2 ${not empty requestScope.amountInvalid ? (requestScope.amountInvalid ? 'is-invalid' : '') : ''}" placeholder="Amount" required>
+            </div>
+            <div class="form-group my-2 mx-2 input-group-lg">
+                <select class="form-control my-2" name="currency" required>
+                    <c:forEach var="currency" items="${requestScope.currencies}">
+                        <option value="${currency}" ${requestScope.account.currency eq currency ? 'selected' : ''}>${currency}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group my-2 mx-2">
+                <button class="btn btn-lg btn-primary btn-block my-2" type="submit" >Replenish</button>
             </div>
         </form>
     </c:if>

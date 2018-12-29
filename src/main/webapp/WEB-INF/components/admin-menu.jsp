@@ -24,13 +24,6 @@
     </div>
     <div class="row justify-content-center my-3">
         <div class="col-5">
-            <form method="post" action="${pageContext.request.contextPath}/api/replenishAccount">
-                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.replenish.account" /></button>
-            </form>
-        </div>
-    </div>
-    <div class="row justify-content-center my-3">
-        <div class="col-5">
             <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.info.account" /></button>
             </form>
@@ -45,14 +38,7 @@
     </div>
     <div class="row justify-content-center my-3">
         <div class="col-5">
-            <form method="post" action="${pageContext.request.contextPath}/api/closeAccount">
-                <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.close.account" /></button>
-            </form>
-        </div>
-    </div>
-    <div class="row justify-content-center my-3">
-        <div class="col-5">
-            <form method="post" action="${pageContext.request.contextPath}/api/request">
+            <form method="post" action="${pageContext.request.contextPath}/api/showRequests">
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.menu.admin.show.requests" /></button>
             </form>
         </div>

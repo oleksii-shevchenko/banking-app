@@ -129,9 +129,11 @@ public class JdbcTransactionDao implements TransactionDao {
                  PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
                  PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-                Account sender = getAccountById(transaction.getSender(), getAccountStatement);
+                if (transaction.getType().equals(Transaction.Type.MANUAL)) {
+                    Account sender = getAccountById(transaction.getSender(), getAccountStatement);
 
-                updateAccountBalance(sender.getId(), sender.withdrawFromAccount(transaction), updateBalanceStatement);
+                    updateAccountBalance(sender.getId(), sender.withdrawFromAccount(transaction), updateBalanceStatement);
+                }
 
                 Account receiver = getAccountById(transaction.getReceiver(), getAccountStatement);
 

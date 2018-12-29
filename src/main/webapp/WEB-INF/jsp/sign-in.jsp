@@ -35,11 +35,11 @@
             <form class="form-signin" action="${pageContext.request.contextPath}/api/signIn" method="post">
                 <h1 class="h3 mb-3 font-weight-normal"><fmt:message key="content.sign.in.welcome" /></h1>
                 <div class="form-group">
-                    <input type="text" name="login" class="form-control my-2" value="${param.login}" placeholder="<fmt:message key="content.sign.in.login"/>" required autofocus>
+                    <input type="text" name="login" class="form-control my-2 ${not empty requestScope.loginWrong ? 'is-invalid' : ''}" value="${param.login}" placeholder="<fmt:message key="content.sign.in.login"/>" required autofocus>
                     <p class="text-danger">${requestScope.loginWrong}</p>
                 </div>
                 <div class="form-group">
-                    <input type="password" name="pass" class="form-control my-2" value="${param.pass}" placeholder="<fmt:message key="content.sign.in.password" />" required>
+                    <input type="password" name="pass" class="form-control my-2 ${not empty requestScope.passWrong ? 'is-invalid' : ''}" value="${param.pass}" placeholder="<fmt:message key="content.sign.in.password" />" required>
                     <p class="text-danger">${requestScope.passWrong}</p>
                 </div>
                 <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.sign.in.submit" /></button>
