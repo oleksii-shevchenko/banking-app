@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.RequestDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Request;
 import ua.training.model.exception.UnsupportedOperationException;
 
@@ -26,35 +27,16 @@ public class JdbcRequestDao implements RequestDao {
      * This method returns entity of {@link Request} and sets request status completed. If the request is already
      * completed throws exception.
      * @param requestId Targeted request.
-     * @return Entity of Request
      */
     @Override
-    public Request considerRequest(Long requestId) {
+    public void considerRequest(Long requestId) {
         try (Connection connection = ConnectionsPool.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getRequestStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
-                 PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
-                getRequestStatement.setLong(1, requestId);
-
-                ResultSet resultSet = getRequestStatement.executeQuery();
-
-                Request request;
-                if (resultSet.next()) {
-                    request = new JdbcMapperFactory().getRequestMapper().map(resultSet);
-                } else {
-                    throw new SQLException();
-                }
-
-                if (request.isConsidered()) {
-                    throw new SQLException();
-                }
-
+            try (PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
                 setCompletedStatement.setBoolean(1, true);
                 setCompletedStatement.setLong(2, requestId);
                 setCompletedStatement.executeUpdate();
-
-                return request;
             } catch (SQLException exception) {
                 connection.rollback();
 
@@ -64,6 +46,64 @@ public class JdbcRequestDao implements RequestDao {
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public PageDto<Request> getPage(boolean isConsidered, int itemsNumber, int page) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setAutoCommit(false);
+            try (PreparedStatement countRequests = connection.prepareStatement(QueriesManager.getQuery("sql.requests.count"));
+                 PreparedStatement getRequestsPage = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.page"))) {
+                countRequests.setBoolean(1, isConsidered);
+
+                int requestsNumber;
+                ResultSet resultSet = countRequests.executeQuery();
+                if (resultSet.next()) {
+                    requestsNumber = resultSet.getInt("requests_number");
+                } else {
+                    throw new SQLException();
+                }
+
+                int pagesNumber = requestsNumber % itemsNumber == 0 ? requestsNumber / itemsNumber : (requestsNumber / itemsNumber) + 1;
+
+                if (page > pagesNumber) {
+                    throw new SQLException();
+                }
+
+                int offset = itemsNumber * (page - 1);
+
+                getRequestsPage.setBoolean(1, isConsidered);
+                getRequestsPage.setInt(2, itemsNumber);
+                getRequestsPage.setInt(3, offset);
+
+                Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
+                resultSet = getRequestsPage.executeQuery();
+
+                List<Request> transactions = new ArrayList<>();
+                while (resultSet.next()) {
+                    transactions.add(mapper.map(resultSet));
+                }
+
+                PageDto<Request> pageDto = new PageDto<>();
+                pageDto.setPagesNumber(pagesNumber);
+                pageDto.setCurrentPage(page);
+                pageDto.setItemsNumber(itemsNumber);
+                pageDto.setItems(transactions);
+
+                connection.commit();
+
+                return pageDto;
+            } catch (SQLException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
         }
     }
 

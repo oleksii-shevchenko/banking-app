@@ -1,5 +1,6 @@
 package ua.training.model.dao;
 
+import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Request;
 
 import java.util.List;
@@ -11,7 +12,8 @@ import java.util.List;
  * @author Oleksii Shevchenko
  */
 public interface RequestDao extends Dao<Long, Request> {
-    Request considerRequest(Long requestId);
+    void considerRequest(Long requestId);
 
     List<Request> getByConsideration(boolean consideration);
+    PageDto<Request> getPage(boolean isConsidered, int itemsNumber, int page);
 }
