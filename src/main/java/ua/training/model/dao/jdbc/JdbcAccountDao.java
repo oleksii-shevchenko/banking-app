@@ -3,15 +3,12 @@ package ua.training.model.dao.jdbc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.dao.AccountDao;
-import ua.training.model.dao.jdbc.strategy.CreditStatementSetter;
-import ua.training.model.dao.jdbc.strategy.DepositStatementSetter;
-import ua.training.model.dao.jdbc.strategy.StatementSetter;
+import ua.training.model.dao.jdbc.setters.CreditStatementSetter;
+import ua.training.model.dao.jdbc.setters.DepositStatementSetter;
+import ua.training.model.dao.jdbc.setters.StatementSetter;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
-import ua.training.model.entity.Account;
-import ua.training.model.entity.CreditAccount;
-import ua.training.model.entity.DepositAccount;
-import ua.training.model.entity.Permission;
+import ua.training.model.entity.*;
 import ua.training.model.exception.ActiveAccountException;
 
 import java.math.BigDecimal;
@@ -78,6 +75,68 @@ public class JdbcAccountDao implements AccountDao {
             }
 
             return accounts;
+        } catch (SQLException exception) {
+            logger.error(exception);
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @Override
+    public long completeOpeningRequest(Long requestId, Account account) {
+        try (Connection connection = ConnectionsPool.getConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            connection.setAutoCommit(false);
+            try (PreparedStatement getRequest = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
+                 PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement insertHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"));
+                 PreparedStatement updateConsideration = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
+                getRequest.setLong(1, requestId);
+
+                ResultSet resultSet = getRequest.executeQuery();
+
+                Request request;
+                if (resultSet.next()) {
+                    request = new JdbcMapperFactory().getRequestMapper().map(resultSet);
+                } else {
+                    throw new SQLException();
+                }
+
+                if (request.isConsidered()) {
+                    throw new SQLException();
+                }
+
+                StatementSetter setter = statementSetters.get(account.getClass().getSimpleName());
+
+                setter.setStatementParameters(account, insertAccountStatement);
+                insertAccountStatement.executeUpdate();
+
+                resultSet = insertAccountStatement.getGeneratedKeys();
+
+                long accountId;
+                if (resultSet.next()) {
+                    accountId = resultSet.getLong(1);
+                } else {
+                    throw new SQLException();
+                }
+
+                insertHolderStatement.setLong(1, request.getRequesterId());
+                insertHolderStatement.setLong(2, accountId);
+                insertHolderStatement.setString(3, Permission.ALL.name());
+                insertAccountStatement.executeUpdate();
+
+                updateConsideration.setBoolean(1, true);
+                updateConsideration.setLong(2, requestId);
+                updateConsideration.executeUpdate();
+
+                connection.commit();
+
+                return accountId;
+            } catch (SQLException exception) {
+                connection.rollback();
+
+                logger.error(exception);
+                throw new RuntimeException(exception);
+            }
         } catch (SQLException exception) {
             logger.error(exception);
             throw new RuntimeException(exception);

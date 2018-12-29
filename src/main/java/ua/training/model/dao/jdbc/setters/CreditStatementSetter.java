@@ -1,4 +1,4 @@
-package ua.training.model.dao.jdbc.strategy;
+package ua.training.model.dao.jdbc.setters;
 
 import ua.training.model.entity.Account;
 import ua.training.model.entity.CreditAccount;
@@ -10,7 +10,7 @@ import java.sql.Types;
 
 /**
  * Realization of interface {@link StatementSetter} for mapping CreditAccount entities.
- * @see ua.training.model.dao.jdbc.strategy.StatementSetter
+ * @see ua.training.model.dao.jdbc.setters.StatementSetter
  * @see CreditAccount
  * @see Account
  * @author Oleksii Shevchenko

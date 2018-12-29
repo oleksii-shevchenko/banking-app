@@ -19,4 +19,6 @@ public interface AccountDao extends Dao<Long, Account> {
     long openAccount(Long userId, Account account);
     void blockAccount(Long accountId);
     void closeAccount(Long accountId);
+
+    long completeOpeningRequest(Long requestId, Account account);
 }

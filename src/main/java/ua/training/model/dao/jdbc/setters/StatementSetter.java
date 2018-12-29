@@ -1,4 +1,4 @@
-package ua.training.model.dao.jdbc.strategy;
+package ua.training.model.dao.jdbc.setters;
 
 import ua.training.model.entity.Account;
 

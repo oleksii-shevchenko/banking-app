@@ -50,10 +50,10 @@ public class CurrencyExchangeService {
     }
 
     public BigDecimal exchangeRate(Currency from, Currency to) {
-        return BigDecimal.ONE;
+        //return BigDecimal.ONE;
 
         //todo activate
-        /*readWriteLock.readLock().lock();
+        readWriteLock.readLock().lock();
         try {
             RequestUtil util = new RequestUtil();
 
@@ -71,7 +71,7 @@ public class CurrencyExchangeService {
             return getRate(from, to);
         } finally {
             readWriteLock.readLock().unlock();
-        }*/
+        }
     }
 
     private BigDecimal getRate(Currency from, Currency to) {
