@@ -1,6 +1,7 @@
 package ua.training.controller.listeners;
 
 import ua.training.model.dao.factory.JdbcDaoFactory;
+import ua.training.model.service.CurrencyExchangeService;
 import ua.training.model.service.ScheduledTaskService;
 
 import javax.servlet.ServletContextEvent;
@@ -12,7 +13,7 @@ public class ContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         new ScheduledTaskService().init(JdbcDaoFactory.getInstance());
-        //new CurrencyExchangeService().init();
+        new CurrencyExchangeService().init();
     }
 
     @Override
