@@ -89,7 +89,7 @@ public class JdbcAccountDao implements AccountDao {
             try (PreparedStatement getRequest = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
                  PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement insertHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"));
-                 PreparedStatement updateConsideration = connection.prepareStatement(QueriesManager.getQuery("sql.request.update.considered"))) {
+                 PreparedStatement updateConsideration = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update.considered"))) {
                 getRequest.setLong(1, requestId);
 
                 ResultSet resultSet = getRequest.executeQuery();
@@ -122,7 +122,7 @@ public class JdbcAccountDao implements AccountDao {
                 insertHolderStatement.setLong(1, request.getRequesterId());
                 insertHolderStatement.setLong(2, accountId);
                 insertHolderStatement.setString(3, Permission.ALL.name());
-                insertAccountStatement.executeUpdate();
+                insertHolderStatement.executeUpdate();
 
                 updateConsideration.setBoolean(1, true);
                 updateConsideration.setLong(2, requestId);
@@ -173,7 +173,7 @@ public class JdbcAccountDao implements AccountDao {
                 insertHolderStatement.setLong(1, userId);
                 insertHolderStatement.setLong(2, accountId);
                 insertHolderStatement.setString(3, Permission.ALL.name());
-                insertAccountStatement.executeUpdate();
+                insertHolderStatement.executeUpdate();
 
                 connection.commit();
 

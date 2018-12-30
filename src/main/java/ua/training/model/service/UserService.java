@@ -1,6 +1,7 @@
 package ua.training.model.service;
 
 import ua.training.model.dao.factory.DaoFactory;
+import ua.training.model.entity.Account;
 import ua.training.model.entity.Permission;
 import ua.training.model.entity.Request;
 import ua.training.model.entity.User;
@@ -44,5 +45,9 @@ public class UserService {
 
     public void considerRequest(Long requestId) {
         factory.getRequestDao().considerRequest(requestId);
+    }
+
+    public void openAccount(Long requestId, Account account) {
+        factory.getAccountDao().completeOpeningRequest(requestId, account);
     }
 }
