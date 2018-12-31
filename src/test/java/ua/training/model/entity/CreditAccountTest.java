@@ -1,4 +1,4 @@
-package ua.training.model;
+package ua.training.model.entity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,10 +8,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import ua.training.model.entity.Account;
-import ua.training.model.entity.CreditAccount;
-import ua.training.model.entity.Currency;
-import ua.training.model.entity.Transaction;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.service.CurrencyExchangeService;
