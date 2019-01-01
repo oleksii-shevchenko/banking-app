@@ -20,13 +20,13 @@ import static org.mockito.Mockito.*;
 @PrepareForTest(CommandUtil.class)
 public class AuthorizationFilterTest {
     @Mock
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
 
     @Mock
-    private static HttpSession session;
+    private HttpSession session;
 
     @Mock
-    private static HttpServletResponse response;
+    private HttpServletResponse response;
 
     @Before
     public void initRequest() {
