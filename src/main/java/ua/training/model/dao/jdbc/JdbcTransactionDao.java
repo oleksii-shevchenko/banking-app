@@ -14,6 +14,7 @@ import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
 import ua.training.model.service.producers.TransactionProducer;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,9 +34,15 @@ import java.util.Optional;
 public class JdbcTransactionDao implements TransactionDao {
     private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
 
+    private DataSource dataSource;
+
+    public JdbcTransactionDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public PageDto<Transaction> getPage(Long accountId, int itemsNumber, int page) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement countTransactions = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.count"));
@@ -100,7 +107,7 @@ public class JdbcTransactionDao implements TransactionDao {
      */
     @Override
     public List<Transaction> getAccountTransactions(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.account"))) {
             preparedStatement.setLong(1, accountId);
             preparedStatement.setLong(2, accountId);
@@ -122,7 +129,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public long makeTransaction(Transaction transaction) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
@@ -166,7 +173,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public long makeTransaction(Long accountId, TransactionProducer producer) throws CancelingTaskException{
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
@@ -247,7 +254,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public Transaction get(Long key) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.id"))) {
             preparedStatement.setLong(1, key);
 

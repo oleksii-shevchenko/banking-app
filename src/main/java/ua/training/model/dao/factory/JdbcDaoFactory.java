@@ -31,7 +31,7 @@ public class JdbcDaoFactory implements DaoFactory{
 
     @Override
     public TransactionDao getTransactionDao() {
-        return new JdbcTransactionDao();
+        return new JdbcTransactionDao(ConnectionsPool.getDataSource());
     }
 
     @Override
