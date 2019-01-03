@@ -12,6 +12,7 @@ import ua.training.model.exception.NoSuchUserException;
 import ua.training.model.exception.NonUniqueEmailException;
 import ua.training.model.exception.NonUniqueLoginException;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,13 @@ import java.util.Map;
 public class JdbcUserDao implements UserDao {
     private static Logger logger = LogManager.getLogger(JdbcUserDao.class);
 
-    //todo add that is is proxy
+    private DataSource dataSource;
+
+    public JdbcUserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    //todo add that is proxy
     /**
      * Gets entity {@link User} using unique field login. If there is no such user, then throws {@link NoSuchUserException}.
      * @param login User login
@@ -35,7 +42,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public User getUserByLogin(String login) throws NoSuchUserException {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.login"))) {
             preparedStatement.setString(1, login);
 
@@ -59,7 +66,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public List<User> getAccountHolders(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
@@ -80,7 +87,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public Map<User, Permission> getAccountHoldersWithPermission(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
@@ -106,7 +113,7 @@ public class JdbcUserDao implements UserDao {
      * @return User permission.
      */
     public Permission getPermissions(Long holderId, Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
             getPermissionStatement.setLong(1, holderId);
             getPermissionStatement.setLong(2, accountId);
@@ -133,7 +140,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public int removeAccountHolder(Long holderId, Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement removeHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"));
              PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
             getPermissionStatement.setLong(1, holderId);
@@ -166,7 +173,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public int addAccountHolder(Long holderId, Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
             preparedStatement.setLong(1, holderId);
             preparedStatement.setLong(2, accountId);
@@ -181,7 +188,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public User get(Long key) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.full"))) {
             getUserStatement.setLong(1, key);
 
@@ -215,7 +222,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public Long insert(User entity) throws NonUniqueLoginException, NonUniqueEmailException {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.insert"), Statement.RETURN_GENERATED_KEYS)) {
             setStatementParameters(entity, preparedStatement);
             preparedStatement.executeUpdate();
@@ -249,7 +256,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public int update(User entity) throws NonUniqueEmailException, NonUniqueLoginException {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.update"))) {
             setStatementParameters(entity, preparedStatement);
             preparedStatement.setLong(7, entity.getId());
@@ -274,7 +281,7 @@ public class JdbcUserDao implements UserDao {
      */
     @Override
     public int remove(User entity) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));

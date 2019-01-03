@@ -36,6 +36,6 @@ public class JdbcDaoFactory implements DaoFactory{
 
     @Override
     public UserDao getUserDao() {
-        return new JdbcUserDao();
+        return new JdbcUserDao(ConnectionsPool.getDataSource());
     }
 }
