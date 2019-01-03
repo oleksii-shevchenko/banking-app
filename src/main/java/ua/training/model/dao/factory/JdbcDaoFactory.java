@@ -16,7 +16,7 @@ public class JdbcDaoFactory implements DaoFactory{
 
     @Override
     public AccountDao getAccountDao() {
-        return new JdbcAccountDao();
+        return new JdbcAccountDao(ConnectionsPool.getDataSource());
     }
 
     @Override

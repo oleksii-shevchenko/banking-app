@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * This class provides connections to database using pool structure. Access provided via singleton pattern.
  * @author Oleksii Shevchenko
  */
-final class ConnectionsPool {
+public final class ConnectionsPool {
     private static Logger logger = LogManager.getLogger(ConnectionsPool.class);
     private static DataSource dataSource;
 
@@ -36,6 +36,7 @@ final class ConnectionsPool {
      * Method return {@link java.sql.Connection} from pool using principle "one stop shopping"
      * @return Connection to database
      */
+    @Deprecated
     static Connection getConnection() {
         try {
             return dataSource.getConnection();
@@ -43,5 +44,9 @@ final class ConnectionsPool {
             logger.error(exception);
             throw new RuntimeException(exception);
         }
+    }
+
+    public static DataSource getDataSource() {
+        return dataSource;
     }
 }

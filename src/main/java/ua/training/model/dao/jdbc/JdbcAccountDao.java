@@ -11,6 +11,7 @@ import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
 import ua.training.model.entity.*;
 import ua.training.model.exception.ActiveAccountException;
 
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.util.Map;
 public class JdbcAccountDao implements AccountDao {
     private static Logger logger = LogManager.getLogger(JdbcAccountDao.class);
 
+    private DataSource dataSource;
+
     private static Map<String, StatementSetter> statementSetters;
 
     static {
@@ -36,9 +39,13 @@ public class JdbcAccountDao implements AccountDao {
         statementSetters.put(CreditAccount.class.getSimpleName(), new CreditStatementSetter());
     }
 
+    public JdbcAccountDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public List<Account> getActiveAccounts() {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.active"))) {
             ResultSet resultSet = preparedStatement.executeQuery();
             Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
@@ -62,7 +69,7 @@ public class JdbcAccountDao implements AccountDao {
      */
     @Override
     public List<Account> getUserAccounts(Long userId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.account.by.user"))) {
             preparedStatement.setLong(1, userId);
 
@@ -83,7 +90,7 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     public long completeOpeningRequest(Long requestId, Account account) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getRequest = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
@@ -151,7 +158,7 @@ public class JdbcAccountDao implements AccountDao {
      */
     @Override
     public long openAccount(Long userId, Account account) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);
             try (PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
@@ -198,7 +205,7 @@ public class JdbcAccountDao implements AccountDao {
      */
     @Override
     public void blockAccount(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement getStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.status.by.id"));
              PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"))) {
             getStatusStatement.setLong(1, accountId);
@@ -231,7 +238,7 @@ public class JdbcAccountDao implements AccountDao {
      */
     @Override
     public void closeAccount(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
@@ -275,7 +282,7 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     public void accountForceClosing(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
@@ -309,7 +316,7 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     public Account get(Long key) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.full"))) {
             getAccountStatement.setLong(1, key);
 
