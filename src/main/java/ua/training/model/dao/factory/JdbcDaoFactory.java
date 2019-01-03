@@ -26,7 +26,7 @@ public class JdbcDaoFactory implements DaoFactory{
 
     @Override
     public RequestDao getRequestDao() {
-        return new JdbcRequestDao();
+        return new JdbcRequestDao(ConnectionsPool.getDataSource());
     }
 
     @Override

@@ -9,6 +9,7 @@ import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Request;
 import ua.training.model.exception.UnsupportedOperationException;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,12 @@ import java.util.List;
 public class JdbcRequestDao implements RequestDao {
     private static Logger logger = LogManager.getLogger(JdbcRequestDao.class);
 
+    private DataSource dataSource;
+
+    public JdbcRequestDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     /**
      * This method returns entity of {@link Request} and sets request status completed. If the request is already
      * completed throws exception.
@@ -30,7 +37,7 @@ public class JdbcRequestDao implements RequestDao {
      */
     @Override
     public void considerRequest(Long requestId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update.considered"))) {
                 setCompletedStatement.setBoolean(1, true);
                 setCompletedStatement.setLong(2, requestId);
@@ -43,7 +50,7 @@ public class JdbcRequestDao implements RequestDao {
 
     @Override
     public PageDto<Request> getPage(int itemsNumber, int page) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             try (PreparedStatement countRequests = connection.prepareStatement(QueriesManager.getQuery("sql.requests.count"));
@@ -104,7 +111,7 @@ public class JdbcRequestDao implements RequestDao {
      */
     @Override
     public List<Request> getByConsideration(boolean consideration) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.consideration"))) {
             preparedStatement.setBoolean(1, consideration);
 
@@ -125,7 +132,7 @@ public class JdbcRequestDao implements RequestDao {
 
     @Override
     public Request get(Long key) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"))) {
             preparedStatement.setLong(1, key);
 
@@ -144,7 +151,7 @@ public class JdbcRequestDao implements RequestDao {
 
     @Override
     public Long insert(Request entity) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.insert"), Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getRequesterId());
             preparedStatement.setString(2, entity.getType().name());
