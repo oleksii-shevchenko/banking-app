@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * This entity is general template for all accounts. It has POJO structure.
+ * This entity is general template for all accounts.
  * @author Oleksii Shevchenko
  * @see CreditAccount
  * @see DepositAccount
@@ -84,10 +84,20 @@ public abstract class Account {
         this.holders = holders;
     }
 
+    /**
+     * Checks is account non active. If account status BLOCKED or CLOSED return false.
+     * @return Is account non active
+     */
     public boolean isNonActive() {
         return !status.equals(Status.ACTIVE);
     }
 
+    /**
+     * Replenish account balance based on information presented in transaction.
+     * @param transaction Transaction according to witch mush be replenishment done.
+     * @return Balance of account after replenishment.
+     * @throws NonActiveAccountException Thrown if and only is {@code isNonActive()} return true.
+     */
     public BigDecimal replenishAccount(Transaction transaction) throws NonActiveAccountException{
         if (isNonActive()) {
             throw new NonActiveAccountException();

@@ -113,6 +113,13 @@ public class CreditAccount extends Account {
         return new CreditAccountBuilder();
     }
 
+    /**
+     * Implementation withdrawing money from account according to credit policy.
+     * @param transaction Transaction according to witch withdraw must be done.
+     * @return Balance of account after withdraw.
+     * @throws NonActiveAccountException Thrown if and only if {@code isNonActive()} return true.
+     * @throws NotEnoughMoneyException Throw if and only if absolute balance of account after withdraw more than credit limit.
+     */
     @Override
     public BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException{
         if (isNonActive()) {

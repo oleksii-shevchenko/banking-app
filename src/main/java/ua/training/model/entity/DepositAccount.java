@@ -113,6 +113,13 @@ public class DepositAccount extends Account {
         return new DepositAccountBuilder();
     }
 
+    /**
+     * Implementation withdrawing money from account according to deposit policy.
+     * @param transaction Transaction according to witch withdraw must be done.
+     * @return Balance of account after withdraw.
+     * @throws NonActiveAccountException Thrown if and only if {@code isNonActive()} return true.
+     * @throws NotEnoughMoneyException Throw if and only if balance of account after withdraw less than zero.
+     */
     @Override
     public BigDecimal withdrawFromAccount(Transaction transaction) throws NonActiveAccountException, NotEnoughMoneyException {
         if (isNonActive()) {
