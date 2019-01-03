@@ -12,11 +12,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This service performs periodic or scheduled tasks in system.
+ * @author Oleksii Shevchenko
+ */
 public class ScheduledTaskService {
     private static final int THREADS_NUMBER = 4;
 
     private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(THREADS_NUMBER);
 
+    /**
+     * Method to staring service.
+     * @param factory Factory that creates dao implementations.
+     */
     public void init(DaoFactory factory) {
         List<Account> accounts = factory.getAccountDao().getActiveAccounts();
 
@@ -30,7 +38,12 @@ public class ScheduledTaskService {
         }
     }
 
-    private void registerDeposit(Account account, DaoFactory factory) {
+    /**
+     * Register deposit account for periodic update.
+     * @param account Targeted deposit account.
+     * @param factory Factory for creating dao.
+     */
+    public void registerDeposit(Account account, DaoFactory factory) {
         DepositAccount depositAccount = (DepositAccount) account;
         executorService.scheduleWithFixedDelay(
                 new DepositUpdater(factory, account.getId()),

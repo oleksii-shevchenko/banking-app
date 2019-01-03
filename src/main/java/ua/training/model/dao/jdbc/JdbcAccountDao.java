@@ -43,6 +43,12 @@ public class JdbcAccountDao implements AccountDao {
         this.dataSource = dataSource;
     }
 
+    /**
+     * This method returns all active accounts that stored in database. The main purpose of this method is receive all
+     * active accounts in scheduled task service for 'cold start'.
+     * @see ua.training.model.service.ScheduledTaskService
+     * @return List of all active accounts
+     */
     @Override
     public List<Account> getActiveAccounts() {
         try (Connection connection = dataSource.getConnection();
@@ -88,6 +94,12 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * This method open account based on user request and then marks this request as considered.
+     * @param requestId Id of user account opening request
+     * @param account Account to open
+     * @return Id of opened account
+     */
     @Override
     public long completeOpeningRequest(Long requestId, Account account) {
         try (Connection connection = dataSource.getConnection()) {
@@ -280,6 +292,10 @@ public class JdbcAccountDao implements AccountDao {
         }
     }
 
+    /**
+     * This method used for closing accounts with non-zero balance by admin manually.
+     * @param accountId Account id to close
+     */
     @Override
     public void accountForceClosing(Long accountId) {
         try (Connection connection = dataSource.getConnection()) {

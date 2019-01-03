@@ -2,6 +2,10 @@ package ua.training.model.dto;
 
 import java.util.List;
 
+/**
+ * This is generic class pages in pagination. It produced by appropriate dao.
+ * @param <T> The type on items that displayed on JSP page.
+ */
 public class PageDto<T> {
     private List<T> items;
     private int itemsNumber;

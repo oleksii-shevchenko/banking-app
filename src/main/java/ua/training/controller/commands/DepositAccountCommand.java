@@ -7,6 +7,7 @@ import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.DepositAccount;
+import ua.training.model.service.ScheduledTaskService;
 import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,9 @@ public class DepositAccountCommand implements Command {
 
         Long requestId = Long.valueOf(request.getParameter("requestId"));
 
-        new UserService(JdbcDaoFactory.getInstance()).openAccount(requestId, account);
+        account.setId(new UserService(JdbcDaoFactory.getInstance()).completeOpeningRequest(requestId, account));
+
+        new ScheduledTaskService().registerDeposit(account, JdbcDaoFactory.getInstance());
 
         return PathManager.getPath("path.completed");
     }

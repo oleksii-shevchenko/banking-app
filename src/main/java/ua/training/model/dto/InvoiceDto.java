@@ -4,6 +4,11 @@ import ua.training.model.entity.Invoice;
 
 import java.util.List;
 
+/**
+ * This DTO contains to separate list of invoices. In one user is requester, in another user is payer.
+ * @see Invoice
+ * @author Oleksii Shevchenko
+ */
 public class InvoiceDto {
     private List<Invoice> invoicesAsPayer;
     private List<Invoice> invoicesAsRequester;

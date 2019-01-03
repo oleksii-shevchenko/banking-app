@@ -5,7 +5,7 @@ import ua.training.model.dao.mapper.jdbc.*;
 import ua.training.model.entity.*;
 
 /**
- * Realization mappers factory for jdbc mappers.
+ * Realization abstract mappers factory for jdbc mappers.
  * @see Mapper
  * @see MapperFactory
  * @author Oleksii Shevchenko

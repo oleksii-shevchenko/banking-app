@@ -164,6 +164,13 @@ public class JdbcInvoiceDao implements InvoiceDao {
         }
     }
 
+    /**
+     * Performs account getting using open prepared statement.
+     * @param accountId Targeted account
+     * @param getAccountStatement Open prepared statement to db.
+     * @return Account mapped from result set
+     * @throws SQLException Thrown if there is some problems during request to db.
+     */
     private Account getAccountById(Long accountId, PreparedStatement getAccountStatement) throws SQLException {
         getAccountStatement.setLong(1, accountId);
 

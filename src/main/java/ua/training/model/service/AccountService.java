@@ -10,6 +10,10 @@ import ua.training.model.entity.Transaction;
 
 import java.util.List;
 
+/**
+ * This service designed to compose functions to work with account instance.
+ * @author Oleksii Shevchenko
+ */
 public class AccountService {
     private DaoFactory factory;
 

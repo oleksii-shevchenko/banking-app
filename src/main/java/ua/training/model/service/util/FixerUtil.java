@@ -25,11 +25,20 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ * This util used when interaction with fixer service api.
+ * @see ua.training.model.service.CurrencyExchangeService
+ * @author Oleksii Shevchenko
+ */
 public class FixerUtil {
     private static Logger logger = LogManager.getLogger(FixerUtil.class);
 
     private static ResourceBundle config = ResourceBundle.getBundle("fixer_io");
 
+    /**
+     * This method create uri for making request to fixer service.
+     * @return Request URI
+     */
     public URI getRequestUri() throws URISyntaxException {
         return new URIBuilder(config.getString("fixer.api.end_point"))
                 .setParameter("access_key", config.getString("fixer.api.key"))
@@ -38,6 +47,12 @@ public class FixerUtil {
                 .build();
     }
 
+    /**
+     * Method makes http request to fixer service and return rates extracted for JSON response.
+     * @param uri Request URI.
+     * @return Currencies rates.
+     * @throws Exception Thrown if the request is no success.
+     */
     public Map<Currency, BigDecimal> makeRequest(URI uri) throws Exception {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(new HttpGet(uri));
@@ -56,10 +71,21 @@ public class FixerUtil {
         }
     }
 
+    /**
+     * Checks is the data is still valid for last update.
+     * @param lastUpdate Time of last update.
+     * @param validationPeriod Time for witch data stays valid.
+     * @return Is data valid.
+     */
     public boolean isRatesNotValid(LocalDateTime lastUpdate, long validationPeriod) {
         return ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now()) > validationPeriod;
     }
 
+    /**
+     * Method used for getting default currencies rates in case the first update request is not success.
+     * @param base The base currency when exchanging.
+     * @return Default currencies rates.
+     */
     public Map<Currency, BigDecimal> getRatesOrDefault(Currency base) {
         try {
             return makeRequest(getRequestUri());

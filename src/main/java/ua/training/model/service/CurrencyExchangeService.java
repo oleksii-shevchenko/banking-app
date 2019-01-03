@@ -13,6 +13,10 @@ import java.util.ResourceBundle;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * This service provides currency exchange rates.
+ * @author Oleksii Shevchenko
+ */
 public class CurrencyExchangeService {
     private static Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
 
@@ -23,6 +27,9 @@ public class CurrencyExchangeService {
     private static volatile Map<Currency, BigDecimal> exchangeRates;
     private static Currency base;
 
+    /**
+     * Method to staring service.
+     */
     public void init() {
         ResourceBundle config = ResourceBundle.getBundle("fixer_io");
 
@@ -38,6 +45,12 @@ public class CurrencyExchangeService {
         return base;
     }
 
+    /**
+     * Return exchange rate from one currency to another.
+     * @param from Currency from witch exchanging.
+     * @param to Currency to witch exchanging.
+     * @return Exchange rate.
+     */
     public BigDecimal exchangeRate(Currency from, Currency to) {
         try {
             lock.readLock().lock();

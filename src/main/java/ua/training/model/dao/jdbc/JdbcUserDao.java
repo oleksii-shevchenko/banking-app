@@ -34,9 +34,10 @@ public class JdbcUserDao implements UserDao {
         this.dataSource = dataSource;
     }
 
-    //todo add that is proxy
     /**
      * Gets entity {@link User} using unique field login. If there is no such user, then throws {@link NoSuchUserException}.
+     * Note that this method do not return full user entity for improving performance (the holders are not setted), as
+     * this entity used only for authentication. For getting full instances see {@link JdbcUserDao#get(Long)}.
      * @param login User login
      * @return User entity
      */
@@ -85,6 +86,11 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * Returns map holder-permission for some account.
+     * @param accountId Targeted account.
+     * @return Permissions of all account holders.
+     */
     @Override
     public Map<User, Permission> getAccountHoldersWithPermission(Long accountId) {
         try (Connection connection = dataSource.getConnection();
@@ -186,6 +192,11 @@ public class JdbcUserDao implements UserDao {
         }
     }
 
+    /**
+     * This method returns fully created user instance.
+     * @param key The id of user.
+     * @return User instance.
+     */
     @Override
     public User get(Long key) {
         try (Connection connection = dataSource.getConnection();

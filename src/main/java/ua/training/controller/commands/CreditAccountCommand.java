@@ -39,7 +39,7 @@ public class CreditAccountCommand implements Command {
 
         Long requestId = Long.valueOf(request.getParameter("requestId"));
 
-        new UserService(JdbcDaoFactory.getInstance()).openAccount(requestId, account);
+        new UserService(JdbcDaoFactory.getInstance()).completeOpeningRequest(requestId, account);
 
         return PathManager.getPath("path.completed");
     }

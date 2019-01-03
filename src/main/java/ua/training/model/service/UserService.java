@@ -8,6 +8,10 @@ import ua.training.model.entity.User;
 
 import java.util.Map;
 
+/**
+ * This service designed to compose functions to work with user instance.
+ * @author Oleksii Shevchenko
+ */
 public class UserService {
     private DaoFactory factory;
 
@@ -47,7 +51,7 @@ public class UserService {
         factory.getRequestDao().considerRequest(requestId);
     }
 
-    public void openAccount(Long requestId, Account account) {
-        factory.getAccountDao().completeOpeningRequest(requestId, account);
+    public Long completeOpeningRequest(Long requestId, Account account) {
+        return factory.getAccountDao().completeOpeningRequest(requestId, account);
     }
 }

@@ -11,6 +11,13 @@ import ua.training.model.exception.CancelingTaskException;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+/**
+ * This is implementation of {@code TransactionProducer} interface for implementing deposit policy. It produce
+ * transaction for accrual of interest on deposit.
+ * @see DepositAccount
+ * @see ua.training.model.service.ScheduledTaskService
+ * @author Oleksii Shevchenko
+ */
 public class DepositUpdater implements TransactionProducer, Runnable{
     private static Logger logger = LogManager.getLogger(DepositUpdater.class);
 
@@ -22,6 +29,13 @@ public class DepositUpdater implements TransactionProducer, Runnable{
         this.accountId = accountId;
     }
 
+    /**
+     * Produce transaction for accrual of interest on deposit base on account state. If balance of account is zero
+     * produce empty optional. If account is non active or is not deposit account throws {@link CancelingTaskException}.
+     * @param account Targeted deposit account
+     * @return Transaction base on account state
+     * @throws CancelingTaskException Thrown if and only if account is non active or is not deposit account.
+     */
     @Override
     public Optional<Transaction> produce(Account account) throws CancelingTaskException {
         if (account.isNonActive() || !(account instanceof DepositAccount)) {
@@ -47,6 +61,11 @@ public class DepositUpdater implements TransactionProducer, Runnable{
         return Optional.of(transaction);
     }
 
+    /**
+     * Method makes transaction produced by method {@link DepositUpdater#produce(Account)}. It is designed to use in
+     * multi thread scenario.
+     * @see ua.training.model.service.ScheduledTaskService
+     */
     @Override
     public void run() {
         try {

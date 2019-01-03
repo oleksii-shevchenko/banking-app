@@ -6,7 +6,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
-
+/**
+ * This DTO used in {@link ua.training.model.service.util.FixerUtil} for parsing JSON responses using GSON API.
+ * @see ua.training.model.service.util.FixerUtil
+ * @see ua.training.model.service.CurrencyExchangeService
+ * @author Oleksii Shevchenko
+ */
 public class FixerDto {
     private boolean success;
     private long timestamp;

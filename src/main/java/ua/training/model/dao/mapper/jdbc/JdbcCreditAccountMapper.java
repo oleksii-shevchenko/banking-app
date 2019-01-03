@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Realization of interface {@link Mapper} for entity {@link CreditAccount}. It if used as sub-mapper in
+ * Realization of interface {@link Mapper} for entity {@link CreditAccount}. It is used as sub-mapper in
  * {@link JdbcAccountMapper}.
  * @see Mapper
  * @see CreditAccount

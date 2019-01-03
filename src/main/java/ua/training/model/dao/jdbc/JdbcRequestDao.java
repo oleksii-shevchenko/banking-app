@@ -31,8 +31,7 @@ public class JdbcRequestDao implements RequestDao {
     }
 
     /**
-     * This method returns entity of {@link Request} and sets request status completed. If the request is already
-     * completed throws exception.
+     * This method mark targeted request as considered.
      * @param requestId Targeted request.
      */
     @Override
@@ -48,6 +47,12 @@ public class JdbcRequestDao implements RequestDao {
         }
     }
 
+    /**
+     * This method used in pagination mechanism to minimize data transfers from db.
+     * @param itemsNumber The number of items on page.
+     * @param page The number of requested page.
+     * @return The page dto.
+     */
     @Override
     public PageDto<Request> getPage(int itemsNumber, int page) {
         try (Connection connection = dataSource.getConnection()) {

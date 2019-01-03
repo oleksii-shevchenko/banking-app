@@ -46,6 +46,11 @@ public final class ConnectionsPool {
         }
     }
 
+    /**
+     * Method return {@code DataSource} instance according to singleton pattern. The data source works as a connections
+     * pool using principle "one stop shopping".
+     * @return Data source for getting connections to database.
+     */
     public static DataSource getDataSource() {
         return dataSource;
     }

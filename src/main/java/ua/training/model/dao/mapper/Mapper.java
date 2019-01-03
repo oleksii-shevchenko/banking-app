@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Template interface for mappers from result set to entities.
+ * Generic interface for mappers from result set to entities.
  * @see ResultSet
  * @param <E> Targeted entity
  * @author Oleksii Shevchenko

@@ -4,7 +4,7 @@ import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.entity.*;
 
 /**
- * General factory interface for mappers.
+ * Abstract mappers factory interface.
  * @see Mapper
  * @author Oleksii Shevchenko
  */

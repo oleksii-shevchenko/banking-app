@@ -40,6 +40,12 @@ public class JdbcTransactionDao implements TransactionDao {
         this.dataSource = dataSource;
     }
 
+    /**
+     * This method used in pagination mechanism to minimize data transfers from db.
+     * @param itemsNumber The number of items on page.
+     * @param page The number of requested page.
+     * @return The page dto.
+     */
     @Override
     public PageDto<Transaction> getPage(Long accountId, int itemsNumber, int page) {
         try (Connection connection = dataSource.getConnection()) {
@@ -127,6 +133,12 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * This method makes based on instance passed as argument. It gets account from resource, perform actions and
+     * register it.
+     * @param transaction Transaction that must be completed
+     * @return Id of completed transaction.
+     */
     @Override
     public long makeTransaction(Transaction transaction) {
         try (Connection connection = dataSource.getConnection()) {
@@ -171,6 +183,14 @@ public class JdbcTransactionDao implements TransactionDao {
         }
     }
 
+    /**
+     * This specific method makes transactions that are created depend on account state. It gets account from resource,
+     * create transaction based on internal state of this account and then tries to make it.
+     * @param accountId Targeted account
+     * @param producer The transaction producer
+     * @return Id of completed transaction
+     * @throws CancelingTaskException Thrown by transaction producer
+     */
     @Override
     public long makeTransaction(Long accountId, TransactionProducer producer) throws CancelingTaskException{
         try (Connection connection = dataSource.getConnection()) {
