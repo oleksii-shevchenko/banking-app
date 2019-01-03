@@ -15,10 +15,10 @@
     <link rel="stylesheet" href="<c:url value="/css/custom.css" />">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-    <script src="${pageContext.request.contextPath}/js/jquery-3.2.1.slim.min.js"></script>
-    <script src="${pageContext.request.contextPath}/js/popper.min.js"></script>
-    <script src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
-    <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.js"></script>
+    <script src="<c:url value="/js/jquery-3.2.1.slim.min.js" />"></script>
+    <script src="<c:url value="/js/popper.min.js" />"></script>
+    <script src="<c:url value="/js/bootstrap.js" />"></script>
+    <script src="<c:url value="/js/bootstrap.bundle.js" />"></script>
 </head>
 
 <body>
