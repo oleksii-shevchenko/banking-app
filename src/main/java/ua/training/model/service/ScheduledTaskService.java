@@ -1,6 +1,5 @@
 package ua.training.model.service;
 
-import ua.training.model.dao.AccountDao;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
@@ -22,8 +21,8 @@ public class ScheduledTaskService {
         List<Account> accounts = factory.getAccountDao().getActiveAccounts();
 
         for (Account account : accounts) {
-            registerAccountBlocking(account, factory.getAccountDao());
-            registerAccountClosing(account, factory.getAccountDao());
+            registerAccountBlocking(account, factory);
+            registerAccountClosing(account, factory);
 
             if (account instanceof DepositAccount) {
                 registerDeposit(account, factory);
@@ -41,12 +40,12 @@ public class ScheduledTaskService {
         );
     }
 
-    private void registerAccountBlocking(Account account, AccountDao accountDao) {
-        executorService.schedule(() -> accountDao.blockAccount(account.getId()), computeDelay(account.getExpiresEnd()), TimeUnit.DAYS);
+    private void registerAccountBlocking(Account account, DaoFactory factory) {
+        executorService.schedule(() -> factory.getAccountDao().blockAccount(account.getId()), computeDelay(account.getExpiresEnd()), TimeUnit.DAYS);
     }
 
-    private void registerAccountClosing(Account account, AccountDao accountDao) {
-        executorService.schedule(() -> accountDao.closeAccount(account.getId()), computeDelay(account.getExpiresEnd()) + 1, TimeUnit.DAYS);
+    private void registerAccountClosing(Account account, DaoFactory factory) {
+        executorService.schedule(() -> factory.getAccountDao().closeAccount(account.getId()), computeDelay(account.getExpiresEnd()) + 1, TimeUnit.DAYS);
     }
 
     private long computeDelay(LocalDate endDate) {
