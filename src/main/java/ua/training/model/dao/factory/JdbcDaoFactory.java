@@ -21,7 +21,7 @@ public class JdbcDaoFactory implements DaoFactory{
 
     @Override
     public InvoiceDao getInvoiceDao() {
-        return new JdbcInvoiceDao();
+        return new JdbcInvoiceDao(ConnectionsPool.getDataSource());
     }
 
     @Override

@@ -12,6 +12,7 @@ import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
 import ua.training.model.exception.UnsupportedOperationException;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,12 @@ import java.util.List;
 public class JdbcInvoiceDao implements InvoiceDao {
     private static Logger logger = LogManager.getLogger(JdbcInvoiceDao.class);
 
+    private DataSource dataSource;
+
+    public JdbcInvoiceDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     /**
      * Method returns all invoices where specified account is requester.
      * @param accountId Targeted account.
@@ -33,7 +40,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
      */
     @Override
     public List<Invoice> getInvoicesByRequester(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.requester"))) {
             preparedStatement.setLong(1, accountId);
 
@@ -59,7 +66,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
      */
     @Override
     public List<Invoice> getInvoicesByPayer(Long accountId) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.payer"))) {
             preparedStatement.setLong(1, accountId);
 
@@ -84,7 +91,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
      */
     @Override
     public void acceptInvoice(Long invoiceId) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
@@ -175,7 +182,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
      */
     @Override
     public void denyInvoice(Long invoiceId) {
-        try (Connection connection = ConnectionsPool.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             try (PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"));
@@ -214,7 +221,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
 
     @Override
     public Invoice get(Long key) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"))) {
             return getInvoiceById(key, preparedStatement);
         } catch (SQLException exception) {
@@ -237,7 +244,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
 
     @Override
     public Long insert(Invoice entity) {
-        try (Connection connection = ConnectionsPool.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.insert"), Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getRequester());
             preparedStatement.setLong(2, entity.getPayer());
