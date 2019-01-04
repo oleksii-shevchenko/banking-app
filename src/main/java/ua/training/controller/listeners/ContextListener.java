@@ -10,6 +10,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+/**
+ * This web listener used for starting services simultaneously with start of application.
+ * @author Oleksii Shevhcenko
+ */
 @WebListener
 public class ContextListener implements ServletContextListener {
     private static Logger logger = LogManager.getLogger(ContextListener.class);

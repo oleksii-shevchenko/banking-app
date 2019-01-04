@@ -14,6 +14,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Command used by admins to open accounts for users. Required params: intiDeposit, expiresEnd, creditLimit, creditRate,
+ * requestId.
+ * @see OpenAccountCommand
+ * @author Oleksii Shevchenko
+ */
 public class CreditAccountCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {

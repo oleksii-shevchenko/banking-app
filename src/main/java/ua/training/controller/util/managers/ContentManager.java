@@ -6,6 +6,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * The util designed to work with localized messages from resource bundle.
+ * @author Oleksii Shevchenko
+ */
 public class ContentManager {
     public static String getLocalizedContent(String key, Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle("content", locale);

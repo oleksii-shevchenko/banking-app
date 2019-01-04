@@ -8,6 +8,11 @@ import ua.training.model.service.AccountService;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * This command used by admins to force closing user account after its end of expires when the balance of account is
+ * not zero. Required params: accountId - id of account to close.
+ * @author Oleksii Shevchenko
+ */
 public class CloseAccountCommand implements Command {
     private static Logger logger = LogManager.getLogger(CloseAccountCommand.class);
 

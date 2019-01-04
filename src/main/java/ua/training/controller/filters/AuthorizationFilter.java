@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This filters implements authorization mechanism. If user has permissions to make such request, than the request will
  * be pass further, else the response will be sent to error page. If there is even no such commend, response will be
- * sent to error page to.
+ * sent to error page too.
  */
 public class AuthorizationFilter implements Filter {
     private static Logger logger = LogManager.getLogger(AuthorizationFilter.class);

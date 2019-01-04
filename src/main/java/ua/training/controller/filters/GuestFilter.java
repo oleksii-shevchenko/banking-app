@@ -10,6 +10,11 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Filter creates default session (role: GUEST, lang: en-US) for all guest users first time visiting the app (they have
+ * no another active session).
+ * @author Oleksii Shevchenko
+ */
 public class GuestFilter implements Filter {
     private static Logger logger = LogManager.getLogger(GuestFilter.class);
 

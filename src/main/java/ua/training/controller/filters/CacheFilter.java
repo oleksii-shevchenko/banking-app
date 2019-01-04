@@ -6,6 +6,11 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This filter set headers in response to disable caching mechanism to prevent unwanted behavior caused by 'aggressive'
+ * caching mechanism of some browsers when use 'back arrow'.
+ * @author Oleksii Shevchenko
+ */
 public class CacheFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {

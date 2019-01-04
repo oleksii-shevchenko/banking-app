@@ -13,6 +13,12 @@ import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * This command used by users to complete the invoices. Positive execution possible if and only if user one of the holders
+ * of invoice payer account. Required params: masterAccount - invoice requester account, invoiceId - id of invoice to
+ * complete.
+ * @author Oleksii Shevcehnko
+ */
 public class CompleteInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(CompleteInvoiceCommand.class);
 
@@ -25,7 +31,7 @@ public class CompleteInvoiceCommand implements Command {
 
         Invoice invoice = new AccountService(JdbcDaoFactory.getInstance()).getInvoice(invoiceId);
 
-        if (!user.getAccounts().contains(accountId) || !(accountId.equals(invoice.getPayer()) || accountId.equals(invoice.getRequester()))) {
+        if (!user.getAccounts().contains(accountId) || !accountId.equals(invoice.getPayer())) {
             logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
 
             return "redirect:" + PathManager.getPath("path.error");

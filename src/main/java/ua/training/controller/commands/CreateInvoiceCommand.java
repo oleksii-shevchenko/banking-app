@@ -15,6 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * This command used to create invoices by users. Positive execution possible if and only if user is one of holders of
+ * the invoice requester account. Required params: requester - id of requester account, payer - id of payer account,
+ * amount - positive amount of money to pay, currency, description (optional).
+ * @author Oleksii Shevchenko
+ */
 public class CreateInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(CreateInvoiceCommand.class);
 

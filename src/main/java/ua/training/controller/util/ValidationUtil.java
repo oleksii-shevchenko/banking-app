@@ -7,7 +7,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Util used for validation user inputs.
+ * @author Oleksii Shevchenko
+ */
 public class ValidationUtil {
+    /**
+     * Method validates user inputs listed in {@code params} and contained in {@code request} using regex from resource
+     * bundle. If the the input is not valid the localized message setted into request about it.
+     * @param request The http request containing the inputs.
+     * @param params List of inputs to validate.
+     * @return Is all inputs are valid.
+     */
     public boolean makeValidation(HttpServletRequest request, List<String> params) {
         boolean flag = true;
         for (String param : params) {

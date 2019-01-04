@@ -11,6 +11,11 @@ import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Command used by user to mark the invoice as denied. Positive execution possible if and only if user is one of the
+ * invoice payer account holders. Required params: masterAccount - invoice payer account id, invoiceId.
+ * @author Oleksii Shevchenko
+ */
 public class DenyInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(DenyInvoiceCommand.class);
 
@@ -23,7 +28,7 @@ public class DenyInvoiceCommand implements Command {
 
         Invoice invoice = new AccountService(JdbcDaoFactory.getInstance()).getInvoice(invoiceId);
 
-        if (!user.getAccounts().contains(accountId) || !(accountId.equals(invoice.getPayer()) || accountId.equals(invoice.getRequester()))) {
+        if (!user.getAccounts().contains(accountId) || !accountId.equals(invoice.getPayer())) {
             logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
 
             return "redirect:" + PathManager.getPath("path.error");

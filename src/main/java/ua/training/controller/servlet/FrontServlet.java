@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Implementation of Front Servlet patter. It handles request to api and manage it.
+ * @author Oleksii Shevchenko
+ */
 @WebServlet(name = "FrontServlet", urlPatterns = {"/api/*"})
 public class FrontServlet extends HttpServlet {
     private Map<String, Command> commands;

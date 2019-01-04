@@ -9,6 +9,11 @@ import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * This command used to new holder to active account by one of the valid holders. Required params: accountId;
+ * holderId - id of the new holder.
+ * @author Oleksii Shevchenko
+ */
 public class AddHolderCommand implements Command {
     private static Logger logger = LogManager.getLogger(AddHolderCommand.class);
 
