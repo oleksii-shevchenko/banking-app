@@ -66,6 +66,18 @@ public class JdbcTransactionDao implements TransactionDao {
 
                 int pagesNumber = transactionsNumber % itemsNumber == 0 ? transactionsNumber / itemsNumber : (transactionsNumber / itemsNumber) + 1;
 
+                if (pagesNumber == 0) {
+                    PageDto<Transaction> pageDto = new PageDto<>();
+                    pageDto.setPagesNumber(1);
+                    pageDto.setCurrentPage(1);
+                    pageDto.setItemsNumber(itemsNumber);
+                    pageDto.setItems(List.of());
+
+                    connection.commit();
+
+                    return pageDto;
+                }
+
                 if (page > pagesNumber) {
                     throw new SQLException();
                 }

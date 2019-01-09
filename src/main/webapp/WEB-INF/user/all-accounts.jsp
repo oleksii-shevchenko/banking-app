@@ -31,39 +31,48 @@
     <div class="row justify-content-start my-lg-2">
         <p class="h2"><fmt:message key="content.accounts.welcome" /></p>
     </div>
-    <div class="row justify-content-center">
-        <div class="col-3">
-            <p class="font-weight-bold"><fmt:message key="content.accounts.id" /></p>
-        </div>
-        <div class="col-3">
-            <p class="font-weight-bold"><fmt:message key="content.accounts.balance" /></p>
-        </div>
-        <div class="col-3">
-            <p class="font-weight-bold"><fmt:message key="content.accounts.status" /></p>
-        </div>
-        <div class="col-3">
-            <p class="font-weight-bold"><fmt:message key="content.accounts.info" /></p>
-        </div>
-    </div>
-    <c:forEach items="${requestScope.accounts}" var="accounts">
-        <div class="row justify-content-center my-2">
-            <div class="col-3">
-                <p>${accounts.id}</p>
+    <c:choose>
+        <c:when test="${not empty requestScope.accounts}">
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <p class="font-weight-bold"><fmt:message key="content.accounts.id" /></p>
+                </div>
+                <div class="col-3">
+                    <p class="font-weight-bold"><fmt:message key="content.accounts.balance" /></p>
+                </div>
+                <div class="col-3">
+                    <p class="font-weight-bold"><fmt:message key="content.accounts.status" /></p>
+                </div>
+                <div class="col-3">
+                    <p class="font-weight-bold"><fmt:message key="content.accounts.info" /></p>
+                </div>
             </div>
-            <div class="col-3">
-                <p><ctg:balance balance="${accounts.balance}" currency="${accounts.currency}" /></p>
+            <c:forEach items="${requestScope.accounts}" var="accounts">
+                <div class="row justify-content-center my-2">
+                    <div class="col-3">
+                        <p>${accounts.id}</p>
+                    </div>
+                    <div class="col-3">
+                        <p><ctg:balance balance="${accounts.balance}" currency="${accounts.currency}" /></p>
+                    </div>
+                    <div class="col-3">
+                        <ctg:status account="${accounts}" localeTag="${sessionScope.lang}" />
+                    </div>
+                    <div class="col-3">
+                        <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
+                            <input type="hidden" name="accountId" value="${accounts.id}" />
+                            <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.accounts.info" /></button>
+                        </form>
+                    </div>
+                </div>
+            </c:forEach>
+        </c:when>
+        <c:otherwise>
+            <div class="row justify-content-center my-2">
+                <div class="h2 text-muted"><fmt:message key="content.accounts.id.empty" /></div>
             </div>
-            <div class="col-3">
-                <ctg:status account="${accounts}" localeTag="${sessionScope.lang}" />
-            </div>
-            <div class="col-3">
-                <form method="post" action="${pageContext.request.contextPath}/api/infoAccount">
-                    <input type="hidden" name="accountId" value="${accounts.id}" />
-                    <button class="btn btn-lg btn-primary btn-block" type="submit"><fmt:message key="content.accounts.info" /></button>
-                </form>
-            </div>
-        </div>
-    </c:forEach>
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <jsp:include page="../components/footer.jsp" />
