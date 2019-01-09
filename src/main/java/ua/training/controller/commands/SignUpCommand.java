@@ -30,7 +30,7 @@ public class SignUpCommand implements Command {
         User user = buildUserFromRequest(request);
 
         try {
-            service.register(user);
+            user.setId(service.register(user));
         } catch (NonUniqueLoginException exception) {
             logger.warn("Tries to sign up with existing login " + user.getLogin());
 

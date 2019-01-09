@@ -38,7 +38,7 @@ public class AuthenticationService {
      * Register user in system.
      * @param user User to register.
      */
-    public void register(User user){
-        userDao.insert(user);
+    public Long register(User user){
+        return userDao.insert(user);
     }
 }
