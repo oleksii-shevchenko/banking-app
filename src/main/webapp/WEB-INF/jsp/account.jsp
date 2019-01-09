@@ -59,7 +59,7 @@
                 </form>
             </div>
         </c:if>
-        <c:if test="${sessionScope.role eq 'ADMIN'}">
+        <c:if test="${(sessionScope.role eq 'ADMIN') and not (requestScope.account.status eq 'CLOSED')}">
             <div class="col-2">
                 <form method="post" action="${pageContext.request.contextPath}/api/closeAccount">
                     <input type="hidden" name="accountId" value="${requestScope.account.id}">

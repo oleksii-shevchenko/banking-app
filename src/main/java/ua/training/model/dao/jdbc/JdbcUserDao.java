@@ -211,7 +211,10 @@ public class JdbcUserDao implements UserDao {
                 user.setAccounts(new ArrayList<>());
                 resultSet.beforeFirst();
                 while (resultSet.next()) {
-                    user.getAccounts().add(resultSet.getLong("account_id"));
+                    long accountId = resultSet.getLong("account_id");
+                    if (accountId != 0){
+                        user.getAccounts().add(resultSet.getLong("account_id"));
+                    }
                 }
 
                 return user;
