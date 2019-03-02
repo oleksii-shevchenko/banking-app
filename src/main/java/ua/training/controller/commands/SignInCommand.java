@@ -2,11 +2,11 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
 import ua.training.model.exception.NoSuchUserException;
 import ua.training.model.exception.WrongPasswordException;
@@ -21,36 +21,38 @@ import java.util.Objects;
 public class SignInCommand implements Command {
     private static Logger logger = LogManager.getLogger(SignInCommand.class);
 
+    private AuthenticationService authenticationService;
+    private ValidationUtil validationUtil;
+    private ContentManager contentManager;
+    private PathManager pathManager;
+
     @Override
     public String execute(HttpServletRequest request) {
-        AuthenticationService service = new AuthenticationService(new JdbcDaoFactory().getUserDao());
-        ValidationUtil util = new ValidationUtil();
-
-        if (!util.makeValidation(request, List.of("login", "pass"))) {
-            return PathManager.getPath("path.sign.in");
+        if (!validationUtil.makeValidation(request, List.of("login", "pass"))) {
+            return pathManager.getPath("path.sign.in");
         }
 
         String login = request.getParameter("login");
         String password = request.getParameter("pass");
 
         try {
-            User user = service.authenticate(login, password);
+            User user = authenticationService.authenticate(login, password);
 
             invalidateOtherSessions(request, user);
             signInUser(request, user);
         } catch (NoSuchUserException exception) {
             logger.warn("Tries to sign in with wrong login " + login);
 
-            ContentManager.setLocalizedMessage(request, "loginWrong", "content.message.wrong.login");
-            return PathManager.getPath("path.sign.in");
+            contentManager.setLocalizedMessage(request, "loginWrong", "content.message.wrong.login");
+            return pathManager.getPath("path.sign.in");
         } catch (WrongPasswordException exception) {
             logger.warn("User " + login + " tries to sign in with wrong password");
 
-            ContentManager.setLocalizedMessage(request, "passWrong", "content.message.wrong.pass");
-            return PathManager.getPath("path.sign.in");
+            contentManager.setLocalizedMessage(request, "passWrong", "content.message.wrong.pass");
+            return pathManager.getPath("path.sign.in");
         }
 
-        return "redirect:" + PathManager.getPath("path.index");
+        return "redirect:" + pathManager.getPath("path.index");
     }
 
     private void signInUser(HttpServletRequest request, User user) {
@@ -69,5 +71,25 @@ public class SignInCommand implements Command {
         }
 
         logger.warn("Closed another session of user " + user.getLogin());
+    }
+
+    @Autowired
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    @Autowired
+    public void setValidationUtil(ValidationUtil validationUtil) {
+        this.validationUtil = validationUtil;
+    }
+
+    @Autowired
+    public void setContentManager(ContentManager contentManager) {
+        this.contentManager = contentManager;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
     }
 }
