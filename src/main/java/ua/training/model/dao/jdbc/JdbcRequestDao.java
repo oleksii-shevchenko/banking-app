@@ -2,9 +2,12 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.RequestDao;
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dao.mapper.factory.MapperFactory;
 import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Request;
 import ua.training.model.exception.UnsupportedOperationException;
@@ -21,13 +24,27 @@ import java.util.List;
  * @see Request
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcRequestDao implements RequestDao {
     private static Logger logger = LogManager.getLogger(JdbcRequestDao.class);
 
     private DataSource dataSource;
+    private MapperFactory mapperFactory;
+    private QueriesManager queriesManager;
 
     public JdbcRequestDao(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Autowired
+    @Qualifier("jdbcMapperFactory")
+    public void setMapperFactory(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
+    }
+
+    @Autowired
+    public void setQueriesManager(QueriesManager queriesManager) {
+        this.queriesManager = queriesManager;
     }
 
     /**
@@ -37,7 +54,7 @@ public class JdbcRequestDao implements RequestDao {
     @Override
     public void considerRequest(Long requestId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement setCompletedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update.considered"))) {
+             PreparedStatement setCompletedStatement = connection.prepareStatement(queriesManager.getQuery("sql.requests.update.considered"))) {
                 setCompletedStatement.setBoolean(1, true);
                 setCompletedStatement.setLong(2, requestId);
                 setCompletedStatement.executeUpdate();
@@ -58,8 +75,8 @@ public class JdbcRequestDao implements RequestDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-            try (PreparedStatement countRequests = connection.prepareStatement(QueriesManager.getQuery("sql.requests.count"));
-                 PreparedStatement getRequestsPage = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.page"))) {
+            try (PreparedStatement countRequests = connection.prepareStatement(queriesManager.getQuery("sql.requests.count"));
+                 PreparedStatement getRequestsPage = connection.prepareStatement(queriesManager.getQuery("sql.requests.get.page"))) {
 
                 int requestsNumber;
                 ResultSet resultSet = countRequests.executeQuery();
@@ -80,7 +97,7 @@ public class JdbcRequestDao implements RequestDao {
                 getRequestsPage.setInt(1, itemsNumber);
                 getRequestsPage.setInt(2, offset);
 
-                Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
+                Mapper<Request> mapper = mapperFactory.getRequestMapper();
                 resultSet = getRequestsPage.executeQuery();
 
                 List<Request> transactions = new ArrayList<>();
@@ -117,11 +134,11 @@ public class JdbcRequestDao implements RequestDao {
     @Override
     public List<Request> getByConsideration(boolean consideration) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.consideration"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.requests.get.by.consideration"))) {
             preparedStatement.setBoolean(1, consideration);
 
             ResultSet resultSet  = preparedStatement.executeQuery();
-            Mapper<Request> mapper = new JdbcMapperFactory().getRequestMapper();
+            Mapper<Request> mapper = mapperFactory.getRequestMapper();
 
             List<Request> requests = new ArrayList<>();
             while (resultSet.next()) {
@@ -138,13 +155,13 @@ public class JdbcRequestDao implements RequestDao {
     @Override
     public Request get(Long key) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.requests.get.by.id"))) {
             preparedStatement.setLong(1, key);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return new JdbcMapperFactory().getRequestMapper().map(resultSet);
+                return mapperFactory.getRequestMapper().map(resultSet);
             } else {
                 throw new SQLException();
             }
@@ -157,7 +174,7 @@ public class JdbcRequestDao implements RequestDao {
     @Override
     public Long insert(Request entity) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.requests.insert"), Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.requests.insert"), Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getRequesterId());
             preparedStatement.setString(2, entity.getType().name());
             preparedStatement.setString(3, entity.getCurrency().name());
