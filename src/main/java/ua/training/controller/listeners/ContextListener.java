@@ -2,11 +2,14 @@ package ua.training.controller.listeners;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ua.training.controller.commands.Command;
 import ua.training.controller.di.Config;
+import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Collections;
 
 /**
  * This web listener used for starting services simultaneously with start of application.
@@ -14,17 +17,12 @@ import javax.servlet.annotation.WebListener;
  */
 @WebListener
 public class ContextListener implements ServletContextListener {
-    //private static Logger logger = LogManager.getLogger(ContextListener.class);
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
 
-        /*new ScheduledTaskService().init(JdbcDaoFactory.getInstance());
-
-        new FixerExchangeService().init();
-        logger.info("Scheduled task service is online.");
-        logger.info("Currency exchange service is online.");*/
+        sce.getServletContext().setAttribute("commands", Collections.unmodifiableMap(context.getBeansOfType(Command.class)));
+        sce.getServletContext().setAttribute("pathManager", context.getBean(PathManager.class));
     }
 
     @Override

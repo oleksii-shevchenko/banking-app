@@ -1,6 +1,6 @@
 package ua.training.controller.servlet;
 
-import ua.training.controller.commands.*;
+import ua.training.controller.commands.Command;
 import ua.training.controller.util.CommandUtil;
 import ua.training.controller.util.managers.PathManager;
 
@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of Front Servlet patter. It handles request to api and manage it.
@@ -20,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebServlet(name = "FrontServlet", urlPatterns = {"/api/*"})
 public class FrontServlet extends HttpServlet {
     private Map<String, Command> commands;
+    private PathManager pathManager;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,42 +31,16 @@ public class FrontServlet extends HttpServlet {
         processRequest(req, resp);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void init() {
-        commands = new ConcurrentHashMap<>();
-        commands.put("signIn", new SignInCommand());
-        commands.put("signUp", new SignUpCommand());
-        commands.put("signOut", new SignOutCommand());
-        commands.put("changeLanguage", new ChangeLanguageCommand());
-        commands.put("currencyRate", new CurrencyRateCommand());
-        commands.put("openAccount", new OpenAccountCommand());
-        commands.put("request", new RequestCommand());
-        commands.put("closeAccount", new CloseAccountCommand());
-        commands.put("showAccounts", new ShowAccountsCommand());
-        commands.put("infoAccount", new InfoAccountCommand());
-        commands.put("infoTransaction", new InfoTransactionCommand());
-        commands.put("workspace", new WorkspaceCommand());
-        commands.put("createInvoice", new CreateInvoiceCommand());
-        commands.put("infoInvoice", new InfoInvoiceCommand());
-        commands.put("completeInvoice", new CompleteInvoiceCommand());
-        commands.put("showRequests", new ShowRequestsCommand());
-        commands.put("considerRequest", new ConsiderRequestCommand());
-        commands.put("replenishAccount", new ReplenishAccountCommand());
-        commands.put("showInvoices", new ShowInvoicesCommand());
-        commands.put("infoUser", new InfoUserCommand());
-        commands.put("profile", new ProfileCommand());
-        commands.put("makeTransaction", new MakeTransactionCommand());
-        commands.put("denyInvoice", new DenyInvoiceCommand());
-        commands.put("showHolders", new ShowHoldersCommand());
-        commands.put("addHolder", new AddHolderCommand());
-        commands.put("removeHolder", new RemoveHolderCommand());
-        commands.put("showTransactions", new ShowTransactionsCommand());
-        commands.put("processRequest", new ProcessRequestCommand());
+        commands = (Map<String, Command>) getServletContext().getAttribute("commands");
+        pathManager = (PathManager) getServletContext().getAttribute("pathManager");
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String command = new CommandUtil().extractCommand(request);
-        String page = commands.getOrDefault(command, (r) -> "redirect:" + PathManager.getPath("path.error")).execute(request);
+        String page = commands.getOrDefault(command, (r) -> "redirect:" + pathManager.getPath("path.error")).execute(request);
 
         if (page.contains("redirect:")) {
             response.sendRedirect(request.getContextPath() + page.replace("redirect:", ""));

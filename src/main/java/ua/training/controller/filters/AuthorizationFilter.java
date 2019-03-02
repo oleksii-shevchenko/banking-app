@@ -3,7 +3,6 @@ package ua.training.controller.filters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.controller.util.CommandUtil;
-import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -89,7 +88,7 @@ public class AuthorizationFilter implements Filter {
         } else {
             logger.warn("User with role " + role + " tries to access commands " + command);
 
-            response.sendRedirect(request.getContextPath() + PathManager.getPath("path.error"));
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
         }
     }
 }
