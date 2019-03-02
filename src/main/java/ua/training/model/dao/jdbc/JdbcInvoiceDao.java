@@ -2,9 +2,13 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.InvoiceDao;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dao.mapper.factory.MapperFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Invoice;
 import ua.training.model.entity.Transaction;
@@ -24,13 +28,28 @@ import java.util.List;
  * @see ua.training.model.dao.InvoiceDao
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcInvoiceDao implements InvoiceDao {
     private static Logger logger = LogManager.getLogger(JdbcInvoiceDao.class);
 
     private DataSource dataSource;
+    private MapperFactory mapperFactory;
+    private QueriesManager queriesManager;
 
+    @Autowired
     public JdbcInvoiceDao(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Autowired
+    public void setQueriesManager(QueriesManager queriesManager) {
+        this.queriesManager = queriesManager;
+    }
+
+    @Autowired
+    @Qualifier("jdbcMapperFactory")
+    public void setMapperFactory(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
     }
 
     /**
@@ -41,11 +60,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
     @Override
     public List<Invoice> getInvoicesByRequester(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.requester"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.get.by.requester"))) {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Invoice> mapper = new JdbcMapperFactory().getInvoiceMapper();
+            Mapper<Invoice> mapper = mapperFactory.getInvoiceMapper();
 
             List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
@@ -67,11 +86,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
     @Override
     public List<Invoice> getInvoicesByPayer(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.payer"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.get.by.payer"))) {
             preparedStatement.setLong(1, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Invoice> mapper = new JdbcMapperFactory().getInvoiceMapper();
+            Mapper<Invoice> mapper = mapperFactory.getInvoiceMapper();
 
             List<Invoice> invoices = new ArrayList<>();
             while (resultSet.next()) {
@@ -94,11 +113,11 @@ public class JdbcInvoiceDao implements InvoiceDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"));
-                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.transaction"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
+            try (PreparedStatement getAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.by.id"));
+                 PreparedStatement getInvoiceStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.get.by.id"));
+                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.update.transaction"));
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(queriesManager.getQuery("sql.transactions.insert"), Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement updateBalanceStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.balance"))) {
 
                 Invoice invoice = getInvoiceById(invoiceId, getInvoiceStatement);
 
@@ -192,15 +211,15 @@ public class JdbcInvoiceDao implements InvoiceDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"));
-                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.update.status"))) {
+            try (PreparedStatement getInvoiceStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.get.by.id"));
+                 PreparedStatement updateInvoiceStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.update.status"))) {
                 getInvoiceStatement.setLong(1, invoiceId);
 
                 ResultSet resultSet = getInvoiceStatement.executeQuery();
 
                 Invoice invoice;
                 if (resultSet.next()) {
-                    invoice = new JdbcMapperFactory().getInvoiceMapper().map(resultSet);
+                    invoice = mapperFactory.getInvoiceMapper().map(resultSet);
                 } else {
                     throw new SQLException();
                 }
@@ -229,7 +248,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
     @Override
     public Invoice get(Long key) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.get.by.id"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.get.by.id"))) {
             return getInvoiceById(key, preparedStatement);
         } catch (SQLException exception) {
             logger.error(exception);
@@ -243,7 +262,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
         ResultSet resultSet = getAccountStatement.executeQuery();
 
         if (resultSet.next()) {
-            return new JdbcMapperFactory().getInvoiceMapper().map(resultSet);
+            return mapperFactory.getInvoiceMapper().map(resultSet);
         } else {
             throw new SQLException();
         }
@@ -252,7 +271,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
     @Override
     public Long insert(Invoice entity) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.invoices.insert"), Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.invoices.insert"), Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getRequester());
             preparedStatement.setLong(2, entity.getPayer());
             preparedStatement.setBigDecimal(3, entity.getAmount());
