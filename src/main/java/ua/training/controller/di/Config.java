@@ -3,10 +3,7 @@ package ua.training.controller.di;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import ua.training.controller.commands.Command;
 import ua.training.model.entity.Request;
 
@@ -40,6 +37,7 @@ public class Config {
     }
 
     @Bean("dataSource")
+    @Lazy
     public DataSource dataSource() {
         BasicDataSource poolingSource = new BasicDataSource();
         poolingSource.setDriverClassName("${db.connection.driver}");
@@ -49,5 +47,10 @@ public class Config {
         poolingSource.setMaxIdle(Integer.parseInt("${db.connection.idle.max}"));
         poolingSource.setMinIdle(Integer.parseInt("${db.connection.idle.min}"));
         return poolingSource;
+    }
+
+    @Bean("queries")
+    public ResourceBundle queries() {
+        return ResourceBundle.getBundle("query");
     }
 }

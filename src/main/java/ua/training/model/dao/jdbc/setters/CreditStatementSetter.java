@@ -1,5 +1,6 @@
 package ua.training.model.dao.jdbc.setters;
 
+import org.springframework.stereotype.Component;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.CreditAccount;
 
@@ -9,12 +10,14 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * Realization of interface {@link StatementSetter} for mapping CreditAccount entities.
+ * Realization of interface {@link StatementSetter} for mapping CreditAccount entities. Bean id is starts from upper
+ * case letter only for legacy purpose after adding spring di.
  * @see ua.training.model.dao.jdbc.setters.StatementSetter
  * @see CreditAccount
  * @see Account
  * @author Oleksii Shevchenko
  */
+@Component("CreditStatementSetter")
 public class CreditStatementSetter implements StatementSetter {
     @Override
     public void setStatementParameters(Account account, PreparedStatement preparedStatement) throws SQLException {

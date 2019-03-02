@@ -2,20 +2,22 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.AccountDao;
-import ua.training.model.dao.jdbc.setters.CreditStatementSetter;
-import ua.training.model.dao.jdbc.setters.DepositStatementSetter;
 import ua.training.model.dao.jdbc.setters.StatementSetter;
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
-import ua.training.model.entity.*;
+import ua.training.model.dao.mapper.factory.MapperFactory;
+import ua.training.model.entity.Account;
+import ua.training.model.entity.Permission;
+import ua.training.model.entity.Request;
 import ua.training.model.exception.ActiveAccountException;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,21 +28,36 @@ import java.util.Map;
  * @see Account
  * @author Oleksii Shevhenko
  */
+@Component
 public class JdbcAccountDao implements AccountDao {
     private static Logger logger = LogManager.getLogger(JdbcAccountDao.class);
 
     private DataSource dataSource;
+    private QueriesManager queriesManager;
 
-    private static Map<String, StatementSetter> statementSetters;
+    private MapperFactory mapperFactory;
 
-    static {
-        statementSetters = new HashMap<>();
-        statementSetters.put(DepositAccount.class.getSimpleName(), new DepositStatementSetter());
-        statementSetters.put(CreditAccount.class.getSimpleName(), new CreditStatementSetter());
-    }
+    private Map<String, StatementSetter> statementSetters;
 
+    @Autowired
     public JdbcAccountDao(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Autowired
+    public void setStatementSetters(Map<String, StatementSetter> statementSetters) {
+        this.statementSetters = statementSetters;
+    }
+
+    @Autowired
+    public void setQueriesManager(QueriesManager queriesManager) {
+        this.queriesManager = queriesManager;
+    }
+
+    @Autowired
+    @Qualifier("jdbcMapperFactory")
+    public void setMapperFactory(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
     }
 
     /**
@@ -52,9 +69,9 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public List<Account> getActiveAccounts() {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.active"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.by.active"))) {
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
+            Mapper<Account> mapper = mapperFactory.getAccountMapper();
 
             List<Account> accounts = new ArrayList<>();
             while (resultSet.next()) {
@@ -76,11 +93,11 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public List<Account> getUserAccounts(Long userId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.account.by.user"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.get.account.by.user"))) {
             preparedStatement.setLong(1, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Account> mapper = new JdbcMapperFactory().getAccountMapper();
+            Mapper<Account> mapper = mapperFactory.getAccountMapper();
 
             List<Account> accounts = new ArrayList<>();
             while (resultSet.next()) {
@@ -105,17 +122,17 @@ public class JdbcAccountDao implements AccountDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getRequest = connection.prepareStatement(QueriesManager.getQuery("sql.requests.get.by.id"));
-                 PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement insertHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"));
-                 PreparedStatement updateConsideration = connection.prepareStatement(QueriesManager.getQuery("sql.requests.update.considered"))) {
+            try (PreparedStatement getRequest = connection.prepareStatement(queriesManager.getQuery("sql.requests.get.by.id"));
+                 PreparedStatement insertAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement insertHolderStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.insert"));
+                 PreparedStatement updateConsideration = connection.prepareStatement(queriesManager.getQuery("sql.requests.update.considered"))) {
                 getRequest.setLong(1, requestId);
 
                 ResultSet resultSet = getRequest.executeQuery();
 
                 Request request;
                 if (resultSet.next()) {
-                    request = new JdbcMapperFactory().getRequestMapper().map(resultSet);
+                    request = mapperFactory.getRequestMapper().map(resultSet);
                 } else {
                     throw new SQLException();
                 }
@@ -173,8 +190,8 @@ public class JdbcAccountDao implements AccountDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);
-            try (PreparedStatement insertAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement insertHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
+            try (PreparedStatement insertAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.insert"), Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement insertHolderStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.insert"))) {
                 StatementSetter setter = statementSetters.get(account.getClass().getSimpleName());
 
                 setter.setStatementParameters(account, insertAccountStatement);
@@ -218,8 +235,8 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public void blockAccount(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement getStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.status.by.id"));
-             PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"))) {
+             PreparedStatement getStatusStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.status.by.id"));
+             PreparedStatement updateStatusStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.status"))) {
             getStatusStatement.setLong(1, accountId);
 
             ResultSet resultSet = getStatusStatement.executeQuery();
@@ -253,16 +270,16 @@ public class JdbcAccountDao implements AccountDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-            try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
-                 PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement removeAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove.account"))) {
+            try (PreparedStatement updateStatusStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.status"));
+                 PreparedStatement getAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.by.id"));
+                 PreparedStatement removeAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.remove.account"))) {
                 getAccountStatement.setLong(1, accountId);
 
                 ResultSet resultSet = getAccountStatement.executeQuery();
 
                 Account account;
                 if (resultSet.next()) {
-                    account = new JdbcMapperFactory().getAccountMapper().map(resultSet);
+                    account = mapperFactory.getAccountMapper().map(resultSet);
                 } else {
                     throw new SQLException();
                 }
@@ -301,9 +318,9 @@ public class JdbcAccountDao implements AccountDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-            try (PreparedStatement updateStatusStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.status"));
-                 PreparedStatement removeAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove.account"));
-                 PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"))) {
+            try (PreparedStatement updateStatusStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.status"));
+                 PreparedStatement removeAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.remove.account"));
+                 PreparedStatement updateBalanceStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.balance"))) {
                 updateStatusStatement.setString(1, Account.Status.CLOSED.name());
                 updateStatusStatement.setLong(2, accountId);
                 updateStatusStatement.executeUpdate();
@@ -333,13 +350,13 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public Account get(Long key) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.full"))) {
+             PreparedStatement getAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.full"))) {
             getAccountStatement.setLong(1, key);
 
             ResultSet resultSet = getAccountStatement.executeQuery();
 
             if (resultSet.next()) {
-                Account account =  new JdbcMapperFactory().getAccountMapper().map(resultSet);
+                Account account =  mapperFactory.getAccountMapper().map(resultSet);
 
                 account.setHolders(new ArrayList<>());
                 resultSet.beforeFirst();
