@@ -1,5 +1,7 @@
 package ua.training.controller.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ua.training.controller.util.managers.ContentManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +13,21 @@ import java.util.ResourceBundle;
  * Util used for validation user inputs.
  * @author Oleksii Shevchenko
  */
+@Component
 public class ValidationUtil {
+    private ContentManager contentManager;
+    private LocaleUtil localeUtil;
+
+    @Autowired
+    public void setContentManager(ContentManager contentManager) {
+        this.contentManager = contentManager;
+    }
+
+    @Autowired
+    public void setLocaleUtil(LocaleUtil localeUtil) {
+        this.localeUtil = localeUtil;
+    }
+
     /**
      * Method validates user inputs listed in {@code params} and contained in {@code request} using regex from resource
      * bundle. If the the input is not valid the localized message setted into request about it.
@@ -29,11 +45,11 @@ public class ValidationUtil {
 
 
     private boolean isValid(HttpServletRequest request, String param) {
-        ResourceBundle bundle = ResourceBundle.getBundle("regex", LocaleUtil.getLocale(request));
+        ResourceBundle bundle = ResourceBundle.getBundle("regex", localeUtil.getLocale(request));
         if (isMatch(request.getParameter(param), bundle.getString("regex." + param))) {
             return true;
         } else {
-            ContentManager.setLocalizedMessage(request, param + "Wrong", "content.message.not.match." + param);
+            contentManager.setLocalizedMessage(request, param + "Wrong", "content.message.not.match." + param);
             return false;
         }
     }
