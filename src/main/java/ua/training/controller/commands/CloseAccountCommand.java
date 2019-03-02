@@ -2,9 +2,9 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.AccountService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,13 +18,26 @@ import javax.servlet.http.HttpServletRequest;
 public class CloseAccountCommand implements Command {
     private static Logger logger = LogManager.getLogger(CloseAccountCommand.class);
 
+    private AccountService service;
+    private PathManager manager;
+
+    @Autowired
+    public void setService(AccountService service) {
+        this.service = service;
+    }
+
+    @Autowired
+    public void setManager(PathManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public String execute(HttpServletRequest request) {
         Long accountId = Long.valueOf(request.getParameter("accountId"));
-        new AccountService(JdbcDaoFactory.getInstance()).accountForceClosing(accountId);
+        service.accountForceClosing(accountId);
 
         logger.info("Admin " + request.getSession().getAttribute("id") + " close account " + accountId);
 
-        return PathManager.getPath("path.completed");
+        return manager.getPath("path.completed");
     }
 }
