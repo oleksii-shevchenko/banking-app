@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.entity.User;
@@ -21,10 +22,12 @@ public class AddHolderCommand implements Command {
     private UserService service;
     private PathManager manager;
 
+    @Autowired
     public void setService(UserService service) {
         this.service = service;
     }
 
+    @Autowired
     public void setManager(PathManager manager) {
         this.manager = manager;
     }

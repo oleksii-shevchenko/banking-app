@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 
@@ -12,9 +13,17 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller("changeLanguage")
 public class ChangeLanguageCommand implements Command {
+    private PathManager manager;
+
+    @Autowired
+    public void setManager(PathManager manager) {
+        this.manager = manager;
+    }
+
+
     @Override
     public String execute(HttpServletRequest request) {
         request.getSession().setAttribute("lang", request.getParameter("lang"));
-        return "redirect:" + PathManager.getPath("path.index");
+        return "redirect:" + manager.getPath("path.index");
     }
 }
