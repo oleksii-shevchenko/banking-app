@@ -2,9 +2,12 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.UserDao;
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dao.mapper.factory.MapperFactory;
 import ua.training.model.entity.Permission;
 import ua.training.model.entity.User;
 import ua.training.model.exception.ActiveAccountException;
@@ -25,13 +28,27 @@ import java.util.Map;
  * @see User
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcUserDao implements UserDao {
     private static Logger logger = LogManager.getLogger(JdbcUserDao.class);
 
     private DataSource dataSource;
+    private MapperFactory mapperFactory;
+    private QueriesManager queriesManager;
 
     public JdbcUserDao(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Autowired
+    @Qualifier("jdbcMapperFactory")
+    public void setMapperFactory(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
+    }
+
+    @Autowired
+    public void setQueriesManager(QueriesManager queriesManager) {
+        this.queriesManager = queriesManager;
     }
 
     /**
@@ -44,13 +61,13 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User getUserByLogin(String login) throws NoSuchUserException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.by.login"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.users.get.by.login"))) {
             preparedStatement.setString(1, login);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return new JdbcMapperFactory().getUserMapper().map(resultSet);
+                return mapperFactory.getUserMapper().map(resultSet);
             } else {
                 throw new NoSuchUserException();
             }
@@ -68,10 +85,10 @@ public class JdbcUserDao implements UserDao {
     @Override
     public List<User> getAccountHolders(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
-            Mapper<User> mapper = new JdbcMapperFactory().getUserMapper();
+            Mapper<User> mapper = mapperFactory.getUserMapper();
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<User> holders = new ArrayList<>();
@@ -94,10 +111,10 @@ public class JdbcUserDao implements UserDao {
     @Override
     public Map<User, Permission> getAccountHoldersWithPermission(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.user.by.account"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.get.user.by.account"))) {
             preparedStatement.setLong(1, accountId);
 
-            Mapper<User> mapper = new JdbcMapperFactory().getUserMapper();
+            Mapper<User> mapper = mapperFactory.getUserMapper();
             ResultSet resultSet = preparedStatement.executeQuery();
 
             Map<User, Permission> holders = new HashMap<>();
@@ -120,7 +137,7 @@ public class JdbcUserDao implements UserDao {
      */
     public Permission getPermissions(Long holderId, Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
+             PreparedStatement getPermissionStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.get.permission"))) {
             getPermissionStatement.setLong(1, holderId);
             getPermissionStatement.setLong(2, accountId);
 
@@ -147,8 +164,8 @@ public class JdbcUserDao implements UserDao {
     @Override
     public int removeAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement removeHolderStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.remove"));
-             PreparedStatement getPermissionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.get.permission"))) {
+             PreparedStatement removeHolderStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.remove"));
+             PreparedStatement getPermissionStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.get.permission"))) {
             getPermissionStatement.setLong(1, holderId);
             getPermissionStatement.setLong(2, accountId);
 
@@ -180,7 +197,7 @@ public class JdbcUserDao implements UserDao {
     @Override
     public int addAccountHolder(Long holderId, Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.insert"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.insert"))) {
             preparedStatement.setLong(1, holderId);
             preparedStatement.setLong(2, accountId);
             preparedStatement.setString(3, Permission.RESTRICTED.name());
@@ -200,13 +217,13 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User get(Long key) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement getUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.get.full"))) {
+             PreparedStatement getUserStatement = connection.prepareStatement(queriesManager.getQuery("sql.users.get.full"))) {
             getUserStatement.setLong(1, key);
 
             ResultSet resultSet = getUserStatement.executeQuery();
 
             if (resultSet.next()) {
-                User user =  new JdbcMapperFactory().getUserMapper().map(resultSet);
+                User user =  mapperFactory.getUserMapper().map(resultSet);
 
                 user.setAccounts(new ArrayList<>());
                 resultSet.beforeFirst();
@@ -237,7 +254,7 @@ public class JdbcUserDao implements UserDao {
     @Override
     public Long insert(User entity) throws NonUniqueLoginException, NonUniqueEmailException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.insert"), Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.users.insert"), Statement.RETURN_GENERATED_KEYS)) {
             setStatementParameters(entity, preparedStatement);
             preparedStatement.executeUpdate();
 
@@ -271,7 +288,7 @@ public class JdbcUserDao implements UserDao {
     @Override
     public int update(User entity) throws NonUniqueEmailException, NonUniqueLoginException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.update"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.users.update"))) {
             setStatementParameters(entity, preparedStatement);
             preparedStatement.setLong(7, entity.getId());
 
@@ -298,8 +315,8 @@ public class JdbcUserDao implements UserDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-            try (PreparedStatement removeUserStatement = connection.prepareStatement(QueriesManager.getQuery("sql.users.remove"));
-                 PreparedStatement countAccountsStatement = connection.prepareStatement(QueriesManager.getQuery("sql.holders.count.account.by.user"))) {
+            try (PreparedStatement removeUserStatement = connection.prepareStatement(queriesManager.getQuery("sql.users.remove"));
+                 PreparedStatement countAccountsStatement = connection.prepareStatement(queriesManager.getQuery("sql.holders.count.account.by.user"))) {
                 countAccountsStatement.setLong(1, entity.getId());
 
                 ResultSet resultSet = countAccountsStatement.executeQuery();

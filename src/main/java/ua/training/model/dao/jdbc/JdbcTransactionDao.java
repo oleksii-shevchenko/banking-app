@@ -2,9 +2,12 @@ package ua.training.model.dao.jdbc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.TransactionDao;
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.factory.JdbcMapperFactory;
+import ua.training.model.dao.mapper.factory.MapperFactory;
 import ua.training.model.dto.PageDto;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Transaction;
@@ -31,13 +34,27 @@ import java.util.Optional;
  * @see Transaction
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcTransactionDao implements TransactionDao {
     private static Logger logger = LogManager.getLogger(JdbcTransactionDao.class);
 
     private DataSource dataSource;
+    private MapperFactory mapperFactory;
+    private QueriesManager queriesManager;
 
     public JdbcTransactionDao(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Autowired
+    @Qualifier("jdbcMapperFactory")
+    public void setMapperFactory(MapperFactory mapperFactory) {
+        this.mapperFactory = mapperFactory;
+    }
+
+    @Autowired
+    public void setQueriesManager(QueriesManager queriesManager) {
+        this.queriesManager = queriesManager;
     }
 
     /**
@@ -51,8 +68,8 @@ public class JdbcTransactionDao implements TransactionDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
-            try (PreparedStatement countTransactions = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.count"));
-                 PreparedStatement getTransactionsPage = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.page"))) {
+            try (PreparedStatement countTransactions = connection.prepareStatement(queriesManager.getQuery("sql.transactions.count"));
+                 PreparedStatement getTransactionsPage = connection.prepareStatement(queriesManager.getQuery("sql.transactions.get.page"))) {
                 countTransactions.setLong(1, accountId);
                 countTransactions.setLong(2, accountId);
 
@@ -89,7 +106,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 getTransactionsPage.setInt(3, itemsNumber);
                 getTransactionsPage.setInt(4, offset);
 
-                Mapper<Transaction> mapper = new JdbcMapperFactory().getTransactionMapper();
+                Mapper<Transaction> mapper = mapperFactory.getTransactionMapper();
                 resultSet = getTransactionsPage.executeQuery();
 
                 List<Transaction> transactions = new ArrayList<>();
@@ -126,12 +143,12 @@ public class JdbcTransactionDao implements TransactionDao {
     @Override
     public List<Transaction> getAccountTransactions(Long accountId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.account"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.transactions.get.by.account"))) {
             preparedStatement.setLong(1, accountId);
             preparedStatement.setLong(2, accountId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Mapper<Transaction> mapper = new JdbcMapperFactory().getTransactionMapper();
+            Mapper<Transaction> mapper = mapperFactory.getTransactionMapper();
 
             List<Transaction> transactions = new ArrayList<>();
             while (resultSet.next()) {
@@ -156,9 +173,9 @@ public class JdbcTransactionDao implements TransactionDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement getAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.by.id"));
+                 PreparedStatement updateBalanceStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.balance"));
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(queriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
 
                 if (transaction.getType().equals(Transaction.Type.MANUAL)) {
                     Account sender = getAccountById(transaction.getSender(), getAccountStatement);
@@ -208,9 +225,9 @@ public class JdbcTransactionDao implements TransactionDao {
         try (Connection connection = dataSource.getConnection()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
-            try (PreparedStatement getAccountStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.get.by.id"));
-                 PreparedStatement updateBalanceStatement = connection.prepareStatement(QueriesManager.getQuery("sql.accounts.update.balance"));
-                 PreparedStatement insertTransactionStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement getAccountStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.get.by.id"));
+                 PreparedStatement updateBalanceStatement = connection.prepareStatement(queriesManager.getQuery("sql.accounts.update.balance"));
+                 PreparedStatement insertTransactionStatement = connection.prepareStatement(queriesManager.getQuery("sql.transactions.insert"), PreparedStatement.RETURN_GENERATED_KEYS)) {
                 Account account = getAccountById(accountId, getAccountStatement);
 
                 Optional<Transaction> optionalTransaction = producer.produce(account);
@@ -256,7 +273,7 @@ public class JdbcTransactionDao implements TransactionDao {
         ResultSet resultSet = getAccountStatement.executeQuery();
 
         if (resultSet.next()) {
-            return new JdbcMapperFactory().getAccountMapper().map(resultSet);
+            return mapperFactory.getAccountMapper().map(resultSet);
         } else {
             throw new SQLException();
         }
@@ -287,13 +304,13 @@ public class JdbcTransactionDao implements TransactionDao {
     @Override
     public Transaction get(Long key) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(QueriesManager.getQuery("sql.transactions.get.by.id"))) {
+             PreparedStatement preparedStatement = connection.prepareStatement(queriesManager.getQuery("sql.transactions.get.by.id"))) {
             preparedStatement.setLong(1, key);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return new JdbcMapperFactory().getTransactionMapper().map(resultSet);
+                return mapperFactory.getTransactionMapper().map(resultSet);
             } else {
                 throw new SQLException();
             }
