@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
 import ua.training.model.service.UserService;
 
@@ -19,9 +18,20 @@ import javax.servlet.http.HttpServletRequest;
 public class AddHolderCommand implements Command {
     private static Logger logger = LogManager.getLogger(AddHolderCommand.class);
 
+    private UserService service;
+    private PathManager manager;
+
+    public void setService(UserService service) {
+        this.service = service;
+    }
+
+    public void setManager(PathManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public String execute(HttpServletRequest request) {
-        User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
+        User user = service.get((Long) request.getSession().getAttribute("id"));
 
         Long accountId = Long.valueOf(request.getParameter("accountId"));
         Long holderId = Long.valueOf(request.getParameter("holderId"));
@@ -29,13 +39,13 @@ public class AddHolderCommand implements Command {
         if (!user.getAccounts().contains(accountId)) {
             logger.warn("User " + user.getId() + "try to access account " + accountId + " without permissions");
 
-            return "redirect:" + PathManager.getPath("path.error");
+            return "redirect:" + manager.getPath("path.error");
         }
 
-        new UserService(JdbcDaoFactory.getInstance()).addHolder(holderId, accountId);
+        service.addHolder(holderId, accountId);
 
         logger.info("User " + holderId + " was added as holder to account " + accountId);
 
-        return "redirect:" + PathManager.getPath("path.completed");
+        return "redirect:" + manager.getPath("path.completed");
     }
 }
