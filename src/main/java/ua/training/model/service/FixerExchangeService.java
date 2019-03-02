@@ -2,17 +2,19 @@ package ua.training.model.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.training.model.entity.Currency;
 import ua.training.model.service.util.FixerUtil;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This service provides currency exchange rates.
@@ -22,25 +24,41 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class FixerExchangeService implements CurrencyExchangeService {
     private static Logger logger = LogManager.getLogger(FixerExchangeService.class);
 
-    private static ReadWriteLock lock;
-    private static volatile LocalDateTime lastUpdate;
-    private static long validationTime;
+    private FixerUtil fixerUtil;
+    private ResourceBundle bundle;
 
-    private static volatile Map<Currency, BigDecimal> exchangeRates;
-    private static Currency base;
+    private ReadWriteLock lock;
 
-    /**
-     * Method to staring service.
-     */
+    private long validationTime;
+    private LocalDateTime lastUpdate;
+
+    private Map<Currency, BigDecimal> exchangeRates;
+    private Currency base;
+
+    @Autowired
+    public void setFixerUtil(FixerUtil fixerUtil) {
+        this.fixerUtil = fixerUtil;
+    }
+
+    @Autowired
+    @Qualifier("lock")
+    public void setLock(ReadWriteLock lock) {
+        this.lock = lock;
+    }
+
+    @Autowired
+    @Qualifier("fixerConfig")
+    public void setBundle(ResourceBundle bundle) {
+        this.bundle = bundle;
+    }
+
+    @PostConstruct
     public void init() {
-        ResourceBundle config = ResourceBundle.getBundle("fixer_io");
-
         lastUpdate = LocalDateTime.now();
-        base = Currency.valueOf(config.getString("fixer.api.base"));
-        validationTime = Long.valueOf(config.getString("fixer.api.valid"));
+        base = Currency.valueOf(bundle.getString("fixer.api.base"));
+        validationTime = Long.valueOf(bundle.getString("fixer.api.valid"));
 
-        lock = new ReentrantReadWriteLock();
-        exchangeRates = new FixerUtil().getRatesOrDefault(base);
+        exchangeRates = fixerUtil.getRatesOrDefault(base);
     }
 
     @Override
@@ -74,13 +92,12 @@ public class FixerExchangeService implements CurrencyExchangeService {
     }
 
     private void updateRates() {
-        FixerUtil util = new FixerUtil();
-        if (util.isRatesNotValid(lastUpdate, validationTime)) {
+        if (fixerUtil.isRatesNotValid(lastUpdate, validationTime)) {
             lock.readLock().unlock();
             try {
                 lock.writeLock().lock();
-                if (util.isRatesNotValid(lastUpdate, validationTime)) {
-                    exchangeRates = util.makeRequest(util.getRequestUri());
+                if (fixerUtil.isRatesNotValid(lastUpdate, validationTime)) {
+                    exchangeRates = fixerUtil.makeRequest(fixerUtil.getRequestUri());
                     lastUpdate = LocalDateTime.now();
                 }
             } catch (Exception exception) {

@@ -8,6 +8,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ua.training.model.dto.FixerDto;
 import ua.training.model.entity.Currency;
 import ua.training.model.service.FixerExchangeService;
@@ -31,10 +34,23 @@ import java.util.stream.Collectors;
  * @see FixerExchangeService
  * @author Oleksii Shevchenko
  */
+@Component
 public class FixerUtil {
     private static Logger logger = LogManager.getLogger(FixerUtil.class);
 
-    private static ResourceBundle config = ResourceBundle.getBundle("fixer_io");
+    private Gson gson;
+    private ResourceBundle config;
+
+    @Autowired
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
+
+    @Autowired
+    @Qualifier("fixerConfig")
+    public void setConfig(ResourceBundle config) {
+        this.config = config;
+    }
 
     /**
      * This method create uri for making request to fixer service.
@@ -42,6 +58,7 @@ public class FixerUtil {
      */
     public URI getRequestUri() throws URISyntaxException {
         return new URIBuilder(config.getString("fixer.api.end_point"))
+                .setPath(config.getString("fixer.api.end_point"))
                 .setParameter("access_key", config.getString("fixer.api.key"))
                 .setParameter("symbols", buildSymbols())
                 .setCharset(StandardCharsets.UTF_8)
@@ -59,7 +76,7 @@ public class FixerUtil {
              CloseableHttpResponse response = httpClient.execute(new HttpGet(uri));
              Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
 
-            FixerDto fixerDto = new Gson().fromJson(reader, FixerDto.class);
+            FixerDto fixerDto = gson.fromJson(reader, FixerDto.class);
 
             if (fixerDto.isSuccess()) {
                 return fixerDto.getRates();

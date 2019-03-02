@@ -31,9 +31,9 @@ public class ScheduledTaskService {
         this.daoFactory = daoFactory;
     }
 
-
     @PostConstruct
     public void init() {
+        System.err.println(daoFactory);
         List<Account> accounts = daoFactory.getAccountDao().getActiveAccounts();
 
         for (Account account : accounts) {
@@ -41,7 +41,7 @@ public class ScheduledTaskService {
             registerAccountClosing(account, daoFactory);
 
             if (account instanceof DepositAccount) {
-                registerDeposit(account, daoFactory);
+                registerDeposit(account);
             }
         }
     }
@@ -49,9 +49,8 @@ public class ScheduledTaskService {
     /**
      * Register deposit account for periodic update.
      * @param account Targeted deposit account.
-     * @param factory Factory for creating dao.
      */
-    public void registerDeposit(Account account, DaoFactory factory) {
+    public void registerDeposit(Account account) {
         DepositAccount depositAccount = (DepositAccount) account;
         executorService.scheduleWithFixedDelay(
                 getDepositUpdate().setAccountId(account.getId()),
@@ -61,8 +60,8 @@ public class ScheduledTaskService {
         );
     }
 
-    @Lookup
-    private DepositUpdater getDepositUpdate() {
+    @Lookup("depositUpdater")
+    public DepositUpdater getDepositUpdate() {
         return null;
     }
 

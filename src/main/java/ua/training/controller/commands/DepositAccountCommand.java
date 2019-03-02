@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.DepositAccount;
@@ -38,7 +37,7 @@ public class DepositAccountCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
         if (!validationUtil.makeValidation(request, List.of("initDeposit", "expiresEnd", "depositRate", "updatePeriod"))) {
-            return new ProcessRequestCommand().execute(request);
+            return command.execute(request);
         }
 
         DepositAccount account = DepositAccount.getBuilder()
@@ -59,7 +58,7 @@ public class DepositAccountCommand implements Command {
 
         account.setId(userService.completeOpeningRequest(requestId, account));
 
-        scheduledTaskService.registerDeposit(account, JdbcDaoFactory.getInstance());
+        scheduledTaskService.registerDeposit(account);
 
         return pathManager.getPath("path.completed");
     }

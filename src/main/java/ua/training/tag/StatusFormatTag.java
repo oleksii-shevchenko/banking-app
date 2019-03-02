@@ -1,6 +1,5 @@
 package ua.training.tag;
 
-import ua.training.controller.util.managers.ContentManager;
 import ua.training.model.entity.Account;
 import ua.training.tag.util.FormatManager;
 
@@ -24,6 +23,6 @@ public class StatusFormatTag extends SimpleTagSupport {
     public void doTag() throws IOException {
         String status = account.getStatus().name().toLowerCase();
         getJspContext().getOut().write(FormatManager.mapFormat("content.tag.status." + status,
-                        ContentManager.getLocalizedContent("content.accounts.status." + status, Locale.forLanguageTag(localeTag))));
+                        FormatManager.getLocalizedMessage("content.accounts.status." + status, Locale.forLanguageTag(localeTag))));
     }
 }

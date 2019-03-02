@@ -1,9 +1,12 @@
 package ua.training.controller.di;
 
+import com.google.gson.Gson;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import ua.training.controller.commands.Command;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.dao.mapper.jdbc.JdbcCreditAccountMapper;
@@ -17,6 +20,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Configuration
 @ComponentScan(basePackages = "ua.training")
@@ -44,14 +49,15 @@ public class Config {
 
     @Bean("dataSource")
     @Lazy
-    public DataSource dataSource() {
+    @Autowired
+    public DataSource dataSource(Environment environment) {
         BasicDataSource poolingSource = new BasicDataSource();
-        poolingSource.setDriverClassName("${db.connection.driver}");
-        poolingSource.setUrl("${db.connection.url}");
-        poolingSource.setUsername("${db.connection.user}");
-        poolingSource.setPassword("${db.connection.pass}");
-        poolingSource.setMaxIdle(Integer.parseInt("${db.connection.idle.max}"));
-        poolingSource.setMinIdle(Integer.parseInt("${db.connection.idle.min}"));
+        poolingSource.setDriverClassName(environment.getProperty("db.connection.driver"));
+        poolingSource.setUrl(environment.getProperty("db.connection.url"));
+        poolingSource.setUsername(environment.getProperty("db.connection.user"));
+        poolingSource.setPassword(environment.getProperty("db.connection.pass"));
+        poolingSource.setMaxIdle(Integer.parseInt(environment.getProperty("db.connection.idle.max")));
+        poolingSource.setMinIdle(Integer.parseInt(environment.getProperty("db.connection.idle.min")));
         return poolingSource;
     }
 
@@ -71,5 +77,21 @@ public class Config {
     @Bean("standardScheduledExecutor")
     public ScheduledExecutorService standardScheduledExecutor() {
         return Executors.newScheduledThreadPool(5);
+    }
+
+    @Bean("jsonMapper")
+    public Gson jsonMapper() {
+        return new Gson();
+    }
+
+    @Bean("fixerConfig")
+    public ResourceBundle fixerConfig() {
+        return ResourceBundle.getBundle("fixer_io");
+    }
+
+    @Bean("lock")
+    @Scope("prototype")
+    public ReadWriteLock lock() {
+        return new ReentrantReadWriteLock();
     }
 }

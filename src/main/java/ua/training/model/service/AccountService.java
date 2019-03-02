@@ -1,5 +1,7 @@
 package ua.training.model.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.dto.InvoiceDto;
@@ -19,7 +21,8 @@ import java.util.List;
 public class AccountService {
     private DaoFactory factory;
 
-    public AccountService(DaoFactory factory) {
+    @Autowired
+    public AccountService(@Qualifier("jdbcDaoFactory") DaoFactory factory) {
         this.factory = factory;
     }
 

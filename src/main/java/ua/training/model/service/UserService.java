@@ -1,5 +1,7 @@
 package ua.training.model.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
@@ -17,7 +19,8 @@ import java.util.Map;
 public class UserService {
     private DaoFactory factory;
 
-    public UserService(DaoFactory factory) {
+    @Autowired
+    public UserService(@Qualifier("jdbcDaoFactory") DaoFactory factory) {
         this.factory = factory;
     }
 

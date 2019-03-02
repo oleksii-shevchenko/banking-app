@@ -1,6 +1,8 @@
 package ua.training.model.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.training.model.dao.UserDao;
 import ua.training.model.entity.User;
@@ -15,7 +17,8 @@ import ua.training.model.exception.WrongPasswordException;
 public class AuthenticationService {
     private UserDao userDao;
 
-    public AuthenticationService(UserDao userDao) {
+    @Autowired
+    public AuthenticationService(@Qualifier("jdbcUserDao") UserDao userDao) {
         this.userDao = userDao;
     }
 
