@@ -1,8 +1,8 @@
 package ua.training.controller.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +13,25 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller("considerRequest")
 public class ConsiderRequestCommand implements Command {
+    private UserService userService;
+    private PathManager pathManager;
+
     @Override
     public String execute(HttpServletRequest request) {
         Long requestId = Long.valueOf(request.getParameter("requestId"));
 
-        new UserService(JdbcDaoFactory.getInstance()).considerRequest(requestId);
+        userService.considerRequest(requestId);
 
-        return "redirect:" + PathManager.getPath("path.api.requests");
+        return "redirect:" + pathManager.getPath("path.api.requests");
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
     }
 }
