@@ -1,51 +1,46 @@
 package ua.training.model.dao.factory;
 
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.*;
-import ua.training.model.dao.jdbc.*;
 
 /**
- * Implementation of abstract dao factory for jdbc dao implementations.
+ * Implementation of abstract dao factory for jdbc dao implementations. After version 1.1 (Spring DI implementing), such
+ * injection approach used only for legacy purpose.
  * @see DaoFactory
  * @author Oleksii Shevchenko
+ * @version 1.1
  */
+@Component
 public class JdbcDaoFactory implements DaoFactory{
-    private static JdbcDaoFactory factory;
+    private AccountDao accountDao;
+    private InvoiceDao invoiceDao;
+    private RequestDao requestDao;
+    private TransactionDao transactionDao;
+    private UserDao userDao;
 
-    static {
-        factory = new JdbcDaoFactory();
-    }
-
-    /**
-     * This method used for getting cached jdbc dao factory. Note that creating this factory using constructor is
-     * allowed, but not recommended for saving memory.
-     * @return Cached JdbcDaoFactory
-     */
-    public static DaoFactory getInstance() {
-        return factory;
-    }
 
     @Override
     public AccountDao getAccountDao() {
-        return new JdbcAccountDao(ConnectionsPool.getDataSource());
+        return accountDao;
     }
 
     @Override
     public InvoiceDao getInvoiceDao() {
-        return new JdbcInvoiceDao(ConnectionsPool.getDataSource());
+        return invoiceDao;
     }
 
     @Override
     public RequestDao getRequestDao() {
-        return new JdbcRequestDao(ConnectionsPool.getDataSource());
+        return requestDao;
     }
 
     @Override
     public TransactionDao getTransactionDao() {
-        return new JdbcTransactionDao(ConnectionsPool.getDataSource());
+        return transactionDao;
     }
 
     @Override
     public UserDao getUserDao() {
-        return new JdbcUserDao(ConnectionsPool.getDataSource());
+        return userDao;
     }
 }

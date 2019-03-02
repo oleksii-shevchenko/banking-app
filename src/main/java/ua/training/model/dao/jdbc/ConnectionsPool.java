@@ -12,8 +12,11 @@ import java.util.ResourceBundle;
 
 /**
  * This class provides connections to database using pool structure. Access provided via singleton pattern.
+ * Is deprecated after adding spring di. Data source is defined as singleton bean in {@link ua.training.controller.di.Config}
+ * class.
  * @author Oleksii Shevchenko
  */
+@Deprecated
 public final class ConnectionsPool {
     private static Logger logger = LogManager.getLogger(ConnectionsPool.class);
     private static DataSource dataSource;
