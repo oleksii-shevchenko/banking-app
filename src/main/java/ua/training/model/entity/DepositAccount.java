@@ -2,7 +2,7 @@ package ua.training.model.entity;
 
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
-import ua.training.model.service.CurrencyExchangeService;
+import ua.training.model.service.FixerExchangeService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -126,7 +126,7 @@ public class DepositAccount extends Account {
             throw new NonActiveAccountException();
         }
 
-        BigDecimal exchangeRate = new CurrencyExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
+        BigDecimal exchangeRate = new FixerExchangeService().exchangeRate(transaction.getCurrency(), getCurrency());
         BigDecimal balance = getBalance().subtract(transaction.getAmount().multiply(exchangeRate));
 
         if (balance.compareTo(BigDecimal.ZERO) < 0) {

@@ -22,7 +22,7 @@ public class ContextListener implements ServletContextListener {
 
         /*new ScheduledTaskService().init(JdbcDaoFactory.getInstance());
 
-        new CurrencyExchangeService().init();
+        new FixerExchangeService().init();
         logger.info("Scheduled task service is online.");
         logger.info("Currency exchange service is online.");*/
     }

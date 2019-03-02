@@ -1,6 +1,7 @@
 package ua.training.model.dto;
 
 import ua.training.model.entity.Currency;
+import ua.training.model.service.FixerExchangeService;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * This DTO used in {@link ua.training.model.service.util.FixerUtil} for parsing JSON responses using GSON API.
  * @see ua.training.model.service.util.FixerUtil
- * @see ua.training.model.service.CurrencyExchangeService
+ * @see FixerExchangeService
  * @author Oleksii Shevchenko
  */
 public class FixerDto {

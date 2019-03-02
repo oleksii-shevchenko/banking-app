@@ -10,20 +10,20 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import ua.training.model.exception.NonActiveAccountException;
 import ua.training.model.exception.NotEnoughMoneyException;
-import ua.training.model.service.CurrencyExchangeService;
+import ua.training.model.service.FixerExchangeService;
 
 import java.math.BigDecimal;
 
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CurrencyExchangeService.class, DepositAccount.class})
+@PrepareForTest({FixerExchangeService.class, DepositAccount.class})
 @PowerMockIgnore({"org.apache.logging.log4j.*", "javax.xml.parsers.*", "com.sun.org.apache.xerces.internal.jaxp.*"})
 public class DepositAccountTest {
     private DepositAccount account;
 
     @Mock
-    private CurrencyExchangeService service;
+    private FixerExchangeService service;
 
     @Before
     public void buildDepositAccount() {
@@ -46,7 +46,7 @@ public class DepositAccountTest {
     public void givenAccountWithZeroBalanceWhenWithdrawMoneyThenThrowException() throws Exception {
         when(service.exchangeRate(Currency.UAH, Currency.UAH)).thenReturn(BigDecimal.ONE);
 
-        PowerMockito.whenNew(CurrencyExchangeService.class).withNoArguments().thenReturn(service);
+        PowerMockito.whenNew(FixerExchangeService.class).withNoArguments().thenReturn(service);
 
         Transaction transaction = Transaction.getBuilder()
                 .setAmount(BigDecimal.valueOf(200.0))

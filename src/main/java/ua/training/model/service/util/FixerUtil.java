@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.training.model.dto.FixerDto;
 import ua.training.model.entity.Currency;
+import ua.training.model.service.FixerExchangeService;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * This util used when interaction with fixer service api.
- * @see ua.training.model.service.CurrencyExchangeService
+ * @see FixerExchangeService
  * @author Oleksii Shevchenko
  */
 public class FixerUtil {

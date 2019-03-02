@@ -1,6 +1,7 @@
 package ua.training.model.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.stereotype.Service;
 import ua.training.model.dao.UserDao;
 import ua.training.model.entity.User;
 import ua.training.model.exception.NoSuchUserException;
@@ -10,6 +11,7 @@ import ua.training.model.exception.WrongPasswordException;
  * This service used to provide authentication mechanisms.
  * @author Oleksii Shevchenko
  */
+@Service
 public class AuthenticationService {
     private UserDao userDao;
 

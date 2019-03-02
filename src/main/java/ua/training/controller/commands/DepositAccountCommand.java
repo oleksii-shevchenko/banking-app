@@ -1,5 +1,7 @@
 package ua.training.controller.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
@@ -24,13 +26,21 @@ import java.util.List;
  */
 @Controller("depositAccount")
 public class DepositAccountCommand implements Command {
+    private ValidationUtil validationUtil;
+    private ContentManager contentManager;
+    private PathManager pathManager;
+
+    private UserService userService;
+    private ScheduledTaskService scheduledTaskService;
+
+    private Command command;
+
     @Override
     public String execute(HttpServletRequest request) {
-        ValidationUtil util = new ValidationUtil();
-
-        if (!util.makeValidation(request, List.of("initDeposit", "expiresEnd", "depositRate", "updatePeriod"))) {
+        if (!validationUtil.makeValidation(request, List.of("initDeposit", "expiresEnd", "depositRate", "updatePeriod"))) {
             return new ProcessRequestCommand().execute(request);
         }
+
         DepositAccount account = DepositAccount.getBuilder()
                 .setCurrency(Currency.valueOf(request.getParameter("currency")))
                 .setBalance(new BigDecimal(request.getParameter("initDeposit")))
@@ -41,16 +51,47 @@ public class DepositAccountCommand implements Command {
                 .build();
 
         if (account.getExpiresEnd().isBefore(LocalDate.now())) {
-            ContentManager.setLocalizedMessage(request, "isBeforeNow", "content.message.date.before");
-            return new ProcessRequestCommand().execute(request);
+            contentManager.setLocalizedMessage(request, "isBeforeNow", "content.message.date.before");
+            return command.execute(request);
         }
 
         Long requestId = Long.valueOf(request.getParameter("requestId"));
 
-        account.setId(new UserService(JdbcDaoFactory.getInstance()).completeOpeningRequest(requestId, account));
+        account.setId(userService.completeOpeningRequest(requestId, account));
 
-        new ScheduledTaskService().registerDeposit(account, JdbcDaoFactory.getInstance());
+        scheduledTaskService.registerDeposit(account, JdbcDaoFactory.getInstance());
 
-        return PathManager.getPath("path.completed");
+        return pathManager.getPath("path.completed");
+    }
+
+    @Autowired
+    public void setValidationUtil(ValidationUtil validationUtil) {
+        this.validationUtil = validationUtil;
+    }
+
+    @Autowired
+    public void setContentManager(ContentManager contentManager) {
+        this.contentManager = contentManager;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    @Qualifier("processRequest")
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
+    }
+
+    @Autowired
+    public void setScheduledTaskService(ScheduledTaskService scheduledTaskService) {
+        this.scheduledTaskService = scheduledTaskService;
     }
 }

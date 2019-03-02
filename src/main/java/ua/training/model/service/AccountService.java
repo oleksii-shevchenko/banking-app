@@ -1,5 +1,6 @@
 package ua.training.model.service;
 
+import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.dto.InvoiceDto;
 import ua.training.model.dto.PageDto;
@@ -14,6 +15,7 @@ import java.util.List;
  * This service designed to compose functions to work with account instance.
  * @author Oleksii Shevchenko
  */
+@Service
 public class AccountService {
     private DaoFactory factory;
 

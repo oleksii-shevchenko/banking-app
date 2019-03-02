@@ -1,5 +1,6 @@
 package ua.training.model.service;
 
+import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.Permission;
@@ -12,6 +13,7 @@ import java.util.Map;
  * This service designed to compose functions to work with user instance.
  * @author Oleksii Shevchenko
  */
+@Service
 public class UserService {
     private DaoFactory factory;
 

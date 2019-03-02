@@ -1,5 +1,6 @@
 package ua.training.model.service;
 
+import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * This service performs periodic or scheduled tasks in system.
  * @author Oleksii Shevchenko
  */
+@Service
 public class ScheduledTaskService {
     private static final int THREADS_NUMBER = 4;
 
