@@ -3,6 +3,7 @@ package ua.training.controller.filters;
 import org.apache.http.HttpHeaders;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
  * caching mechanism of some browsers when use 'back arrow'.
  * @author Oleksii Shevchenko
  */
+@WebFilter(displayName = "cacheFilter", urlPatterns = {"/*"})
 public class CacheFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {

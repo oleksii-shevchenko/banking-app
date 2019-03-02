@@ -1,12 +1,14 @@
 package ua.training.controller.filters;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
  * This filter sets content encoding UTF-8 for all requests and responses.
  * @author Oleksii Shevchenko
  */
+@WebFilter(displayName = "encodingFilter", urlPatterns = {"/*"})
 public class EncodingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) {}

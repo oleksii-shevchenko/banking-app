@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.training.model.entity.User;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.Objects;
  * no another active session).
  * @author Oleksii Shevchenko
  */
+@WebFilter(displayName = "guestFilter", urlPatterns = {"/*"})
 public class GuestFilter implements Filter {
     private static Logger logger = LogManager.getLogger(GuestFilter.class);
 

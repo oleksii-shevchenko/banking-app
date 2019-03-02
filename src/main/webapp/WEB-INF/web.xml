@@ -12,45 +12,4 @@
     <exception-type>java.lang.Throwable</exception-type>
     <location>/error.jsp</location>
   </error-page>
-
-  <filter>
-    <filter-name>CacheFilter</filter-name>
-    <filter-class>ua.training.controller.filters.CacheFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>CacheFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter>
-    <filter-name>GuestFilter</filter-name>
-    <filter-class>ua.training.controller.filters.GuestFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>GuestFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter>
-    <filter-name>EncodingFiler</filter-name>
-    <filter-class>ua.training.controller.filters.EncodingFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>EncodingFiler</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter>
-    <filter-name>AuthorizationFilter</filter-name>
-    <filter-class>ua.training.controller.filters.AuthorizationFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>AuthorizationFilter</filter-name>
-    <url-pattern>/api/*</url-pattern>
-  </filter-mapping>
-
-
 </web-app>

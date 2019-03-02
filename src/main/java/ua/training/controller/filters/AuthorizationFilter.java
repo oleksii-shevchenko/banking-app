@@ -6,6 +6,7 @@ import ua.training.controller.util.CommandUtil;
 import ua.training.controller.util.managers.PathManager;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * be pass further, else the response will be sent to error page. If there is even no such commend, response will be
  * sent to error page too.
  */
+@WebFilter(filterName = "authorizationFilter", urlPatterns = {"/api/*"})
 public class AuthorizationFilter implements Filter {
     private static Logger logger = LogManager.getLogger(AuthorizationFilter.class);
 
