@@ -1,5 +1,6 @@
 package ua.training.model.dao.mapper.jdbc;
 
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.entity.User;
 
@@ -12,6 +13,7 @@ import java.sql.SQLException;
  * @see User
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcUserMapper implements Mapper<User> {
     @Override
     public User map(ResultSet resultSet) throws SQLException {

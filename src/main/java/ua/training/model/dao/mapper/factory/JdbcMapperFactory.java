@@ -1,8 +1,8 @@
 package ua.training.model.dao.mapper.factory;
 
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 import ua.training.model.dao.mapper.Mapper;
-import ua.training.model.dao.mapper.jdbc.*;
 import ua.training.model.entity.*;
 
 /**
@@ -15,27 +15,32 @@ import ua.training.model.entity.*;
 @Component("jdbcMapperFactory")
 public class JdbcMapperFactory implements MapperFactory {
     @Override
+    @Lookup("jdbcAccountMapper")
     public Mapper<Account> getAccountMapper() {
-        return new JdbcAccountMapper();
+        return null;
     }
 
     @Override
+    @Lookup("jdbcInvoiceMapper")
     public Mapper<Invoice> getInvoiceMapper() {
-        return new JdbcInvoiceMapper();
+        return null;
     }
 
     @Override
+    @Lookup("jdbcRequestMapper")
     public Mapper<Request> getRequestMapper() {
-        return new JdbcRequestMapper();
+        return null;
     }
 
     @Override
+    @Lookup("jdbcTransactionMapper")
     public Mapper<Transaction> getTransactionMapper() {
-        return new JdbcTransactionMapper();
+        return null;
     }
 
     @Override
+    @Lookup("jdbcUserMapper")
     public Mapper<User> getUserMapper() {
-        return new JdbcUserMapper();
+        return null;
     }
 }

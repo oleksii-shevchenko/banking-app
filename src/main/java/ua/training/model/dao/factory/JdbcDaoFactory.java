@@ -1,5 +1,6 @@
 package ua.training.model.dao.factory;
 
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 import ua.training.model.dao.*;
 
@@ -12,35 +13,33 @@ import ua.training.model.dao.*;
  */
 @Component
 public class JdbcDaoFactory implements DaoFactory{
-    private AccountDao accountDao;
-    private InvoiceDao invoiceDao;
-    private RequestDao requestDao;
-    private TransactionDao transactionDao;
-    private UserDao userDao;
-
-
     @Override
+    @Lookup("jdbcAccountDao")
     public AccountDao getAccountDao() {
-        return accountDao;
+        return null;
     }
 
     @Override
+    @Lookup("jdbcInvoiceDao")
     public InvoiceDao getInvoiceDao() {
-        return invoiceDao;
+        return null;
     }
 
     @Override
+    @Lookup("jdbcRequestDao")
     public RequestDao getRequestDao() {
-        return requestDao;
+        return null;
     }
 
     @Override
+    @Lookup("jdbcTransactionDao")
     public TransactionDao getTransactionDao() {
-        return transactionDao;
+        return null;
     }
 
     @Override
+    @Lookup("jdbcUserDao")
     public UserDao getUserDao() {
-        return userDao;
+        return null;
     }
 }

@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import ua.training.controller.commands.Command;
+import ua.training.model.dao.mapper.Mapper;
+import ua.training.model.dao.mapper.jdbc.JdbcCreditAccountMapper;
+import ua.training.model.dao.mapper.jdbc.JdbcDepositAccountMapper;
+import ua.training.model.entity.Account;
 import ua.training.model.entity.Request;
 
 import javax.sql.DataSource;
@@ -52,5 +56,13 @@ public class Config {
     @Bean("queries")
     public ResourceBundle queries() {
         return ResourceBundle.getBundle("query");
+    }
+
+    @Bean("jdbcSubMappers")
+    public Map<String, Mapper<Account>> jdbcSubMappers(JdbcDepositAccountMapper depositMapper, JdbcCreditAccountMapper creditMapper) {
+        return Map.of(
+                "CreditAccount", creditMapper,
+                "DepositAccount", depositMapper
+        );
     }
 }

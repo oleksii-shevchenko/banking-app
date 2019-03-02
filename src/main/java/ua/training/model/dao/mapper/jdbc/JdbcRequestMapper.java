@@ -1,5 +1,6 @@
 package ua.training.model.dao.mapper.jdbc;
 
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.mapper.Mapper;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.Request;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
  * @see Request
  * @author Oleksii Shevchenko
  */
+@Component
 public class JdbcRequestMapper implements Mapper<Request> {
     @Override
     public Request map(ResultSet resultSet) throws SQLException {
