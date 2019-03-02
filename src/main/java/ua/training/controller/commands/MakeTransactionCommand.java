@@ -2,11 +2,11 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.Transaction;
 import ua.training.model.entity.User;
@@ -22,18 +22,24 @@ import java.util.List;
 public class MakeTransactionCommand implements Command {
     private static Logger logger = LogManager.getLogger(MakeTransactionCommand.class);
 
+    private UserService userService;
+    private AccountService accountService;
+
+    private ValidationUtil validationUtil;
+    private PathManager pathManager;
+    private ContentManager contentManager;
+
     @Override
     public String execute(HttpServletRequest request) {
-        User user = new UserService(JdbcDaoFactory.getInstance()).get((Long) request.getSession().getAttribute("id"));
+        User user = userService.get((Long) request.getSession().getAttribute("id"));
 
         request.setAttribute("accountIds", user.getAccounts());
         request.setAttribute("currencies", Currency.values());
 
-        ValidationUtil util = new ValidationUtil();
-        if (!util.makeValidation(request, List.of("sender", "receiver", "amount", "currency"))) {
+        if (!validationUtil.makeValidation(request, List.of("sender", "receiver", "amount", "currency"))) {
             logger.warn("User " + user.getId() + " input not valid data");
 
-            return PathManager.getPath("path.make-transaction");
+            return pathManager.getPath("path.make-transaction");
         }
 
         Transaction transaction = Transaction.getBuilder()
@@ -47,20 +53,44 @@ public class MakeTransactionCommand implements Command {
         if (!user.getAccounts().contains(transaction.getSender())) {
             logger.warn("User " + user.getId() + "try to access account " + transaction.getSender() + " without permissions");
 
-            return "redirect:" + PathManager.getPath("path.error");
+            return "redirect:" + pathManager.getPath("path.error");
         }
 
-        AccountService service = new AccountService(JdbcDaoFactory.getInstance());
         try {
-            service.makeTransaction(transaction);
+            accountService.makeTransaction(transaction);
         } catch (NotEnoughMoneyException exception) {
             logger.warn(exception);
 
-            ContentManager.setLocalizedMessage(request, "notEnough", "content.message.not.enough.money");
+            contentManager.setLocalizedMessage(request, "notEnough", "content.message.not.enough.money");
 
-            return PathManager.getPath("path.make-transaction");
+            return pathManager.getPath("path.make-transaction");
         }
 
-        return PathManager.getPath("path.completed");
+        return pathManager.getPath("path.completed");
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    @Autowired
+    public void setValidationUtil(ValidationUtil validationUtil) {
+        this.validationUtil = validationUtil;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
+    }
+
+    @Autowired
+    public void setContentManager(ContentManager contentManager) {
+        this.contentManager = contentManager;
     }
 }
