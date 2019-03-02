@@ -1,9 +1,9 @@
 package ua.training.controller.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Currency;
 import ua.training.model.entity.Request;
 import ua.training.model.service.UserService;
@@ -13,13 +13,14 @@ import java.util.List;
 
 @Controller("request")
 public class RequestCommand implements Command {
+    private UserService userService;
+    private ValidationUtil validationUtil;
+    private PathManager pathManager;
+
     @Override
     public String execute(HttpServletRequest request) {
-        UserService service = new UserService(JdbcDaoFactory.getInstance());
-        ValidationUtil util = new ValidationUtil();
-
-        if (!util.makeValidation(request, List.of("account", "currency"))) {
-            return PathManager.getPath("path.opening-request");
+        if (!validationUtil.makeValidation(request, List.of("account", "currency"))) {
+            return pathManager.getPath("path.opening-request");
         }
 
         Request userRequest = Request.getBuilder()
@@ -29,8 +30,23 @@ public class RequestCommand implements Command {
                 .setConsidered(false)
                 .build();
 
-        service.makeRequest(userRequest);
+        userService.makeRequest(userRequest);
 
-        return "redirect:" + PathManager.getPath("path.completed");
+        return "redirect:" + pathManager.getPath("path.completed");
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setValidationUtil(ValidationUtil validationUtil) {
+        this.validationUtil = validationUtil;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
     }
 }
