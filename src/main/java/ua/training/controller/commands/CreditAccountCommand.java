@@ -1,10 +1,11 @@
 package ua.training.controller.commands;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
-import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.CreditAccount;
 import ua.training.model.entity.Currency;
@@ -23,12 +24,18 @@ import java.util.List;
  */
 @Controller("creditAccount")
 public class CreditAccountCommand implements Command {
+    private ValidationUtil validationUtil;
+    private ContentManager contentManager;
+    private PathManager pathManager;
+
+    private UserService userService;
+
+    private Command command;
+
     @Override
     public String execute(HttpServletRequest request) {
-        ValidationUtil util = new ValidationUtil();
-
-        if (!util.makeValidation(request, List.of("initDeposit", "expiresEnd", "creditLimit", "creditRate"))) {
-            return new ProcessRequestCommand().execute(request);
+        if (!validationUtil.makeValidation(request, List.of("initDeposit", "expiresEnd", "creditLimit", "creditRate"))) {
+            return command.execute(request);
         }
 
         CreditAccount account = CreditAccount.getBuilder()
@@ -41,14 +48,40 @@ public class CreditAccountCommand implements Command {
                 .build();
 
         if (account.getExpiresEnd().isBefore(LocalDate.now())) {
-            ContentManager.setLocalizedMessage(request, "isBeforeNow", "content.message.date.before");
-            return new ProcessRequestCommand().execute(request);
+            contentManager.setLocalizedMessage(request, "isBeforeNow", "content.message.date.before");
+            return command.execute(request);
         }
 
         Long requestId = Long.valueOf(request.getParameter("requestId"));
 
-        new UserService(JdbcDaoFactory.getInstance()).completeOpeningRequest(requestId, account);
+        userService.completeOpeningRequest(requestId, account);
 
-        return PathManager.getPath("path.completed");
+        return pathManager.getPath("path.completed");
+    }
+
+    @Autowired
+    public void setValidationUtil(ValidationUtil validationUtil) {
+        this.validationUtil = validationUtil;
+    }
+
+    @Autowired
+    public void setContentManager(ContentManager contentManager) {
+        this.contentManager = contentManager;
+    }
+
+    @Autowired
+    public void setPathManager(PathManager pathManager) {
+        this.pathManager = pathManager;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    @Qualifier("processRequest")
+    public void setCommand(Command command) {
+        this.command = command;
     }
 }
