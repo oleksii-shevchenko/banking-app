@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
@@ -20,6 +21,7 @@ import java.util.List;
  * @see OpenAccountCommand
  * @author Oleksii Shevchenko
  */
+@Controller("creditAccount")
 public class CreditAccountCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {

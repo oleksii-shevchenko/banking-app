@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 
+@Controller("signIn")
 public class SignInCommand implements Command {
     private static Logger logger = LogManager.getLogger(SignInCommand.class);
 

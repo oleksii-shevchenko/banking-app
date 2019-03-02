@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.entity.Currency;
 import ua.training.model.service.CurrencyExchangeService;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Controller("currencyRare")
 public class CurrencyRateCommand implements Command{
     @Override
     public String execute(HttpServletRequest request) {

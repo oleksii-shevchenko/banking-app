@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.dto.InvoiceDto;
@@ -7,6 +8,7 @@ import ua.training.model.service.AccountService;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Controller("showInvoices")
 public class ShowInvoicesCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {

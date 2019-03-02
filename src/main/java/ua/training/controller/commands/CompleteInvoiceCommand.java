@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * complete.
  * @author Oleksii Shevcehnko
  */
+@Controller("completeInvoice")
 public class CompleteInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(CompleteInvoiceCommand.class);
 

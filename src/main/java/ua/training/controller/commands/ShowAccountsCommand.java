@@ -1,11 +1,13 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.AccountService;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Controller("showAccounts")
 public class ShowAccountsCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {

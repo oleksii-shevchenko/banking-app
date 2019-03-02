@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.Invoice;
@@ -11,6 +12,7 @@ import ua.training.model.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Controller("infoInvoice")
 public class InfoInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(InfoInvoiceCommand.class);
 

@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.AccountService;
@@ -7,6 +8,7 @@ import ua.training.model.service.AccountService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
+@Controller("showRequests")
 public class ShowRequestsCommand implements Command {
     private final int ITEMS_NUMBER = 5;
 

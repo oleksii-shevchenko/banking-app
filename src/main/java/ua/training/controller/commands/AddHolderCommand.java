@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.entity.User;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * holderId - id of the new holder.
  * @author Oleksii Shevchenko
  */
+@Controller("addHolder")
 public class AddHolderCommand implements Command {
     private static Logger logger = LogManager.getLogger(AddHolderCommand.class);
 

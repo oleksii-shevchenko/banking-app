@@ -2,6 +2,7 @@ package ua.training.controller.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
@@ -21,6 +22,7 @@ import java.util.List;
  * amount - positive amount of money to pay, currency, description (optional).
  * @author Oleksii Shevchenko
  */
+@Controller("createInvoice")
 public class CreateInvoiceCommand implements Command {
     private static Logger logger = LogManager.getLogger(CreateInvoiceCommand.class);
 

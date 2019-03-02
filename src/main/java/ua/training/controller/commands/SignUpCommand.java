@@ -3,6 +3,7 @@ package ua.training.controller.commands;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.ValidationUtil;
 import ua.training.controller.util.managers.ContentManager;
 import ua.training.controller.util.managers.PathManager;
@@ -15,6 +16,7 @@ import ua.training.model.service.AuthenticationService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Controller("signUp")
 public class SignUpCommand implements Command {
     private static Logger logger = LogManager.getLogger(SignUpCommand.class);
 

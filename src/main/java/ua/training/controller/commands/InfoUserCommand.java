@@ -1,5 +1,6 @@
 package ua.training.controller.commands;
 
+import org.springframework.stereotype.Controller;
 import ua.training.controller.util.managers.PathManager;
 import ua.training.model.dao.factory.JdbcDaoFactory;
 import ua.training.model.service.UserService;
@@ -7,6 +8,7 @@ import ua.training.model.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
+@Controller("infoUser")
 public class InfoUserCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
