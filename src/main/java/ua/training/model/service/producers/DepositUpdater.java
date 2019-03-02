@@ -2,6 +2,10 @@ package ua.training.model.service.producers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
@@ -18,15 +22,22 @@ import java.util.Optional;
  * @see ua.training.model.service.ScheduledTaskService
  * @author Oleksii Shevchenko
  */
+@Component
+@Scope("prototype")
 public class DepositUpdater implements TransactionProducer, Runnable{
     private static Logger logger = LogManager.getLogger(DepositUpdater.class);
 
     private DaoFactory factory;
     private Long accountId;
 
-    public DepositUpdater(DaoFactory factory, Long accountId) {
+    @Autowired
+    public DepositUpdater(@Qualifier("jdbcDaoFactory") DaoFactory factory) {
         this.factory = factory;
+    }
+
+    public DepositUpdater setAccountId(Long accountId) {
         this.accountId = accountId;
+        return this;
     }
 
     /**

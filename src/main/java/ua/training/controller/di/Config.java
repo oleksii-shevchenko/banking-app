@@ -15,6 +15,8 @@ import javax.sql.DataSource;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
 @ComponentScan(basePackages = "ua.training")
@@ -64,5 +66,10 @@ public class Config {
                 "CreditAccount", creditMapper,
                 "DepositAccount", depositMapper
         );
+    }
+
+    @Bean("standardScheduledExecutor")
+    public ScheduledExecutorService standardScheduledExecutor() {
+        return Executors.newScheduledThreadPool(5);
     }
 }

@@ -1,15 +1,18 @@
 package ua.training.model.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.training.model.dao.factory.DaoFactory;
 import ua.training.model.entity.Account;
 import ua.training.model.entity.DepositAccount;
 import ua.training.model.service.producers.DepositUpdater;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -19,23 +22,26 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class ScheduledTaskService {
-    private static final int THREADS_NUMBER = 4;
+    private final ScheduledExecutorService executorService;
+    private final DaoFactory daoFactory;
 
-    private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(THREADS_NUMBER);
+    @Autowired
+    public ScheduledTaskService(ScheduledExecutorService executorService, @Qualifier("jdbcDaoFactory") DaoFactory daoFactory) {
+        this.executorService = executorService;
+        this.daoFactory = daoFactory;
+    }
 
-    /**
-     * Method to staring service.
-     * @param factory Factory that creates dao implementations.
-     */
-    public void init(DaoFactory factory) {
-        List<Account> accounts = factory.getAccountDao().getActiveAccounts();
+
+    @PostConstruct
+    public void init() {
+        List<Account> accounts = daoFactory.getAccountDao().getActiveAccounts();
 
         for (Account account : accounts) {
-            registerAccountBlocking(account, factory);
-            registerAccountClosing(account, factory);
+            registerAccountBlocking(account, daoFactory);
+            registerAccountClosing(account, daoFactory);
 
             if (account instanceof DepositAccount) {
-                registerDeposit(account, factory);
+                registerDeposit(account, daoFactory);
             }
         }
     }
@@ -48,11 +54,16 @@ public class ScheduledTaskService {
     public void registerDeposit(Account account, DaoFactory factory) {
         DepositAccount depositAccount = (DepositAccount) account;
         executorService.scheduleWithFixedDelay(
-                new DepositUpdater(factory, account.getId()),
+                getDepositUpdate().setAccountId(account.getId()),
                 depositAccount.getUpdatePeriod(),
                 depositAccount.getUpdatePeriod(),
                 TimeUnit.DAYS
         );
+    }
+
+    @Lookup
+    private DepositUpdater getDepositUpdate() {
+        return null;
     }
 
     private void registerAccountBlocking(Account account, DaoFactory factory) {
