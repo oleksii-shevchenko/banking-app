@@ -22,7 +22,7 @@ public class DepositUpdateTest {
                 .setStatus(Account.Status.CLOSED)
                 .build();
 
-        new DepositUpdater(Mockito.any(DaoFactory.class), Mockito.anyLong()).produce(account);
+        new DepositUpdater(Mockito.any(DaoFactory.class)).produce(account);
     }
 
     @Test(expected = CancelingTaskException.class)
@@ -31,7 +31,7 @@ public class DepositUpdateTest {
                 .setStatus(Account.Status.ACTIVE)
                 .build();
 
-        new DepositUpdater(Mockito.any(DaoFactory.class), Mockito.anyLong()).produce(account);
+        new DepositUpdater(Mockito.any(DaoFactory.class)).produce(account);
     }
 
     @Test
@@ -41,7 +41,7 @@ public class DepositUpdateTest {
                 .setBalance(BigDecimal.ZERO)
                 .build();
 
-        Optional<Transaction> transaction = new DepositUpdater(Mockito.any(DaoFactory.class), Mockito.anyLong()).produce(account);
+        Optional<Transaction> transaction = new DepositUpdater(Mockito.any(DaoFactory.class)).produce(account);
 
         assertFalse(transaction.isPresent());
     }
