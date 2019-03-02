@@ -4,7 +4,7 @@ import java.util.List;
 
 
 /**
- * A entity that represents app user. It has a POJO structure and builder {@link UserBuilder}, the instance of witch you
+ * Entity that represents app user. It has a POJO structure and builder {@link UserBuilder}, the instance of witch you
  * can obtain via static method {@link User#getBuilder()}.
  * @author Oleksii Shevchenko
  */
