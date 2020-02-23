@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven {
+        url = 'http://repo.maven.apache.org/maven2'
+    }
+}
+
+dependencies {
+    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+    compile 'org.apache.httpcomponents:httpclient:4.5.6'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'commons-codec:commons-codec:1.11'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
+    compile 'mysql:mysql-connector-java:8.0.12'
+    compile 'org.apache.commons:commons-dbcp2:2.5.0'
+    compile 'org.springframework:spring-core:5.1.4.RELEASE'
+    compile 'org.springframework:spring-beans:5.1.4.RELEASE'
+    compile 'org.springframework:spring-context:5.1.4.RELEASE'
+    compile 'org.springframework:spring-expression:5.1.4.RELEASE'
+    compile 'javax.annotation:jsr250-api:1.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.powermock:powermock-module-junit4:2.0.0-RC.4'
+    testCompile 'org.powermock:powermock-api-mockito2:2.0.0-RC.4'
+    providedCompile 'javax.servlet:javax.servlet-api:4.0.0'
+    providedCompile 'javax.servlet:jsp-api:2.0'
+    providedCompile 'jstl:jstl:1.2'
+    providedCompile 'taglibs:standard:1.1.2'
+}
+
+group = 'ua.training'
+version = '1.0-SNAPSHOT'
+description = 'Banking Webapp'
+sourceCompatibility = '1.9'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
